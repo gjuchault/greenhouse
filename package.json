@@ -1,0 +1,23 @@
+{
+  "name": "greenhouse",
+  "version": "0.1.0",
+  "description": "Greenhouse management through a Rapsberry PI and an Arduino",
+  "main": "dist/index.js",
+  "repository": "git@github.com:gjuchault/greenhouse.git",
+  "author": "Gabriel Juchault <gabriel.juchault@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@serialport/parser-delimiter": "^8.0.6",
+    "johnny-five": "^1.4.0",
+    "nanoevents": "^5.1.5",
+    "serialport": "^8.0.7"
+  },
+  "devDependencies": {
+    "@types/serialport": "^8.0.0",
+    "typescript": "^3.8.3"
+  }
+}
