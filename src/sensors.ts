@@ -1,31 +1,42 @@
-interface Sensors {
-  /**
-   * HC-SR04 distance in centimeters
-   */
-  distance: number;
-
-  /**
-   * Thermoresistence temperature in °C
-   */
-  temperature: number;
-
-  /**
-   * Light between 0 and 100
-   */
-  light: number;
+interface SensorConfig {
+  id: string;
+  name: string;
+  index: number;
 }
 
-const MAX_RAW_LIGHT = 1024;
+interface StatementEntry {
+  sensorId: string;
+  value: string;
+}
 
-export function buildParseSensors() {
-  function parse(line: string): Sensors {
-    const [rawTemperature, rawDistance, rawLight] = line.split(";");
+const separator = ";";
 
-    return {
-      distance: Number(rawDistance),
-      temperature: Number(rawTemperature),
-      light: (Number(rawLight) / MAX_RAW_LIGHT) * 100,
-    };
+export function buildParseSensors(sensorsConfig: SensorConfig[]) {
+  function parse(line: string) {
+    if (!line.includes(separator)) {
+      console.log(line);
+      return;
+    }
+
+    const rawValues = line.split(separator);
+
+    const statementEntries: StatementEntry[] = [];
+
+    for (let i = 0; i < sensorsConfig.length; i += 1) {
+      const sensorId = sensorsConfig[i].id;
+      const value = (rawValues[i] || "-1").trim();
+
+      if (value === "-1" || value === "nan") {
+        continue;
+      }
+
+      statementEntries.push({
+        sensorId,
+        value,
+      });
+    }
+
+    return statementEntries;
   }
 
   return parse;
