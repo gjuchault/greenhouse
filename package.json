@@ -8,22 +8,43 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "tsc",
-    "start": "tsc && node dist/index"
+    "server:clear": "rm -rf dist/server",
+    "server:build": "npm run server:clear && tsc",
+    "server:run": "node dist/server",
+    "server:dev": "ts-node-dev src/server/index.ts",
+    "app:clear": "rm -rf dist/app",
+    "app:build": "npm run app:clear && NODE_ENV=production webpack",
+    "app:dev": "NODE_ENV=development webpack-dev-server",
+    "start": "concurrently \"npm:server:build\" \"npm:app:build\" && npm run server:run",
+    "dev": "concurrently \"npm:app:dev\" \"npm:server:dev\""
   },
   "dependencies": {
     "@serialport/parser-delimiter": "^8.0.6",
-    "@types/pg": "^7.14.3",
-    "@types/uuid": "^7.0.2",
     "dotenv": "^8.2.0",
-    "johnny-five": "^1.4.0",
     "nanoevents": "^5.1.5",
     "pg": "^8.0.2",
     "serialport": "^8.0.7",
     "uuid": "^7.0.3"
   },
   "devDependencies": {
+    "@types/pg": "^7.14.3",
     "@types/serialport": "^8.0.0",
-    "typescript": "^3.8.3"
+    "@types/uuid": "^7.0.2",
+    "babel-loader": "^8.1.0",
+    "babel-preset-react-app": "^9.1.2",
+    "css-loader": "^3.5.2",
+    "concurrently": "^5.1.0",
+    "fork-ts-checker-webpack-plugin": "^4.1.3",
+    "html-webpack-plugin": "^4.2.0",
+    "mini-css-extract-plugin": "^0.9.0",
+    "postcss-loader": "^3.0.0",
+    "postcss-normalize": "^8.0.1",
+    "postcss-preset-env": "^6.7.0",
+    "style-loader": "^1.1.3",
+    "ts-node-dev": "^1.0.0-pre.44",
+    "typescript": "^3.8.3",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3"
   }
 }

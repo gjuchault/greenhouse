@@ -3,10 +3,10 @@ import { config as dotenv } from "dotenv";
 import { buildListenArduino, Arduino } from "./arduino";
 import { buildParseSensors } from "./sensors";
 import { buildStorage, SensorsConfig } from "./storage";
-const { version } = require("../package.json");
+const { version } = require("../../package.json");
 
-dotenv({ path: path.resolve(__dirname, "../.env.local") });
-dotenv({ path: path.resolve(__dirname, "../.env") });
+dotenv({ path: path.resolve(__dirname, "../../.env.local") });
+dotenv({ path: path.resolve(__dirname, "../../.env") });
 
 async function main() {
   console.log(`Greenhouse v${version}`);
@@ -21,6 +21,11 @@ async function main() {
     console.log("Couldn't connect to database");
     console.log(err);
     process.exit(1);
+  }
+
+  if (process.env.MOCK_ARDUINO) {
+    console.log("Skipped arduino");
+    return;
   }
 
   const listenArduino = buildListenArduino();
