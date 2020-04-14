@@ -1,34 +1,34 @@
-const path = require("path");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const postcssNormalize = require("postcss-normalize");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
+const path = require('path')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const postcssNormalize = require('postcss-normalize')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 
-const isProd = process.env.NODE_ENV === "production";
+const isProd = process.env.NODE_ENV === 'production'
 
 function getCssLoader(cssOptions) {
-  const loaders = [];
+  const loaders = []
 
   loaders.push(
     isProd
       ? { loader: MiniCssExtractPlugin.loader }
-      : require.resolve("style-loader")
-  );
+      : require.resolve('style-loader')
+  )
 
   loaders.push({
-    loader: require.resolve("css-loader"),
+    loader: require.resolve('css-loader'),
     options: cssOptions,
-  });
+  })
 
   loaders.push({
-    loader: require.resolve("postcss-loader"),
+    loader: require.resolve('postcss-loader'),
     options: {
-      ident: "postcss",
+      ident: 'postcss',
       plugins: () => [
-        require("postcss-flexbugs-fixes"),
-        require("postcss-preset-env")({
+        require('postcss-flexbugs-fixes'),
+        require('postcss-preset-env')({
           autoprefixer: {
-            flexbox: "no-2009",
+            flexbox: 'no-2009',
           },
           stage: 3,
         }),
@@ -36,35 +36,37 @@ function getCssLoader(cssOptions) {
       ],
       sourceMap: isProd,
     },
-  });
+  })
+
+  return loaders
 }
 
 module.exports = {
-  mode: isProd ? "production" : "development",
-  entry: path.resolve(__dirname, "src/app/index.ts"),
-  devtool: isProd ? "source-map" : "cheap-module-source-map",
+  mode: isProd ? 'production' : 'development',
+  entry: path.resolve(__dirname, 'src/app/index.tsx'),
+  devtool: isProd ? 'source-map' : 'cheap-module-source-map',
   output: {
-    filename: "static/js/app.[contenthash:8].js",
-    path: path.resolve(__dirname, "dist/app"),
+    filename: 'static/js/app.[contenthash:8].js',
+    path: path.resolve(__dirname, 'dist/app'),
     pathinfo: !isProd,
   },
   resolve: {
-    extensions: [".js", ".json", ".ts"],
+    extensions: ['.js', '.json', '.ts', '.tsx'],
   },
   module: {
     rules: [
       { parser: { requireEnsure: false } },
       {
-        test: /\.(js|mjs|jsx|ts|tsx)$/,
-        include: path.resolve(__dirname, "src/app"),
-        loader: require.resolve("babel-loader"),
+        test: /\.tsx?$/,
+        include: path.resolve(__dirname, 'src/app'),
+        loader: require.resolve('babel-loader'),
         options: {
           customize: require.resolve(
-            "babel-preset-react-app/webpack-overrides"
+            'babel-preset-react-app/webpack-overrides'
           ),
           babelrc: false,
           configFile: false,
-          presets: [require.resolve("babel-preset-react-app")],
+          presets: [require.resolve('babel-preset-react-app')],
           cacheDirectory: true,
           compact: isProd,
         },
@@ -72,7 +74,7 @@ module.exports = {
       {
         test: /\.css$/,
         exclude: /\.module\.css$/,
-        include: path.resolve(__dirname, "src/app"),
+        include: path.resolve(__dirname, 'src/app'),
         use: getCssLoader({
           importLoaders: 1,
           sourceMap: isProd,
@@ -80,7 +82,7 @@ module.exports = {
       },
       {
         test: /\.module\.css$/,
-        include: path.resolve(__dirname, "src/app"),
+        include: path.resolve(__dirname, 'src/app'),
         use: getCssLoader({
           importLoaders: 1,
           sourceMap: isProd,
@@ -92,23 +94,23 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       inject: true,
-      template: path.resolve(__dirname, "./src/app/index.html"),
+      template: path.resolve(__dirname, './src/app/index.html'),
       minify: isProd,
     }),
     isProd &&
       new MiniCssExtractPlugin({
-        filename: "static/css/app.[contenthash:8].css",
+        filename: 'static/css/app.[contenthash:8].css',
       }),
     new ForkTsCheckerWebpackPlugin({
       async: !isProd,
       useTypescriptIncrementalApi: true,
       checkSyntacticErrors: true,
-      tsconfig: path.resolve(__dirname, "./tsconfig.app.json"),
+      tsconfig: path.resolve(__dirname, './tsconfig.app.json'),
       silent: true,
     }),
   ].filter(Boolean),
   devServer: {
-    contentBase: "./dist/app",
-    stats: "minimal",
+    contentBase: './dist/app',
+    stats: 'minimal',
   },
-};
+}
