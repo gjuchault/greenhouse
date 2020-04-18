@@ -9,11 +9,11 @@
   "private": true,
   "scripts": {
     "server:clear": "rm -rf dist/server",
-    "server:build": "npm run server:clear && tsc",
+    "server:build": "tsc",
     "server:run": "node dist/server",
     "server:dev": "ts-node-dev src/server/index.ts",
     "app:clear": "rm -rf dist/app",
-    "app:build": "npm run app:clear && NODE_ENV=production webpack",
+    "app:build": "NODE_ENV=production webpack",
     "app:dev": "NODE_ENV=development webpack-dev-server",
     "start": "concurrently \"npm:server:build\" \"npm:app:build\" && npm run server:run",
     "dev": "concurrently \"npm:app:dev\" \"npm:server:dev\"",
@@ -21,11 +21,13 @@
   },
   "dependencies": {
     "@serialport/parser-delimiter": "^8.0.6",
+    "chalk": "^4.0.0",
     "dotenv": "^8.2.0",
     "nanoevents": "^5.1.5",
     "pg": "^8.0.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "rfxcom": "^2.1.1",
     "serialport": "^8.0.7",
     "uuid": "^7.0.3"
   },

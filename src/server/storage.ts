@@ -1,18 +1,21 @@
-import { v4 as uuid } from "uuid";
-import { Client } from "pg";
+import { v4 as uuid } from 'uuid'
+import { Client } from 'pg'
+import { start, done, failed } from './log'
 
 interface StatementEntry {
-  sensorId: string;
-  value: string;
+  sensorId: string
+  value: string
 }
 
 export type SensorsConfig = {
-  id: string;
-  name: string;
-  index: number;
-}[];
+  id: string
+  name: string
+  index: number
+}[]
 
-const sendEvery = 1000 * 60;
+export type Storage = ReturnType<typeof buildStorage>
+
+const sendEvery = 1000 * 60
 
 export function buildStorage() {
   const db = new Client({
@@ -20,12 +23,12 @@ export function buildStorage() {
     port: Number(process.env.DATABASE_PORT),
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
-  });
+  })
 
-  let lastEntry = 0;
+  let lastEntry = 0
 
   async function connect() {
-    await db.connect();
+    await db.connect()
   }
 
   async function getSensors() {
@@ -37,7 +40,7 @@ export function buildStorage() {
             index
         from sensor
       `
-    );
+    )
 
     return rows
       .map((row) => ({
@@ -45,22 +48,23 @@ export function buildStorage() {
         name: row.name as string,
         index: Number(row.index) as number,
       }))
-      .sort((left, right) => left.index - right.index);
+      .sort((left, right) => left.index - right.index)
   }
 
   async function postStatement(entries: StatementEntry[]) {
-    const statementId = uuid();
-    const now = Date.now();
+    const statementId = uuid()
+    const now = Date.now()
 
     if (now - lastEntry <= sendEvery) {
-      return;
+      return
     }
 
-    lastEntry = now;
+    lastEntry = now
 
     try {
-      await db.query("begin");
-      await db.query(`insert into statement (id) values ($1)`, [statementId]);
+      start('Saving statement...')
+      await db.query('begin')
+      await db.query(`insert into statement (id) values ($1)`, [statementId])
 
       await Promise.all(
         entries.map(async (entry) => {
@@ -70,14 +74,16 @@ export function buildStorage() {
               values ($1, $2, $3)
             `,
             [statementId, entry.sensorId, entry.value]
-          );
+          )
         })
-      );
+      )
 
-      await db.query("commit");
+      await db.query('commit')
+      done()
     } catch (err) {
-      await db.query("rollback");
-      throw err;
+      await db.query('rollback')
+      failed()
+      console.log(err)
     }
   }
 
@@ -85,5 +91,5 @@ export function buildStorage() {
     connect,
     getSensors,
     postStatement,
-  };
+  }
 }
