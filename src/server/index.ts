@@ -1,57 +1,54 @@
-import path from "path";
-import { config as dotenv } from "dotenv";
-import { buildListenArduino, Arduino } from "./arduino";
-import { buildParseSensors } from "./sensors";
-import { buildStorage, SensorsConfig } from "./storage";
-const { version } = require("../../package.json");
+import path from 'path'
+import { config as dotenv } from 'dotenv'
+import { start, done, failed } from './log'
+import { buildListUsbDevices, USBDevice } from './usb'
+import { createArduino } from './arduino'
+import { createRadio } from './radio'
+import { buildStorage, SensorsConfig } from './storage'
+import { createHttp } from './http'
+const { version } = require('../../package.json')
 
-dotenv({ path: path.resolve(__dirname, "../../.env.local") });
-dotenv({ path: path.resolve(__dirname, "../../.env") });
+dotenv({ path: path.resolve(__dirname, '../../.env.local') })
+dotenv({ path: path.resolve(__dirname, '../../.env') })
 
 async function main() {
-  console.log(`Greenhouse v${version}`);
-  const storage = buildStorage();
+  console.log(`Greenhouse v${version}`)
+  const storage = buildStorage()
+  const listUsbDevices = buildListUsbDevices()
 
-  let sensorsConfig: SensorsConfig;
+  let sensorsConfig: SensorsConfig
   try {
-    await storage.connect();
-    sensorsConfig = await storage.getSensors();
-    console.log("Storage connected");
+    start('Connecting to storage...')
+    await storage.connect()
+    sensorsConfig = await storage.getSensors()
+    done()
   } catch (err) {
-    console.log("Couldn't connect to database");
-    console.log(err);
-    process.exit(1);
+    failed()
+    console.log(err)
+    process.exit(1)
   }
 
-  if (process.env.MOCK_ARDUINO) {
-    console.log("Skipped arduino");
-    return;
-  }
-
-  const listenArduino = buildListenArduino();
-  const parseSensors = buildParseSensors(sensorsConfig);
-  let arduino: Arduino;
-
+  let usbDevices: USBDevice[]
   try {
-    arduino = await listenArduino();
-    console.log("Arduino connected");
+    start('Listing USB devices...')
+    usbDevices = await listUsbDevices()
+    done()
   } catch (err) {
-    console.log("Couldn't initialize an Arduino");
-    console.log(err);
-    process.exit(1);
+    failed()
+    console.log(err)
+    process.exit(1)
   }
 
-  arduino.on("line", async (data: string) => {
-    const sensors = parseSensors(data);
+  await createHttp()
+  const arduino = await createArduino({ sensorsConfig, usbDevices })
 
-    if (!sensors) {
-      return;
-    }
+  if (arduino) {
+    arduino.on('statement', async (statement) => {
+      await storage.postStatement(statement)
+    })
+  }
 
-    console.log("Arduino data", JSON.stringify(sensors));
-
-    await storage.postStatement(sensors);
-  });
+  const radio = await createRadio({ usbDevices })
 }
 
-main();
+main()

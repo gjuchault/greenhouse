@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react'
 
-import styles from "./Sidebar.module.css";
+import styles from './Sidebar.module.css'
 
 export function Sidebar() {
-  return <div className={styles.sidebar}>Sidebar</div>;
+  return <div className={styles.sidebar}>Sidebar</div>
 }

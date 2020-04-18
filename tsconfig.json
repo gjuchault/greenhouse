@@ -1,10 +1,12 @@
 {
   "include": ["src/server/**/*"],
   "compilerOptions": {
-    "target": "es5",
+    "target": "ES2019",
+    "lib": ["ES2019"],
     "module": "commonjs",
     "outDir": "dist/server",
     "strict": true,
+    "incremental": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "preserve"
