@@ -1,20 +1,17 @@
 import { createNanoEvents } from 'nanoevents'
 import { USBDevice } from '../usb'
-import { SensorsConfig } from '../storage'
 import { buildListenArduino, Arduino } from './listen'
-import { buildParseSensors, StatementEntry } from '../sensors'
+import { parse } from '../sensors'
 import { start, done, failed } from '../log'
 
 interface ArduinoEvents {
-  statement: (data: StatementEntry[]) => void
+  entry: (sensor: string, value: string) => void
 }
 
 export async function createArduino({
   usbDevices,
-  sensorsConfig,
 }: {
   usbDevices: USBDevice[]
-  sensorsConfig: SensorsConfig
 }) {
   if (process.env.DISABLE_ARDUINO) {
     start('Skipping Arduino...')
@@ -23,7 +20,6 @@ export async function createArduino({
   }
 
   const listenArduino = buildListenArduino({ usbDevices })
-  const parseSensors = buildParseSensors({ sensorsConfig })
   let arduino: Arduino
 
   try {
@@ -39,14 +35,9 @@ export async function createArduino({
   const emitter = createNanoEvents<ArduinoEvents>()
 
   arduino.on('line', async (data: string) => {
-    const sensors = parseSensors(data)
-
-    if (!sensors) {
-      return
-    }
-
-    console.log('Arduino data', JSON.stringify(sensors))
-    emitter.emit('statement', sensors)
+    const { sensorId, value } = parse(parseInt(data, 2))
+    console.log('Arduino data', JSON.stringify({ sensorId, value }))
+    emitter.emit('entry', sensorId, value)
   })
 
   return emitter

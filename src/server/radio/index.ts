@@ -1,10 +1,12 @@
 import { createNanoEvents } from 'nanoevents'
 import { USBDevice } from '../usb'
-import { SensorsConfig } from '../storage'
 import { buildListenRadio, Radio } from './listen'
 import { start, done, failed } from '../log'
+import { parse } from '../sensors'
 
-interface RadioEvents {}
+interface RadioEvents {
+  entry: (sensorId: string, value: string) => void
+}
 
 export async function createRadio({ usbDevices }: { usbDevices: USBDevice[] }) {
   if (process.env.DISABLE_RADIO) {
@@ -28,16 +30,13 @@ export async function createRadio({ usbDevices }: { usbDevices: USBDevice[] }) {
 
   const emitter = createNanoEvents<RadioEvents>()
 
-  // radio.on('line', async (data: string) => {
-  //   const sensors = parseSensors(data)
+  radio.on('data', async (data: string) => {
+    const numericValue = parseInt(data, 2)
 
-  //   if (!sensors) {
-  //     return
-  //   }
+    const { sensorId, value } = parse(numericValue)
 
-  //   console.log('Arduino data', JSON.stringify(sensors))
-  //   emitter.emit('statement', sensors)
-  // })
+    emitter.emit('entry', sensorId, value)
+  })
 
   return emitter
 }

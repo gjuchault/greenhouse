@@ -3,10 +3,12 @@ import rfxcom from 'rfxcom'
 import { USBDevice } from '../usb'
 
 interface RadioEvents {
-  command: (data: string) => void
+  data: (data: string) => void
 }
 
 export type Radio = Emitter<RadioEvents>
+
+const lightning4Type = 0x13
 
 export function buildListenRadio({ usbDevices }: { usbDevices: USBDevice[] }) {
   async function find() {
@@ -15,10 +17,9 @@ export function buildListenRadio({ usbDevices }: { usbDevices: USBDevice[] }) {
 
   async function open(path: string) {
     return new Promise<any>((resolve, reject) => {
-      const rfxtrx = new rfxcom.RfxCom(path, { debug: true })
+      const rfxtrx = new rfxcom.RfxCom(path, { debug: false })
       rfxtrx.initialise(() => {
-        const transmitter = new rfxcom.Transmitter(rfxtrx, null)
-        resolve({ rfxtrx, transmitter })
+        resolve(rfxtrx)
       })
     })
   }
@@ -29,12 +30,36 @@ export function buildListenRadio({ usbDevices }: { usbDevices: USBDevice[] }) {
       throw new Error('No Radio found')
     }
 
-    const { rfxtrx, transmitter } = await open(path)
+    const rfxtrx = await open(path)
 
     const emitter = createNanoEvents<RadioEvents>()
 
-    rfxtrx.on('receive', (buf: Buffer) => {
+    rfxtrx.on('receive', (buf: number[]) => {
+      if (buf[0] + 1 !== buf.length) {
+        console.log(`Invalid packet received (invalid length)`, buf.join(';'))
+        return
+      }
+
+      if (buf[1] !== lightning4Type) {
+        console.log(`Invalid packet received (not lightning4)`, buf.join(';'))
+        return
+      }
+
       console.log('radio receive:', buf)
+      console.log(
+        'parsed',
+        buf
+          .slice(4, -3)
+          .map((n) => n.toString(2).padStart(8, '0'))
+          .join('')
+      )
+
+      const rawValue = buf
+        .slice(4, -3)
+        .map((n) => n.toString(2).padStart(8, '0'))
+        .join('')
+
+      emitter.emit('data', rawValue)
     })
 
     return emitter

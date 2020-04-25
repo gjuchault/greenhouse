@@ -46,7 +46,7 @@ module.exports = {
   entry: path.resolve(__dirname, 'src/app/index.tsx'),
   devtool: isProd ? 'source-map' : 'cheap-module-source-map',
   output: {
-    filename: 'static/js/app.[contenthash:8].js',
+    filename: 'static/js/app.[hash:8].js',
     path: path.resolve(__dirname, 'dist/app'),
     pathinfo: !isProd,
   },
@@ -99,17 +99,18 @@ module.exports = {
     }),
     isProd &&
       new MiniCssExtractPlugin({
-        filename: 'static/css/app.[contenthash:8].css',
+        filename: 'static/css/app.[hash:8].css',
       }),
     new ForkTsCheckerWebpackPlugin({
       async: !isProd,
       useTypescriptIncrementalApi: true,
       checkSyntacticErrors: true,
-      tsconfig: path.resolve(__dirname, './tsconfig.app.json'),
+      tsconfig: path.resolve(__dirname, './src/app/tsconfig.json'),
       silent: true,
     }),
   ].filter(Boolean),
   devServer: {
+    hot: true,
     contentBase: './dist/app',
     stats: 'minimal',
   },

@@ -1,87 +1,36 @@
 import { v4 as uuid } from 'uuid'
-import { Client } from 'pg'
+import { sql, createPool, DatabaseConnectionType } from 'slonik'
 import { start, done, failed } from './log'
-
-interface StatementEntry {
-  sensorId: string
-  value: string
-}
-
-export type SensorsConfig = {
-  id: string
-  name: string
-  index: number
-}[]
 
 export type Storage = ReturnType<typeof buildStorage>
 
-const sendEvery = 1000 * 60
-
 export function buildStorage() {
-  const db = new Client({
-    host: process.env.DATABASE_HOST,
-    port: Number(process.env.DATABASE_PORT),
-    user: process.env.DATABASE_USER,
-    password: process.env.DATABASE_PASSWORD,
-  })
+  const user = process.env.DATABASE_USER
+  const password = process.env.DATABASE_PASSWORD
+  const host = process.env.DATABASE_HOST
+  const port = process.env.DATABASE_PORT
+  const name = process.env.DATABASE_NAME
+  const pool = createPool(
+    `postgres://${user}:${password}@${host}:${port}/${name}`
+  )
 
-  let lastEntry = 0
+  let connection: DatabaseConnectionType
 
   async function connect() {
-    await db.connect()
+    connection = (await pool.connect(async () => {})) as any
   }
 
-  async function getSensors() {
-    const { rows } = await db.query(
-      `
-        select
-            id,
-            name,
-            index
-        from sensor
-      `
-    )
-
-    return rows
-      .map((row) => ({
-        id: row.id as string,
-        name: row.name as string,
-        index: Number(row.index) as number,
-      }))
-      .sort((left, right) => left.index - right.index)
-  }
-
-  async function postStatement(entries: StatementEntry[]) {
-    const statementId = uuid()
-    const now = Date.now()
-
-    if (now - lastEntry <= sendEvery) {
-      return
-    }
-
-    lastEntry = now
-
+  async function postEntry(sensor: string, value: string) {
     try {
       start('Saving statement...')
-      await db.query('begin')
-      await db.query(`insert into statement (id) values ($1)`, [statementId])
 
-      await Promise.all(
-        entries.map(async (entry) => {
-          await db.query(
-            `
-              insert into statement_sensor (statement_id, sensor_id, value)
-              values ($1, $2, $3)
-            `,
-            [statementId, entry.sensorId, entry.value]
-          )
-        })
-      )
+      await connection.query(sql`
+        insert into statement (id, sensor_id, value, date) values
+        ("${uuid()}", "${sensor}", ${value}, now())
+      `)
 
-      await db.query('commit')
       done()
     } catch (err) {
-      await db.query('rollback')
       failed()
       console.log(err)
     }
@@ -89,7 +38,6 @@ export function buildStorage() {
 
   return {
     connect,
-    getSensors,
-    postStatement,
+    postEntry,
   }
 }
