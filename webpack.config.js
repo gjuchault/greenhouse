@@ -32,6 +32,7 @@ function getCssLoader(cssOptions) {
           },
           stage: 3,
         }),
+        require('postcss-color-mod-function'),
         postcssNormalize(),
       ],
       sourceMap: isProd,
@@ -88,6 +89,10 @@ module.exports = {
           sourceMap: isProd,
           modules: true,
         }),
+      },
+      {
+        test: /\.svg$/,
+        use: ['@svgr/webpack'],
       },
     ],
   },
