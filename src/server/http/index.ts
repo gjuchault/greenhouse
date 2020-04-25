@@ -3,10 +3,12 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import helmet from 'helmet'
 import cors from 'cors'
-import { login } from './controllers/login'
+import { buildServices } from './services'
+import { buildControllers } from './controllers'
 import { start, done } from '../log'
+import { Storage } from '../storage'
 
-export async function createHttp() {
+export async function createHttp({ storage }: { storage: Storage }) {
   if (process.env.DISABLE_HTTP) {
     start('Skipping HTTP...')
     done()
@@ -17,6 +19,9 @@ export async function createHttp() {
 
   const app = express()
 
+  const services = buildServices({ storage })
+  const controllers = buildControllers({ services })
+
   app.set('case sensitive routing', false)
   app.set('strict routing', false)
   app.set('trust proxy', true)
@@ -26,7 +31,7 @@ export async function createHttp() {
   app.use(cors())
   app.use(bodyParser.json({ limit: '5mb' }))
 
-  app.post('/login', login)
+  app.post('/login', controllers.login)
 
   const server = createServer(app)
 
