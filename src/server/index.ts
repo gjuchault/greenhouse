@@ -4,8 +4,9 @@ import { start, done, failed } from './log'
 import { buildListUsbDevices, USBDevice } from './usb'
 import { createArduino } from './arduino'
 import { createRadio } from './radio'
-import { buildStorage, SensorsConfig } from './storage'
+import { buildStorage } from './storage'
 import { createHttp } from './http'
+import { buildQueue } from './queue'
 const { version } = require('../../package.json')
 
 dotenv({ path: path.resolve(__dirname, '../../.env.local') })
@@ -15,12 +16,13 @@ async function main() {
   console.log(`Greenhouse v${version}`)
   const storage = buildStorage()
   const listUsbDevices = buildListUsbDevices()
+  const queue = buildQueue((sensor: string, value: string) =>
+    storage.postEntry(sensor, value)
+  )
 
-  let sensorsConfig: SensorsConfig
   try {
     start('Connecting to storage...')
     await storage.connect()
-    sensorsConfig = await storage.getSensors()
     done()
   } catch (err) {
     failed()
@@ -39,16 +41,18 @@ async function main() {
     process.exit(1)
   }
 
-  await createHttp()
-  const arduino = await createArduino({ sensorsConfig, usbDevices })
+  await createHttp({ storage })
+  const arduino = await createArduino({ usbDevices })
 
   if (arduino) {
-    arduino.on('statement', async (statement) => {
-      await storage.postStatement(statement)
-    })
+    arduino.on('entry', (sensorId, value) => queue.add(sensorId, value))
   }
 
   const radio = await createRadio({ usbDevices })
+
+  if (radio) {
+    radio.on('entry', (sensorId, value) => queue.add(sensorId, value))
+  }
 }
 
 main()

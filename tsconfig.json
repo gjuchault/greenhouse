@@ -6,6 +6,7 @@
     "module": "commonjs",
     "outDir": "dist/server",
     "strict": true,
+    "strictNullChecks": true,
     "incremental": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

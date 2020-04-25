@@ -1,47 +1,14 @@
-export interface SensorConfig {
-  id: string
-  name: string
-  index: number
-}
+export function parse(data: number) {
+  const rawSensorId = (data & 0b111111100000000000000000) >> 17
+  const rawSign = (data & 0b000000010000000000000000) >> 16
+  const decimals = (data & 0b000000001100000000000000) >> 14
+  const rawNumber = data & 0b000000000011111111111111
 
-export interface StatementEntry {
-  sensorId: string
-  value: string
-}
+  const sensorId = rawSensorId.toString()
+  const sign = rawSign === 0 ? '' : '-'
+  const number = (rawNumber * Math.pow(10, -1 * decimals)).toFixed(decimals)
 
-const separator = ';'
+  const value = [sign, number].join('')
 
-export function buildParseSensors({
-  sensorsConfig,
-}: {
-  sensorsConfig: SensorConfig[]
-}) {
-  function parse(line: string) {
-    if (!line.includes(separator)) {
-      console.log(line)
-      return
-    }
-
-    const rawValues = line.split(separator)
-
-    const statementEntries: StatementEntry[] = []
-
-    for (let i = 0; i < sensorsConfig.length; i += 1) {
-      const sensorId = sensorsConfig[i].id
-      const value = (rawValues[i] || '-1').trim()
-
-      if (value === '-1' || value === 'nan') {
-        continue
-      }
-
-      statementEntries.push({
-        sensorId,
-        value,
-      })
-    }
-
-    return statementEntries
-  }
-
-  return parse
+  return { sensorId, value }
 }
