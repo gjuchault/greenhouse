@@ -46,8 +46,10 @@ export function buildListenArduino({
     const port = await open(path)
 
     const emitter = createNanoEvents<ArduinoEvents>()
-    const parser = port.pipe(new Delimiter({ delimiter: '\n' }))
-    parser.on('data', (buf: Buffer) => emitter.emit('line', buf.toString()))
+    port.on('error', console.log)
+    port.on('data', (d) => console.log(d.toString()))
+    // const parser = port.pipe(new Delimiter({ delimiter: '\n' }))
+    // parser.on('data', (buf: Buffer) => emitter.emit('line', buf.toString()))
 
     return emitter
   }
