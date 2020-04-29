@@ -41,7 +41,7 @@ export function useQuery<TResponse>(
 }
 
 type UseMutation<TBody, TResponse> = [
-  (body: TBody) => Promise<TResponse>,
+  (body: TBody) => Promise<TResponse | undefined>,
   State
 ]
 

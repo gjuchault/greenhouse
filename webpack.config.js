@@ -60,16 +60,12 @@ module.exports = {
       {
         test: /\.tsx?$/,
         include: path.resolve(__dirname, 'src/app'),
-        loader: require.resolve('babel-loader'),
+        loader: require.resolve('ts-loader'),
         options: {
-          customize: require.resolve(
-            'babel-preset-react-app/webpack-overrides'
-          ),
-          babelrc: false,
-          configFile: false,
-          presets: [require.resolve('babel-preset-react-app')],
-          cacheDirectory: true,
-          compact: isProd,
+          transpileOnly: true,
+          compilerOptions: {
+            jsx: 'react',
+          },
         },
       },
       {
