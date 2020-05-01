@@ -3,6 +3,7 @@ import { Provider as AuthProvider } from '../../context/auth'
 import { isLoggedIn, getName, offlineLogin } from '../../auth'
 import { Login } from '../Login/Login'
 import { Sidebar } from '../../components/Sidebar/Sidebar'
+import { LiveMap } from '../LiveMap/LiveMap'
 
 export function App() {
   const [auth, setAuth] = useState({
@@ -32,6 +33,11 @@ export function App() {
     <AuthProvider value={auth}>
       {!auth.isLoggedIn && <Login onLoggedIn={handleLoggedIn} />}
       {auth.isLoggedIn && <Sidebar />}
+      {auth.isLoggedIn && (
+        <main>
+          <LiveMap />
+        </main>
+      )}
     </AuthProvider>
   )
 }

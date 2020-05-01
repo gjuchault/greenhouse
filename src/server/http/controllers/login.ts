@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import * as z from 'zod'
-import { Services } from '../services'
+import { login } from '../services/login'
 
 const bodySchema = z.object({
   user: z.string(),
@@ -9,31 +9,27 @@ const bodySchema = z.object({
 
 type Body = z.infer<typeof bodySchema>
 
-export function buildLogin({ services }: { services: Services }) {
-  async function login(req: Request, res: Response) {
-    let body: Body
+export async function handleLogin(req: Request, res: Response) {
+  let body: Body
 
-    try {
-      body = bodySchema.parse(req.body)
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        return res.status(400).json({
-          outcome: 'notLoggedIn',
-          reason: 'invalidBody',
-        })
-      }
-
-      throw err
+  try {
+    body = bodySchema.parse(req.body)
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return res.status(400).json({
+        outcome: 'notLoggedIn',
+        reason: 'invalidBody',
+      })
     }
 
-    const loginResult = await services.login(body.user, body.password)
-
-    if (loginResult.outcome === 'notLoggedIn') {
-      return res.status(400).json(loginResult)
-    }
-
-    res.status(200).json(loginResult)
+    throw err
   }
 
-  return login
+  const loginResult = await login(body.user, body.password)
+
+  if (loginResult.outcome === 'notLoggedIn') {
+    return res.status(400).json(loginResult)
+  }
+
+  res.status(200).json(loginResult)
 }

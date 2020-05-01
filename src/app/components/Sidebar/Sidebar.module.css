@@ -1,6 +1,5 @@
 .sidebar {
   width: 60px;
-  flex: 1;
   padding: 16px 0;
   background-color: var(--green);
 }
