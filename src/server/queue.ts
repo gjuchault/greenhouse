@@ -10,11 +10,11 @@ export const buildQueue = (onSend: Callback) => {
   const add = (sensor: string, value: string) => {
     const lastSentAt = q.get(sensor) || 0
 
-    if (Date.now() - lastSentAt < interval) {
+    if (Date.now() - lastSentAt > interval) {
       onSend(sensor, value)
+      q.set(sensor, Date.now())
+      return
     }
-
-    q.set(sensor, Date.now())
   }
 
   return { add }

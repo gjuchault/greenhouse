@@ -6,37 +6,37 @@ export interface USBDevice {
 }
 
 const rport = /usb|acm|^com/i
-const isArduino = /arduino/i
-const isRadio = /RFXtrx433/i
+const arduinoManufacturer = ['1a86', 'arduino']
+const rfxcomManufacturer = ['rfxcom']
 
-export function buildListUsbDevices() {
-  async function listUsbDevices() {
-    const usbPorts = await SerialPort.list()
+export async function listUsbDevices() {
+  const usbPorts = await SerialPort.list()
 
-    const results: USBDevice[] = []
+  const results: USBDevice[] = []
 
-    for (const { path, pnpId } of usbPorts) {
-      if (!rport.test(path)) {
-        continue
-      }
-
-      if (isArduino.test(pnpId || '')) {
-        results.push({
-          path,
-          kind: 'arduino',
-        })
-      }
-
-      if (isRadio.test(pnpId || '')) {
-        results.push({
-          path,
-          kind: 'radio',
-        })
-      }
+  for (const { path, manufacturer } of usbPorts) {
+    if (!rport.test(path)) {
+      continue
     }
 
-    return results
+    if (arduinoManufacturer.includes(manufacturer?.toLowerCase() || '')) {
+      results.push({
+        path,
+        kind: 'arduino',
+      })
+
+      console.log(`[usb] found arduino on path=${path}`)
+    }
+
+    if (rfxcomManufacturer.includes(manufacturer?.toLowerCase() || '')) {
+      results.push({
+        path,
+        kind: 'radio',
+      })
+
+      console.log(`[usb] found radio on path=${path}`)
+    }
   }
 
-  return listUsbDevices
+  return results
 }

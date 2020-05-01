@@ -31,7 +31,7 @@ export function Login({ onLoggedIn }: LoginProps) {
     e.preventDefault()
     const res = await sendLogin({ user: name, password })
 
-    if (res.outcome === 'loggedIn') {
+    if (res && res.outcome === 'loggedIn') {
       onLoggedIn(res.name, res.token)
     }
   }

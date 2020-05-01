@@ -45,9 +45,8 @@ export function buildListenRadio({ usbDevices }: { usbDevices: USBDevice[] }) {
         return
       }
 
-      console.log('radio receive:', buf)
       console.log(
-        'parsed',
+        'radio >',
         buf
           .slice(4, -3)
           .map((n) => n.toString(2).padStart(8, '0'))
