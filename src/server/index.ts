@@ -9,6 +9,7 @@ import { createStorage } from './storage'
 import { createHttp } from './http'
 import { buildQueue } from './queue'
 import { cache } from './cache'
+import { createRules } from './rules'
 const { version } = require('../../package.json')
 
 dotenv({ path: path.resolve(__dirname, '../../.env.local') })
@@ -32,14 +33,22 @@ async function main() {
   const queue = buildQueue(storage.postEntry)
   const arduino = await createArduino({ usbDevices })
   const radio = await createRadio({ usbDevices })
+  const rules = await createRules({ storage })
   await createHttp()
 
   const handleSensorValue = (sensorId: string, value: string) => {
+    const matchRule = rules.tryAgainstRules(sensorId, value)
+
+    if (matchRule && arduino) {
+      console.log('arduino < ', matchRule)
+      arduino.sendCommand(matchRule.target, matchRule.targetValue)
+    }
+
     cache.set(sensorId, value)
     queue.add(sensorId, value)
   }
 
-  if (arduino) arduino.on('entry', handleSensorValue)
+  if (arduino) arduino.emitter.on('entry', handleSensorValue)
   if (radio) radio.on('entry', handleSensorValue)
 }
 
