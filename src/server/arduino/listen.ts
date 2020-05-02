@@ -7,7 +7,10 @@ interface ArduinoEvents {
   line: (data: string) => void
 }
 
-export type Arduino = Emitter<ArduinoEvents>
+export type Arduino = {
+  send: (data: string) => Promise<void>
+  emitter: Emitter<ArduinoEvents>
+}
 
 export function buildListenArduino({
   usbDevices,
@@ -58,7 +61,17 @@ export function buildListenArduino({
       emitter.emit('line', line)
     })
 
-    return emitter
+    return {
+      emitter,
+      send: (data: string) =>
+        new Promise<void>((resolve, reject) => {
+          console.log('arduino < ', `${data}\n`)
+          port.write(`${data}\n`, (err) => {
+            if (err) return reject(err)
+            resolve()
+          })
+        }),
+    }
   }
 
   return listen

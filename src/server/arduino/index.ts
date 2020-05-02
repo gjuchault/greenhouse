@@ -34,11 +34,16 @@ export async function createArduino({
 
   const emitter = createNanoEvents<ArduinoEvents>()
 
-  arduino.on('line', async (data: string) => {
+  arduino.emitter.on('line', async (data: string) => {
     const { sensorId, value } = parse(parseInt(data, 2))
     console.log('Arduino data', JSON.stringify({ sensorId, value }))
     emitter.emit('entry', sensorId, value)
   })
 
-  return emitter
+  return {
+    emitter,
+    sendCommand: async (target: string, value: number) => {
+      arduino.send(`${target};${Math.trunc(value).toString()}`)
+    },
+  }
 }

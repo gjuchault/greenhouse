@@ -1,12 +1,19 @@
 import { v4 as uuid } from 'uuid'
 import pg from 'pg'
 import { start, done, failed } from './log'
+import { reshapeRule, Rule } from './rules/rule'
 
-export type Storage = ReturnType<typeof createStorage>
+export type Storage = {
+  getUserByName: (
+    name: string
+  ) => Promise<{ id: string; name: string; password: string } | undefined>
+  postEntry: (sensor: string, value: string) => Promise<void>
+  listRules: () => Promise<Rule[]>
+}
 
 let db: pg.Pool
 
-export async function createStorage() {
+export async function createStorage(): Promise<Storage> {
   if (!db) {
     db = new pg.Pool({
       user: process.env.DATABASE_USER,
@@ -65,8 +72,29 @@ export async function createStorage() {
     }
   }
 
+  async function listRules() {
+    try {
+      const data = await db.query<{
+        id: string
+        source: string
+        operation: 'lt' | 'le' | 'eq' | 'ne' | 'ge' | 'gt'
+        thresold: number
+        target: string
+        target_value: number
+      }>(`
+        select id, source, operation, thresold, target, target_value
+        from "rules"
+      `)
+
+      return data.rows.map(reshapeRule)
+    } catch (err) {
+      return []
+    }
+  }
+
   return {
     getUserByName,
     postEntry,
+    listRules,
   }
 }
