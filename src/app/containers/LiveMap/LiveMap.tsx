@@ -4,7 +4,7 @@ import { useQuery, State } from '../../hooks/useQuery'
 type Sensors = [string, string][]
 
 export function LiveMap() {
-  const [sensors, state] = useQuery<Sensors>('/sensors')
+  const [sensors, state] = useQuery<Sensors>('/api/sensors')
 
   if (state !== State.Success) {
     return null

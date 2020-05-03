@@ -5,7 +5,7 @@ import { Card } from '../../components/Card/Card'
 import { useMutation, State } from '../../hooks/useQuery'
 import { useTextInput } from '../../hooks/useInput'
 
-import styles from './login.module.css'
+import styles from './Login.module.css'
 
 type LoginProps = {
   onLoggedIn: (name: string, token: string) => void
@@ -25,7 +25,7 @@ type LoginResponse =
 export function Login({ onLoggedIn }: LoginProps) {
   const [name, setName] = useTextInput('')
   const [password, setPassword] = useTextInput('')
-  const [sendLogin, state] = useMutation<LoginBody, LoginResponse>('/login')
+  const [sendLogin, state] = useMutation<LoginBody, LoginResponse>('/api/login')
 
   const login = async (e: React.FormEvent) => {
     e.preventDefault()

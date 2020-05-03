@@ -1,4 +1,5 @@
 import { createServer } from 'http'
+import path from 'path'
 import express from 'express'
 import bodyParser from 'body-parser'
 import helmet from 'helmet'
@@ -27,8 +28,14 @@ export async function createHttp() {
   app.use(cors())
   app.use(bodyParser.json({ limit: '5mb' }))
 
-  app.post('/login', handleLogin)
-  app.get('/sensors', isLoggedIn, handleSensors)
+  app.use(express.static(path.join(__dirname, '../../../dist/app')))
+
+  app.post('/api/login', handleLogin)
+  app.get('/api/sensors', isLoggedIn, handleSensors)
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../../dist/app/index.html'))
+  })
 
   const server = createServer(app)
 
