@@ -27,9 +27,5 @@ api.interceptors.response.use(
 )
 
 function createBaseUrl() {
-  if (location.hostname === 'localhost') {
-    return 'http://localhost:3000/'
-  }
-
-  return `${location.protocol}//api.${location.hostname}:${location.port}/`
+  return `${location.protocol}//${location.hostname}:${location.port}/`
 }
