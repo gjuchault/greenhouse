@@ -1,25 +1,19 @@
 import chalk from 'chalk'
 
-export const start = (action: string) => console.log(action)
-export const done = () => console.log(chalk.green('Done'))
-export const failed = () => console.log(chalk.red('Failed'))
-
 export const log = (service: string, message: string) => {
-  console.log(`${getTimestamp()} [${chalk.blue(service)}] ${message}`)
+  let coloredService = chalk.green(service)
+
+  if (service === 'arduino') coloredService = chalk.blue(service)
+  if (service === 'radio') coloredService = chalk.red('service')
+
+  console.log(`${getTimestamp()} [${coloredService}] ${message}`)
 }
 
 export function getTimestamp() {
   const date = new Date()
   return [
-    [
-      date.getUTCFullYear(),
-      date.getUTCMonth().toString().padStart(2, '0'),
-      date.getUTCDate().toString().padStart(2, '0'),
-    ].join('-'),
-    [
-      date.getUTCHours().toString().padStart(2, '0'),
-      date.getUTCMinutes().toString().padStart(2, '0'),
-      date.getUTCSeconds().toString().padStart(2, '0'),
-    ].join(':'),
-  ].join(' ')
+    date.getUTCHours().toString().padStart(2, '0'),
+    date.getUTCMinutes().toString().padStart(2, '0'),
+    date.getUTCSeconds().toString().padStart(2, '0'),
+  ].join(':')
 }

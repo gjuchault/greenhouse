@@ -3,19 +3,18 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import helmet from 'helmet'
 import cors from 'cors'
-import { start, done } from '../log'
+import { log } from '../log'
 import { isLoggedIn } from './isLoggedIn'
 import { handleLogin } from './controllers/login'
 import { handleSensors } from './controllers/sensors'
 
 export async function createHttp() {
   if (process.env.DISABLE_HTTP) {
-    start('Skipping HTTP...')
-    done()
+    log('http', 'Skipping HTTP...')
     return
   }
 
-  start('Creating HTTP server...')
+  log('http', 'Creating HTTP server...')
 
   const app = express()
 
@@ -38,7 +37,6 @@ export async function createHttp() {
       Number(process.env.HTTP_PORT) || 3000,
       process.env.HTTP_BIND || '0.0.0.0',
       () => {
-        done()
         resolve()
       }
     )

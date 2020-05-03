@@ -1,6 +1,8 @@
 import { createNanoEvents, Emitter } from 'nanoevents'
+import chalk from 'chalk'
 import rfxcom from 'rfxcom'
 import { USBDevice } from '../usb'
+import { log } from '../log'
 
 interface RadioEvents {
   data: (data: string) => void
@@ -11,7 +13,7 @@ export type Radio = Emitter<RadioEvents>
 const lightning4Type = 0x13
 
 export function buildListenRadio({ usbDevices }: { usbDevices: USBDevice[] }) {
-  async function find() {
+  function find() {
     return usbDevices.find(({ kind }) => kind === 'radio')?.path
   }
 
@@ -25,7 +27,7 @@ export function buildListenRadio({ usbDevices }: { usbDevices: USBDevice[] }) {
   }
 
   async function listen() {
-    const path = await find()
+    const path = find()
     if (!path) {
       throw new Error('No Radio found')
     }
@@ -45,12 +47,12 @@ export function buildListenRadio({ usbDevices }: { usbDevices: USBDevice[] }) {
         return
       }
 
-      console.log(
-        'radio >',
-        buf
+      log(
+        'radio',
+        `> ${buf
           .slice(4, -3)
           .map((n) => n.toString(2).padStart(8, '0'))
-          .join('')
+          .join('')}`
       )
 
       const rawValue = buf

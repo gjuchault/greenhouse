@@ -1,7 +1,9 @@
 import { createNanoEvents, Emitter } from 'nanoevents'
+import chalk from 'chalk'
 import SerialPort from 'serialport'
 import Delimiter from '@serialport/parser-delimiter'
 import { USBDevice } from '../usb'
+import { log } from '../log'
 
 interface ArduinoEvents {
   line: (data: string) => void
@@ -50,14 +52,12 @@ export function buildListenArduino({
     const parser = port.pipe(new Delimiter({ delimiter: '\r\n' }))
 
     const emitter = createNanoEvents<ArduinoEvents>()
-    port.on('error', () => {
-      console.log('arduino error >', console.log)
+    port.on('error', (err) => {
+      console.log(err)
     })
     parser.on('data', (data: Buffer) => {
-      console.log('binaryraw >', data)
-      console.log('raw >', data.toString().trim())
+      log('arduino', data.toString().trim())
       const line = data.toString().trim().padStart(24, '0')
-      console.log('arduino >', line)
       emitter.emit('line', line)
     })
 
@@ -65,7 +65,7 @@ export function buildListenArduino({
       emitter,
       send: (data: string) =>
         new Promise<void>((resolve, reject) => {
-          console.log('arduino < ', `${data}\n`)
+          log('arduino', `< ${data}`)
           port.write(`${data}\n`, (err) => {
             if (err) return reject(err)
             resolve()
