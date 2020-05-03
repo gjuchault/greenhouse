@@ -1,4 +1,5 @@
 import SerialPort from 'serialport'
+import { log } from '../log'
 
 export interface USBDevice {
   path: string
@@ -25,7 +26,7 @@ export async function listUsbDevices() {
         kind: 'arduino',
       })
 
-      console.log(`[usb] found arduino on path=${path}`)
+      log('ub', `found arduino on path=${path}`)
     }
 
     if (rfxcomManufacturer.includes(manufacturer?.toLowerCase() || '')) {
@@ -34,7 +35,7 @@ export async function listUsbDevices() {
         kind: 'radio',
       })
 
-      console.log(`[usb] found radio on path=${path}`)
+      log('ub', `found radio on path=${path}`)
     }
   }
 

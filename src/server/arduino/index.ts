@@ -1,8 +1,9 @@
 import { createNanoEvents } from 'nanoevents'
+import chalk from 'chalk'
 import { USBDevice } from '../usb'
 import { buildListenArduino, Arduino } from './listen'
 import { parse } from '../sensors'
-import { start, done, failed } from '../log'
+import { log } from '../log'
 
 interface ArduinoEvents {
   entry: (sensor: string, value: string) => void
@@ -14,8 +15,7 @@ export async function createArduino({
   usbDevices: USBDevice[]
 }) {
   if (process.env.DISABLE_ARDUINO) {
-    start('Skipping Arduino...')
-    done()
+    log('arduino', 'Skipping Arduino...')
     return
   }
 
@@ -23,11 +23,9 @@ export async function createArduino({
   let arduino: Arduino
 
   try {
-    start('Connecting to Arduino...')
+    log('arduino', 'Connecting to Arduino...')
     arduino = await listenArduino()
-    done()
   } catch (err) {
-    failed()
     console.log(err)
     return
   }
@@ -36,7 +34,7 @@ export async function createArduino({
 
   arduino.emitter.on('line', async (data: string) => {
     const { sensorId, value } = parse(parseInt(data, 2))
-    console.log('Arduino data', JSON.stringify({ sensorId, value }))
+    log('arduino', `> sensor: ${sensorId} value: ${value}`)
     emitter.emit('entry', sensorId, value)
   })
 

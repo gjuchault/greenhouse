@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid'
 import pg from 'pg'
-import { start, done, failed } from './log'
+import { log } from './log'
 import { reshapeRule, Rule } from './rules/rule'
 
 export type Storage = {
@@ -24,11 +24,9 @@ export async function createStorage(): Promise<Storage> {
     })
 
     try {
-      start('Connecting to storage...')
+      log('db', 'Connecting to storage...')
       await db.connect()
-      done()
     } catch (err) {
-      failed()
       console.log(err)
       process.exit(1)
     }
@@ -36,16 +34,11 @@ export async function createStorage(): Promise<Storage> {
 
   async function postEntry(sensor: string, value: string) {
     try {
-      start('Saving statement...')
-
       await db.query(`
         insert into statement(id, sensor, value, date)
         values ('${uuid()}', '${sensor}', '${value}', now())
       `)
-
-      done()
     } catch (err) {
-      failed()
       console.log(err)
     }
   }
