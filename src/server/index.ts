@@ -35,7 +35,10 @@ async function main() {
   const arduino = await createArduino({ usbDevices })
   const rules = await createRules({ storage })
 
-  const handleSensorValue = (sensorId: string, value: string) => {
+  const handleSensorValue = (source: string) => (
+    sensorId: string,
+    value: string
+  ) => {
     const matchRule = rules.tryAgainstRules(sensorId, value)
 
     if (matchRule && arduino) {
@@ -43,12 +46,16 @@ async function main() {
       arduino.sendCommand(matchRule.target, matchRule.targetValue)
     }
 
-    cache.set(sensorId, value)
+    cache.set(sensorId, {
+      value,
+      lastSentAt: new Date().toISOString(),
+      source,
+    })
     queue.add(sensorId, value)
   }
 
-  if (arduino) arduino.emitter.on('entry', handleSensorValue)
-  if (radio) radio.on('entry', handleSensorValue)
+  if (arduino) arduino.emitter.on('entry', handleSensorValue('arduino'))
+  if (radio) radio.on('entry', handleSensorValue('radio'))
 }
 
 main()

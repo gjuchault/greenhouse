@@ -1,1 +1,8 @@
-export const cache = new Map<string, string>()
+export const cache = new Map<
+  string,
+  {
+    value: string
+    lastSentAt: string
+    source: string
+  }
+>()
