@@ -1,17 +1,11 @@
-import { createNanoEvents, Emitter } from 'nanoevents'
-import chalk from 'chalk'
 import SerialPort from 'serialport'
 import Delimiter from '@serialport/parser-delimiter'
 import { USBDevice } from '../usb'
 import { log } from '../log'
-
-interface ArduinoEvents {
-  line: (data: string) => void
-}
+import { events } from '../events'
 
 export type Arduino = {
   send: (data: string) => Promise<void>
-  emitter: Emitter<ArduinoEvents>
 }
 
 export function buildListenArduino({
@@ -51,27 +45,25 @@ export function buildListenArduino({
     const port = await open(path)
     const parser = port.pipe(new Delimiter({ delimiter: '\r\n' }))
 
-    const emitter = createNanoEvents<ArduinoEvents>()
     port.on('error', (err) => {
       console.log(err)
     })
+
     parser.on('data', (data: Buffer) => {
       log('arduino', data.toString().trim())
       const line = data.toString().trim().padStart(24, '0')
-      emitter.emit('line', line)
+
+      events.emit('arduino:line', line)
     })
 
-    return {
-      emitter,
-      send: (data: string) =>
-        new Promise<void>((resolve, reject) => {
-          log('arduino', `< ${data}`)
-          port.write(`${data}\n`, (err) => {
-            if (err) return reject(err)
-            resolve()
-          })
-        }),
-    }
+    events.on('command:send', (target, value) => {
+      const data = `${target};${Math.trunc(value).toString()}`
+
+      log('arduino', `< ${data}`)
+      port.write(`${data}\n`, (err) => {
+        if (err) log('arduino', `Error when sending data to arduino ${err}`)
+      })
+    })
   }
 
   return listen

@@ -1,0 +1,21 @@
+.rules {
+  padding: 20px;
+}
+
+.title {
+  margin-bottom: 10px;
+}
+
+.title:not(:first-of-type) {
+  margin-top: 20px;
+}
+
+.form {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.form > input {
+  margin-right: 10px;
+}

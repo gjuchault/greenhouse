@@ -8,7 +8,11 @@ export enum State {
   Error,
 }
 
-type UseQuery<TResponse> = [TResponse | undefined, State]
+type UseQuery<TResponse> = {
+  data: TResponse | undefined
+  state: State
+  refetch: () => void
+}
 
 export function useQuery<TResponse>(
   url: string,
@@ -16,6 +20,7 @@ export function useQuery<TResponse>(
 ): UseQuery<TResponse> {
   const [state, setState] = useState<State>(State.Idle)
   const [response, setResponse] = useState<TResponse>()
+  const [refetchToken, setRefetchToken] = useState(0)
 
   useEffect(() => {
     async function fetchData() {
@@ -35,9 +40,17 @@ export function useQuery<TResponse>(
     }
 
     fetchData()
-  }, deps)
+  }, [refetchToken, ...deps])
 
-  return [response, state]
+  function refetch() {
+    setRefetchToken((value) => value + 1)
+  }
+
+  return {
+    data: response,
+    state,
+    refetch,
+  }
 }
 
 type UseMutation<TBody, TResponse> = [

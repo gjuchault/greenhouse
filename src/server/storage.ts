@@ -2,6 +2,7 @@ import { v4 as uuid } from 'uuid'
 import pg from 'pg'
 import { log } from './log'
 import { reshapeRule, Rule } from './rules/rule'
+import { reshapeCommand, Command } from './rules/command'
 
 export type Storage = {
   getUserByName: (
@@ -9,6 +10,12 @@ export type Storage = {
   ) => Promise<{ id: string; name: string; password: string } | undefined>
   postEntry: (sensor: string, value: string) => Promise<void>
   listRules: () => Promise<Rule[]>
+  listCommands: () => Promise<Command[]>
+  postCommand: (
+    target: string,
+    value: string,
+    expiresIn: string
+  ) => Promise<void>
 }
 
 let db: pg.Pool
@@ -61,6 +68,7 @@ export async function createStorage(): Promise<Storage> {
 
       return data.rows[0]
     } catch (err) {
+      console.log(err)
       return
     }
   }
@@ -81,7 +89,42 @@ export async function createStorage(): Promise<Storage> {
 
       return data.rows.map(reshapeRule)
     } catch (err) {
+      console.log(err)
       return []
+    }
+  }
+
+  async function listCommands() {
+    try {
+      const data = await db.query<{
+        id: string
+        target: string
+        value: string
+        expires_in: Date
+      }>(`
+        select id, target, value, expires_in from "commands"
+        where expires_in > NOW()
+      `)
+
+      return data.rows.map(reshapeCommand)
+    } catch (err) {
+      console.log(err)
+      return []
+    }
+  }
+
+  async function postCommand(target: string, value: string, expiresIn: string) {
+    try {
+      await db.query(`
+        delete from commands where target='${target}'
+      `)
+
+      await db.query(`
+        insert into commands(id, target, value, expires_in)
+        values ('${uuid()}', '${target}', '${value}', '${expiresIn}')
+      `)
+    } catch (err) {
+      console.log(err)
     }
   }
 
@@ -89,5 +132,7 @@ export async function createStorage(): Promise<Storage> {
     getUserByName,
     postEntry,
     listRules,
+    listCommands,
+    postCommand,
   }
 }

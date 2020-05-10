@@ -112,7 +112,8 @@ module.exports = {
   ].filter(Boolean),
   devServer: {
     hot: true,
-    contentBase: './dist/app',
+    historyApiFallback: true,
+    // contentBase: './dist/app',
     stats: 'minimal',
   },
 }

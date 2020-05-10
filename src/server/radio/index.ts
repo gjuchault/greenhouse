@@ -1,13 +1,8 @@
-import { createNanoEvents } from 'nanoevents'
-import chalk from 'chalk'
 import { USBDevice } from '../usb'
-import { buildListenRadio, Radio } from './listen'
+import { buildListenRadio } from './listen'
 import { log } from '../log'
 import { parse } from '../sensors'
-
-interface RadioEvents {
-  entry: (sensorId: string, value: string) => void
-}
+import { events } from '../events'
 
 export async function createRadio({ usbDevices }: { usbDevices: USBDevice[] }) {
   if (process.env.DISABLE_RADIO) {
@@ -16,26 +11,21 @@ export async function createRadio({ usbDevices }: { usbDevices: USBDevice[] }) {
   }
 
   const listenRadio = buildListenRadio({ usbDevices })
-  let radio: Radio
 
   try {
     log('radio', 'Connecting to Radio...')
-    radio = await listenRadio()
+    await listenRadio()
   } catch (err) {
     console.log(err)
     return
   }
 
-  const emitter = createNanoEvents<RadioEvents>()
-
-  radio.on('data', async (data: string) => {
+  events.on('radio:line', async (data: string) => {
     const numericValue = parseInt(data, 2)
 
     const { sensorId, value } = parse(numericValue)
     log('radio', `sensor: ${sensorId} value: ${value}`)
 
-    emitter.emit('entry', sensorId, value)
+    events.emit('radio:entry', sensorId, value)
   })
-
-  return emitter
 }
