@@ -26,7 +26,7 @@ export async function listUsbDevices() {
         kind: 'arduino',
       })
 
-      log('ub', `found arduino on path=${path}`)
+      log('usb', `found arduino on path=${path}`)
     }
 
     if (rfxcomManufacturer.includes(manufacturer?.toLowerCase() || '')) {
@@ -35,7 +35,7 @@ export async function listUsbDevices() {
         kind: 'radio',
       })
 
-      log('ub', `found radio on path=${path}`)
+      log('usb', `found radio on path=${path}`)
     }
   }
 
