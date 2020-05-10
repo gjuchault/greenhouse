@@ -4,7 +4,7 @@ export const log = (service: string, message: string) => {
   let coloredService = chalk.green(service)
 
   if (service === 'arduino') coloredService = chalk.blue(service)
-  if (service === 'radio') coloredService = chalk.red('service')
+  if (service === 'radio') coloredService = chalk.red(service)
 
   console.log(`${getTimestamp()} [${coloredService}] ${message}`)
 }
