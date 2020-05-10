@@ -1,15 +1,26 @@
 import { Storage } from '../storage'
 import { Rule } from './rule'
 import { SwitchGuardError } from '../switchGuard'
+import { Command } from './command'
 
 let rules: Rule[] = []
+let commands: Command[] = []
 
 export async function createRules({ storage }: { storage: Storage }) {
-  refreshRules()
-  setInterval(refreshRules, 15000)
+  refreshRulesAndCommands()
+  setInterval(refreshRulesAndCommands, 15000)
 
-  async function refreshRules() {
+  async function refreshRulesAndCommands() {
+    commands = await storage.listCommands()
     rules = await storage.listRules()
+
+    rules = rules.filter((rule) => {
+      const oneCommandAppliesToRuleTarget = commands.find(
+        ({ target }) => target === rule.target
+      )
+
+      return !oneCommandAppliesToRuleTarget
+    })
   }
 
   function tryAgainstRules(sensorId: string, value: string) {
@@ -40,6 +51,10 @@ export async function createRules({ storage }: { storage: Storage }) {
     }
   }
 
+  function listCommands() {
+    return storage.listCommands()
+  }
+
   function buildMatch(match: boolean, target: string, targetValue: number) {
     if (!match) return
 
@@ -48,5 +63,6 @@ export async function createRules({ storage }: { storage: Storage }) {
 
   return {
     tryAgainstRules,
+    listCommands,
   }
 }

@@ -1,5 +1,4 @@
 import path from 'path'
-import chalk from 'chalk'
 import { config as dotenv } from 'dotenv'
 import { log } from './log'
 import { listUsbDevices, USBDevice } from './usb'
@@ -10,6 +9,7 @@ import { createHttp } from './http'
 import { buildQueue } from './queue'
 import { cache } from './cache'
 import { createRules } from './rules'
+import { events } from './events'
 const { version } = require('../../package.json')
 
 dotenv({ path: path.resolve(__dirname, '../../.env.local') })
@@ -43,7 +43,7 @@ async function main() {
 
     if (matchRule && arduino) {
       log('arduino', `< ${JSON.stringify(matchRule)}`)
-      arduino.sendCommand(matchRule.target, matchRule.targetValue)
+      events.emit('command:send', matchRule.target, matchRule.targetValue)
     }
 
     cache.set(sensorId, {
@@ -54,8 +54,8 @@ async function main() {
     queue.add(sensorId, value)
   }
 
-  if (arduino) arduino.emitter.on('entry', handleSensorValue('arduino'))
-  if (radio) radio.on('entry', handleSensorValue('radio'))
+  events.on('arduino:entry', handleSensorValue('arduino'))
+  events.on('radio:entry', handleSensorValue('radio'))
 }
 
 main()

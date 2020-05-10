@@ -8,6 +8,10 @@ import { log } from '../log'
 import { isLoggedIn } from './isLoggedIn'
 import { handleLogin } from './controllers/login'
 import { handleSensors } from './controllers/sensors'
+import {
+  handleRulesAndCommands,
+  handleCreateCommand,
+} from './controllers/rules'
 
 export async function createHttp() {
   if (process.env.DISABLE_HTTP) {
@@ -32,6 +36,8 @@ export async function createHttp() {
 
   app.post('/api/login', handleLogin)
   app.get('/api/sensors', isLoggedIn, handleSensors)
+  app.get('/api/rules-and-commands', isLoggedIn, handleRulesAndCommands)
+  app.post('/api/command', isLoggedIn, handleCreateCommand)
 
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../../../dist/app/index.html'))

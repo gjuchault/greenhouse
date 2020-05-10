@@ -27,5 +27,9 @@ api.interceptors.response.use(
 )
 
 function createBaseUrl() {
+  if (process.env.NODE_ENV === 'development') {
+    return `${location.protocol}//${location.hostname}:3000/`
+  }
+
   return `${location.protocol}//${location.hostname}:${location.port}/`
 }
