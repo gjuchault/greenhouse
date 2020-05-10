@@ -31,8 +31,8 @@ async function main() {
   await createHttp()
   const storage = await createStorage()
   const queue = buildQueue(storage.postEntry)
-  const radio = await createRadio({ usbDevices })
-  const arduino = await createArduino({ usbDevices })
+  await createRadio({ usbDevices })
+  await createArduino({ usbDevices })
   const rules = await createRules({ storage })
 
   const handleSensorValue = (source: string) => (
@@ -41,7 +41,7 @@ async function main() {
   ) => {
     const matchRule = rules.tryAgainstRules(sensorId, value)
 
-    if (matchRule && arduino) {
+    if (matchRule) {
       log('arduino', `< ${JSON.stringify(matchRule)}`)
       events.emit('command:send', matchRule.target, matchRule.targetValue)
     }
@@ -56,6 +56,8 @@ async function main() {
 
   events.on('arduino:entry', handleSensorValue('arduino'))
   events.on('radio:entry', handleSensorValue('radio'))
+
+  log('main', 'Greenhouse ready')
 }
 
 main()
