@@ -14,7 +14,7 @@ export function buildListenArduino({
   usbDevices: USBDevice[]
 }) {
   async function find() {
-    return usbDevices.find(({ kind }) => kind === 'arduino')?.path
+    return usbDevices.filter(({ kind }) => kind === 'arduino')
   }
 
   async function open(path: string) {
@@ -37,33 +37,35 @@ export function buildListenArduino({
   }
 
   async function listen() {
-    const path = await find()
-    if (!path) {
+    const androidUsbDevice = await find()
+    if (!androidUsbDevice.length) {
       throw new Error('No Arduino found')
     }
 
-    const port = await open(path)
-    const parser = port.pipe(new Delimiter({ delimiter: '\r\n' }))
+    for (const { path } of androidUsbDevice) {
+      const port = await open(path)
+      const parser = port.pipe(new Delimiter({ delimiter: '\r\n' }))
 
-    port.on('error', (err) => {
-      console.log(err)
-    })
-
-    parser.on('data', (data: Buffer) => {
-      log('arduino', data.toString().trim())
-      const line = data.toString().trim().padStart(24, '0')
-
-      events.emit('arduino:line', line)
-    })
-
-    events.on('command:send', (target, value) => {
-      const data = `${target};${Math.trunc(value).toString()}`
-
-      log('arduino', `< ${data}`)
-      port.write(`${data}\n`, (err) => {
-        if (err) log('arduino', `Error when sending data to arduino ${err}`)
+      port.on('error', (err) => {
+        console.log(err)
       })
-    })
+
+      parser.on('data', (data: Buffer) => {
+        log('arduino', data.toString().trim())
+        const line = data.toString().trim().padStart(24, '0')
+
+        events.emit('arduino:line', line)
+      })
+
+      events.on('command:send', (target, value) => {
+        const data = `${target};${Math.trunc(value).toString()}`
+
+        log('arduino', `< ${data}`)
+        port.write(`${data}\n`, (err) => {
+          if (err) log('arduino', `Error when sending data to arduino ${err}`)
+        })
+      })
+    }
   }
 
   return listen
