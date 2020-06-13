@@ -14,10 +14,7 @@ type UseQuery<TResponse> = {
   refetch: () => void
 }
 
-export function useQuery<TResponse>(
-  url: string,
-  deps: unknown[] = []
-): UseQuery<TResponse> {
+export function useQuery<TResponse>(url: string): UseQuery<TResponse> {
   const [state, setState] = useState<State>(State.Idle)
   const [response, setResponse] = useState<TResponse>()
   const [refetchToken, setRefetchToken] = useState(0)
@@ -40,7 +37,7 @@ export function useQuery<TResponse>(
     }
 
     fetchData()
-  }, [refetchToken, ...deps])
+  }, [refetchToken])
 
   function refetch() {
     setRefetchToken((value) => value + 1)
