@@ -16,6 +16,9 @@ export type Storage = {
     value: string,
     expiresIn: string
   ) => Promise<void>
+  listReceiverSensors: () => Promise<
+    { id: string; sensor: string; name: string }[]
+  >
 }
 
 let db: pg.Pool
@@ -128,11 +131,25 @@ export async function createStorage(): Promise<Storage> {
     }
   }
 
+  async function listReceiverSensors() {
+    try {
+      const data = await db.query(`
+        select * from receiver_sensors
+      `)
+
+      return data.rows
+    } catch (err) {
+      console.log(err)
+      return []
+    }
+  }
+
   return {
     getUserByName,
     postEntry,
     listRules,
     listCommands,
     postCommand,
+    listReceiverSensors,
   }
 }
