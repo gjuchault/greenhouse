@@ -32,15 +32,18 @@ h6 {
   margin: 0;
 }
 
-input {
+input,
+select {
   height: 36px;
   padding: 0 12px;
   font-size: 14px;
   border-radius: 4px;
   border: 1px solid color-mod(var(--black) a(0.2));
+  appearance: none;
 }
 
-input:focus {
+input:focus,
+select:focus {
   outline: 0;
 }
 

@@ -1,11 +1,18 @@
 import React from 'react'
 import { useQuery, useMutation } from '../../hooks/useQuery'
+import { useTextInput } from '../../hooks/useInput'
+import { ReceiverSensorValue } from '../../components/ReceiverSensorValue/ReceiverSensorValue'
 
 import styles from './Rules.module.css'
-import { useTextInput } from '../../hooks/useInput'
 
 type Rule = {}
 type Command = { id: string; target: string; value: string; expiresIn: string }
+type Sensor = {
+  id: string
+  name: string
+  sensor: string
+  value: '0-1' | '1-1024'
+}
 type CreateCommandBody = {
   target: string
   value: string
@@ -17,6 +24,8 @@ export function Rules() {
     rules: Rule[]
     commands: Command[]
   }>('/api/rules-and-commands')
+
+  const { data: receiverSensors } = useQuery<Sensor[]>('/api/receiver-sensors')
 
   const [createCommand] = useMutation<CreateCommandBody, Command>(
     '/api/command'
@@ -37,23 +46,33 @@ export function Rules() {
     await refetch()
   }
 
+  if (!receiverSensors) {
+    return null
+  }
+
+  const sortedReceiverSensors = receiverSensors.sort((left, right) => {
+    return left.name.localeCompare(right.name)
+  })
+
   return (
     <div className={styles.rules}>
       <h2 className={styles.title}>Contrôle manuel</h2>
       <form className={styles.form} onSubmit={handleCreateCommand}>
-        <input
-          type="text"
-          name="target"
-          placeholder="Cible"
-          value={commandTarget}
-          onChange={setCommandTarget}
-        />
-        <input
-          type="text"
-          name="value"
-          placeholder="Valeur"
-          value={commandValue}
+        <select value={commandTarget} onChange={setCommandTarget}>
+          <option>Choisir une cible</option>
+          {sortedReceiverSensors.map((receiverSensor) => {
+            return (
+              <option key={receiverSensor.id} value={receiverSensor.sensor}>
+                {receiverSensor.name}
+              </option>
+            )
+          })}
+        </select>
+        <ReceiverSensorValue
+          commandTarget={commandTarget}
+          commandValue={commandValue}
           onChange={setCommandValue}
+          receiverSensors={receiverSensors}
         />
         <input
           type="text"

@@ -16,6 +16,7 @@
   margin: 10px 0;
 }
 
-.form > input {
+.form > input,
+.form > select {
   margin-right: 10px;
 }
