@@ -34,17 +34,17 @@ export async function createRules({ storage }: { storage: Storage }) {
 
       switch (rule.operation) {
         case 'lt':
-          return m(Number(value) < rule.thresold)
+          return m(Number(value) < rule.threshold)
         case 'le':
-          return m(Number(value) <= rule.thresold)
+          return m(Number(value) <= rule.threshold)
         case 'eq':
-          return m(Number(value) === rule.thresold)
+          return m(Number(value) === rule.threshold)
         case 'ne':
-          return m(Number(value) !== rule.thresold)
+          return m(Number(value) !== rule.threshold)
         case 'ge':
-          return m(Number(value) >= rule.thresold)
+          return m(Number(value) >= rule.threshold)
         case 'gt':
-          return m(Number(value) > rule.thresold)
+          return m(Number(value) > rule.threshold)
         default:
           throw new SwitchGuardError('tryAgainstRules', rule.operation)
       }

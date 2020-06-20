@@ -10,3 +10,8 @@ export async function listReceiverSensors() {
 
   return storage.listReceiverSensors()
 }
+
+export async function listEmitterSensors() {
+  const storage = await createStorage()
+  return storage.listEmitterSensors()
+}

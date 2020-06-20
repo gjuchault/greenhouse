@@ -10,6 +10,13 @@ export type Storage = {
   ) => Promise<{ id: string; name: string; password: string } | undefined>
   postEntry: (sensor: string, value: string) => Promise<void>
   listRules: () => Promise<Rule[]>
+  postRule: (
+    source: string,
+    operation: string,
+    threshold: number,
+    target: string,
+    targetValue: number
+  ) => Promise<void>
   listCommands: () => Promise<Command[]>
   postCommand: (
     target: string,
@@ -17,7 +24,10 @@ export type Storage = {
     expiresIn: string
   ) => Promise<void>
   listReceiverSensors: () => Promise<
-    { id: string; sensor: string; name: string }[]
+    { id: string; sensor: string; name: string; value: '0-1' | '1-1024' }[]
+  >
+  listEmitterSensors: () => Promise<
+    { id: string; sensor: string; name: string; min: number; max: number }[]
   >
 }
 
@@ -82,11 +92,11 @@ export async function createStorage(): Promise<Storage> {
         id: string
         source: string
         operation: 'lt' | 'le' | 'eq' | 'ne' | 'ge' | 'gt'
-        thresold: number
+        threshold: number
         target: string
         target_value: number
       }>(`
-        select id, source, operation, thresold, target, target_value
+        select id, source, operation, threshold, target, target_value
         from "rules"
       `)
 
@@ -131,6 +141,23 @@ export async function createStorage(): Promise<Storage> {
     }
   }
 
+  async function postRule(
+    source: string,
+    operation: string,
+    threshold: number,
+    target: string,
+    targetValue: number
+  ) {
+    try {
+      await db.query(`
+        insert into rules(id, source, operation, threshold, target, target_value)
+        values ('${uuid()}', '${source}', '${operation}', '${threshold}', '${target}', '${targetValue}')
+      `)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   async function listReceiverSensors() {
     try {
       const data = await db.query(`
@@ -144,12 +171,27 @@ export async function createStorage(): Promise<Storage> {
     }
   }
 
+  async function listEmitterSensors() {
+    try {
+      const data = await db.query(`
+        select * from emitter_sensors
+      `)
+
+      return data.rows
+    } catch (err) {
+      console.log(err)
+      return []
+    }
+  }
+
   return {
     getUserByName,
     postEntry,
     listRules,
+    postRule,
     listCommands,
     postCommand,
     listReceiverSensors,
+    listEmitterSensors,
   }
 }
