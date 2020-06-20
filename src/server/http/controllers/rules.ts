@@ -1,6 +1,10 @@
 import { Request, Response } from 'express'
 import * as z from 'zod'
-import { listRulesAndCommands, createCommand } from '../services/rules'
+import {
+  listRulesAndCommands,
+  createCommand,
+  createRule,
+} from '../services/rules'
 
 export async function handleRulesAndCommands(req: Request, res: Response) {
   const rulesAndCommands = await listRulesAndCommands()
@@ -23,7 +27,7 @@ export async function handleCreateCommand(req: Request, res: Response) {
   } catch (err) {
     if (err instanceof z.ZodError) {
       return res.status(400).json({
-        outcome: 'notLoggedIn',
+        outcome: 'notCreated',
         reason: 'invalidBody',
       })
     }
@@ -32,6 +36,42 @@ export async function handleCreateCommand(req: Request, res: Response) {
   }
 
   await createCommand(body.target, body.value, body.expiresIn)
+
+  res.status(200).end()
+}
+
+const createRuleBodySchema = z.object({
+  source: z.string(),
+  operation: z.string(),
+  threshold: z.number(),
+  target: z.string(),
+  targetValue: z.number(),
+})
+type CreateRuleBody = z.infer<typeof createRuleBodySchema>
+
+export async function handleCreateRule(req: Request, res: Response) {
+  let body: CreateRuleBody
+
+  try {
+    body = createRuleBodySchema.parse(req.body)
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return res.status(400).json({
+        outcome: 'notCreated',
+        reason: 'invalidBody',
+      })
+    }
+
+    throw err
+  }
+
+  await createRule(
+    body.source,
+    body.operation,
+    body.threshold,
+    body.target,
+    body.targetValue
+  )
 
   res.status(200).end()
 }

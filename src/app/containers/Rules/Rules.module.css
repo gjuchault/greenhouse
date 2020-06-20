@@ -1,4 +1,4 @@
-.rules {
+.rulesAndCommands {
   padding: 20px;
 }
 
@@ -19,4 +19,18 @@
 .form > input,
 .form > select {
   margin-right: 10px;
+}
+
+.rules {
+  margin-top: 20px;
+}
+
+.rule > span:not(:first-child),
+.rule > strong:not(:first-child) {
+  margin-left: 4px;
+}
+
+.rule > span:not(:last-child),
+.rule > strong:not(:last-child) {
+  margin-right: 4px;
 }

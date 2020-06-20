@@ -2,7 +2,7 @@ export type Rule = {
   id: string
   source: string
   operation: 'lt' | 'le' | 'eq' | 'ne' | 'ge' | 'gt'
-  thresold: number
+  threshold: number
   target: string
   targetValue: number
 }
@@ -11,13 +11,13 @@ export const reshapeRule = ({
   id,
   source,
   operation,
-  thresold,
+  threshold,
   target,
   target_value,
 }: {
   id: string
   source: string
-  thresold: number
+  threshold: number
   operation: 'lt' | 'le' | 'eq' | 'ne' | 'ge' | 'gt'
   target: string
   target_value: number
@@ -25,7 +25,7 @@ export const reshapeRule = ({
   id,
   source,
   operation,
-  thresold,
+  threshold,
   target,
   targetValue: target_value,
 })

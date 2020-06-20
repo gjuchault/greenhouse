@@ -21,3 +21,15 @@ export async function createCommand(
 
   events.emit('command:send', target, Number(value))
 }
+
+export async function createRule(
+  source: string,
+  operation: string,
+  threshold: number,
+  target: string,
+  targetValue: number
+) {
+  const storage = await createStorage()
+
+  await storage.postRule(source, operation, threshold, target, targetValue)
+}

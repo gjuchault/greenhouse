@@ -1,16 +1,21 @@
 import { createServer } from 'http'
 import path from 'path'
-import express, { application } from 'express'
+import express from 'express'
 import bodyParser from 'body-parser'
 import helmet from 'helmet'
 import cors from 'cors'
 import { log } from '../log'
 import { isLoggedIn } from './isLoggedIn'
 import { handleLogin } from './controllers/login'
-import { handleSensors, handleListReceiverSensors } from './controllers/sensors'
+import {
+  handleSensors,
+  handleListReceiverSensors,
+  handleListEmitterSensors,
+} from './controllers/sensors'
 import {
   handleRulesAndCommands,
   handleCreateCommand,
+  handleCreateRule,
 } from './controllers/rules'
 
 export async function createHttp() {
@@ -38,7 +43,9 @@ export async function createHttp() {
   app.get('/api/sensors', isLoggedIn, handleSensors)
   app.get('/api/rules-and-commands', isLoggedIn, handleRulesAndCommands)
   app.get('/api/receiver-sensors', isLoggedIn, handleListReceiverSensors)
+  app.get('/api/emitter-sensors', isLoggedIn, handleListEmitterSensors)
   app.post('/api/command', isLoggedIn, handleCreateCommand)
+  app.post('/api/rule', isLoggedIn, handleCreateRule)
 
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../../../dist/app/index.html'))
