@@ -36,7 +36,7 @@ export function RuleEditor({
 
       const Actionables = [
         'declare const Actionables = {',
-        ...actionables.map((actionnable) => `"${actionnable.name}": string`),
+        ...actionables.map((actionable) => `"${actionable.name}": string`),
         '}',
       ].join('\n')
 
