@@ -62,6 +62,8 @@ export async function createRules({ storage }: { storage: Storage }) {
         date: now,
         emitterSensors,
         actionables,
+        Actionables,
+        Sensors,
       })
 
       try {
