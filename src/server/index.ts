@@ -7,7 +7,11 @@ import { createRadio } from './radio'
 import { createStorage } from './storage'
 import { createHttp } from './http'
 import { buildQueue } from './queue'
-import { emitterCache, actionableCache } from './cache'
+import {
+  emitterCache,
+  actionableCache,
+  setInitialActionableCache,
+} from './cache'
 import { createRules } from './rules'
 import { events } from './events'
 const { version } = require('../../package.json')
@@ -35,12 +39,17 @@ async function main() {
   await createArduino({ usbDevices })
   const rules = await createRules({ storage })
 
-  const applyRules = () => {
+  const actionables = await storage.listActionables()
+  setInitialActionableCache(actionables)
+
+  const applyRules = async () => {
     const now = new Date().toISOString()
 
     const newActionablesValues = rules.executeRules(
       emitterCache,
-      actionableCache
+      actionableCache,
+      await storage.listEmitterSensors(),
+      await storage.listActionables()
     )
 
     for (const [actionableSensor, actionableValue] of newActionablesValues) {
