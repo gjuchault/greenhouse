@@ -154,7 +154,12 @@ export function Rules() {
       >
         Sauvegarder
       </button>
-      <RuleEditor value={rule} onChange={setRule} />
+      <RuleEditor
+        value={rule}
+        onChange={setRule}
+        actionables={actionables}
+        emitterSensors={emitterSensors}
+      />
     </div>
   )
 }

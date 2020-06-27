@@ -4,6 +4,7 @@ import { Storage } from '../storage'
 import { Rule } from './rule'
 import { Command } from './command'
 import { events } from '../events'
+import { actionableCache } from '../cache'
 
 export async function createRules({ storage }: { storage: Storage }) {
   let rules: Rule[] = []
@@ -24,7 +25,15 @@ export async function createRules({ storage }: { storage: Storage }) {
         value: string
         lastSentAt: string
       }
-    >
+    >,
+    sensorsList: {
+      sensor: string
+      name: string
+    }[],
+    actionablesList: {
+      target: string
+      name: string
+    }[]
   ): Map<string, string> {
     const now = new Date()
 
@@ -35,8 +44,18 @@ export async function createRules({ storage }: { storage: Storage }) {
     )
 
     let result: Map<string, string> = new Map(
-      Array.from(actionables.keys()).map((key) => [key, '0'])
+      Array.from(actionables.keys()).map((key) => [key, '1'])
     )
+
+    const Actionables: Record<string, string> = {}
+    for (const actionable of actionablesList) {
+      Actionables[actionable.name] = actionable.target
+    }
+
+    const Sensors: Record<string, string> = {}
+    for (const sensor of sensorsList) {
+      Sensors[sensor.name] = sensor.sensor
+    }
 
     for (const rule of sortedRules) {
       const vmContext = vm.createContext({
@@ -58,6 +77,12 @@ export async function createRules({ storage }: { storage: Storage }) {
       } catch (err) {
         console.log(err)
         continue
+      }
+    }
+
+    for (const command of commands) {
+      if (command.expiresIn <= now) {
+        result.set(command.target, command.value)
       }
     }
 

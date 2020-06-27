@@ -19,7 +19,13 @@ export type Storage = {
     expiresIn: string
   ) => Promise<void>
   listActionables: () => Promise<
-    { id: string; target: string; name: string; value: '0-1' | '1-1024' }[]
+    {
+      id: string
+      target: string
+      name: string
+      value: '0-1' | '1-1024'
+      default_value: string
+    }[]
   >
   listEmitterSensors: () => Promise<
     { id: string; sensor: string; name: string; min: number; max: number }[]
