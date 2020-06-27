@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom'
 import Logout from './logout.svg'
 import Map from './map.svg'
 import Rules from './rules.svg'
+import Actionables from './actionables.svg'
 
 import styles from './Sidebar.module.css'
 import { offlineLogout } from '../../auth'
@@ -17,8 +18,17 @@ export function Sidebar() {
 
   return (
     <div className={styles.sidebar}>
-      <button className={styles.button} onClick={() => history.push('/map')}>
+      <button
+        className={styles.button}
+        onClick={() => history.push('/sensors')}
+      >
         <Map />
+      </button>
+      <button
+        className={styles.button}
+        onClick={() => history.push('/actionables')}
+      >
+        <Actionables />
       </button>
       <button className={styles.button} onClick={() => history.push('/rules')}>
         <Rules />

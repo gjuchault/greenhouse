@@ -1,15 +1,5 @@
 import { Request, Response } from 'express'
-import {
-  listSensorValues,
-  listActionables,
-  listEmitterSensors,
-} from '../services/sensors'
-
-export async function handleSensors(req: Request, res: Response) {
-  const lastSensorsValues = await listSensorValues()
-
-  res.status(200).json(lastSensorsValues)
-}
+import { listActionables, listEmitterSensors } from '../services/sensors'
 
 export async function handleListActionables(req: Request, res: Response) {
   const actionables = await listActionables()

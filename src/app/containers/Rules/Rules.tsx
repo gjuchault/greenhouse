@@ -20,6 +20,9 @@ type Actionable = {
   target: string
   name: string
   value: '0-1' | '1-1024'
+  default_value: string
+  lastValue?: string
+  lastSentAt?: string
 }
 
 type EmitterSensor = {
@@ -28,6 +31,9 @@ type EmitterSensor = {
   name: string
   min: number
   max: number
+  lastValue?: string
+  lastSentAt?: string
+  lastSentFrom?: string
 }
 
 type CreateCommandBody = {
@@ -41,15 +47,6 @@ type CreateRuleBody = {
   priority: number
 }
 
-const operatorsNames = {
-  lt: 'inférieur à',
-  le: 'inférieur ou égal à',
-  eq: 'égal à',
-  ne: 'différent à',
-  ge: 'supérieur ou égal à',
-  gt: 'supérieur à',
-}
-
 export function Rules() {
   const { data: rulesAndCommands, refetch } = useQuery<{
     rules: Rule[]
@@ -57,9 +54,7 @@ export function Rules() {
   }>('/api/rules-and-commands')
 
   const { data: actionables } = useQuery<Actionable[]>('/api/actionables')
-  const { data: emitterSensors } = useQuery<EmitterSensor[]>(
-    '/api/emitter-sensors'
-  )
+  const { data: emitterSensors } = useQuery<EmitterSensor[]>('/api/sensors')
 
   const [createCommand] = useMutation<CreateCommandBody, unknown>(
     '/api/command'

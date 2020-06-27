@@ -4,7 +4,8 @@ import { Provider as AuthProvider } from '../../context/auth'
 import { isLoggedIn, getName, offlineLogin } from '../../auth'
 import { Login } from '../Login/Login'
 import { Sidebar } from '../../components/Sidebar/Sidebar'
-import { LiveMap } from '../LiveMap/LiveMap'
+import { Sensors } from '../Sensors/Sensors'
+import { Actionables } from '../Actionables/Actionables'
 import { Rules } from '../Rules/Rules'
 
 export function App() {
@@ -38,12 +39,16 @@ export function App() {
         {auth.isLoggedIn && <Sidebar />}
         {auth.isLoggedIn && (
           <main>
-            <Route path="/map">
-              <LiveMap />
+            <Route path="/sensors">
+              <Sensors />
             </Route>
             <Route path="/rules">
               <Rules />
             </Route>
+            <Route path="/actionables">
+              <Actionables />
+            </Route>
+            <Redirect from="/" exact to="/sensors" />
           </main>
         )}
       </AuthProvider>
