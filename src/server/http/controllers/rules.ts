@@ -41,11 +41,8 @@ export async function handleCreateCommand(req: Request, res: Response) {
 }
 
 const createRuleBodySchema = z.object({
-  source: z.string(),
-  operation: z.string(),
-  threshold: z.number(),
-  target: z.string(),
-  targetValue: z.number(),
+  rule: z.string(),
+  priority: z.number(),
 })
 type CreateRuleBody = z.infer<typeof createRuleBodySchema>
 
@@ -65,13 +62,7 @@ export async function handleCreateRule(req: Request, res: Response) {
     throw err
   }
 
-  await createRule(
-    body.source,
-    body.operation,
-    body.threshold,
-    body.target,
-    body.targetValue
-  )
+  await createRule(body.rule, body.priority)
 
   res.status(200).end()
 }

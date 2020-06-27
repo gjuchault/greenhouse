@@ -103,11 +103,11 @@ module.exports = {
         filename: 'static/css/app.[hash:8].css',
       }),
     new ForkTsCheckerWebpackPlugin({
+      typescript: {
+        configFile: path.resolve(__dirname, './src/app/tsconfig.json'),
+      },
       async: !isProd,
-      useTypescriptIncrementalApi: true,
-      checkSyntacticErrors: true,
-      tsconfig: path.resolve(__dirname, './src/app/tsconfig.json'),
-      silent: true,
+      logger: { infrastructure: 'silent', issues: 'silent' },
     }),
   ].filter(Boolean),
   devServer: {

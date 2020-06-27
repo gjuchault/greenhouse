@@ -7,7 +7,7 @@ import { createRadio } from './radio'
 import { createStorage } from './storage'
 import { createHttp } from './http'
 import { buildQueue } from './queue'
-import { cache } from './cache'
+import { emitterCache, actionableCache } from './cache'
 import { createRules } from './rules'
 import { events } from './events'
 const { version } = require('../../package.json')
@@ -35,24 +35,45 @@ async function main() {
   await createArduino({ usbDevices })
   const rules = await createRules({ storage })
 
+  const applyRules = () => {
+    const now = new Date().toISOString()
+
+    const newActionablesValues = rules.executeRules(
+      emitterCache,
+      actionableCache
+    )
+
+    for (const [actionableSensor, actionableValue] of newActionablesValues) {
+      if (actionableValue !== actionableCache.get(actionableSensor)?.value) {
+        log('rules', `${actionableSensor} : ${actionableValue}`)
+
+        actionableCache.set(actionableSensor, {
+          value: actionableValue,
+          lastSentAt: now,
+        })
+
+        events.emit('command:send', actionableSensor, actionableValue)
+      }
+    }
+  }
+
   const handleSensorValue = (source: string) => (
     sensorId: string,
     value: string
   ) => {
-    const matchRule = rules.tryAgainstRules(sensorId, value)
-
-    if (matchRule) {
-      log('arduino', `< ${JSON.stringify(matchRule)}`)
-      events.emit('command:send', matchRule.target, matchRule.targetValue)
-    }
-
-    cache.set(sensorId, {
+    emitterCache.set(sensorId, {
       value,
       lastSentAt: new Date().toISOString(),
       source,
     })
+
+    applyRules()
+
     queue.add(sensorId, value)
   }
+
+  applyRules()
+  setInterval(applyRules, 10000)
 
   events.on('arduino:entry', handleSensorValue('arduino'))
   events.on('radio:entry', handleSensorValue('radio'))

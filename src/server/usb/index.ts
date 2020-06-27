@@ -1,7 +1,7 @@
 import SerialPort from 'serialport'
 import { log } from '../log'
 
-export interface USBDevice {
+export type USBDevice = {
   path: string
   kind: 'arduino' | 'radio'
 }

@@ -19,17 +19,13 @@ export async function createCommand(
 
   await storage.postCommand(target, value, expiresIn)
 
-  events.emit('command:send', target, Number(value))
+  events.emit('command:send', target, value)
 }
 
-export async function createRule(
-  source: string,
-  operation: string,
-  threshold: number,
-  target: string,
-  targetValue: number
-) {
+export async function createRule(rule: string, priority: number) {
   const storage = await createStorage()
 
-  await storage.postRule(source, operation, threshold, target, targetValue)
+  events.emit('rules:new')
+
+  await storage.postRule(rule, priority)
 }
