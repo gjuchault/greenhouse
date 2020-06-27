@@ -1,44 +1,46 @@
 import React, { useState, useEffect } from 'react'
 
-type Sensor = {
+type Actionable = {
   id: string
   name: string
-  sensor: string
+  target: string
   value: '0-1' | '1-1024'
 }
 
 type Props = {
   commandTarget: string
-  receiverSensors: Sensor[]
+  actionables: Actionable[]
   commandValue: string
   onChange: (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => void
 }
 
-export function ReceiverSensorValue({
+export function ActionableValue({
   commandTarget,
-  receiverSensors,
+  actionables,
   commandValue,
   onChange,
 }: Props) {
-  const [selectedSensor, setSelectedSensor] = useState<Sensor | undefined>()
+  const [selectedActionable, setSelectedActionable] = useState<
+    Actionable | undefined
+  >()
 
   useEffect(() => {
-    setSelectedSensor(
-      receiverSensors?.find(
-        (receiverSensor) => receiverSensor.sensor === commandTarget
+    setSelectedActionable(
+      actionables?.find(
+        (receiverSensor) => receiverSensor.target === commandTarget
       )
     )
-  }, [receiverSensors, commandTarget])
+  }, [actionables, commandTarget])
 
-  if (!selectedSensor) {
+  if (!selectedActionable) {
     return <input type="text" name="value" placeholder="Valeur" disabled />
   }
 
-  if (selectedSensor.value === '0-1') {
+  if (selectedActionable.value === '0-1') {
     return (
       <select value={commandValue} onChange={onChange}>
-        <option value="0">0 (activé)</option>
-        <option value="1">1 (désactivé)</option>
+        <option value="0">0</option>
+        <option value="1">1</option>
       </select>
     )
   }

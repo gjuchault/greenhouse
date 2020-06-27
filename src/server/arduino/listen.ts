@@ -58,7 +58,7 @@ export function buildListenArduino({
       })
 
       events.on('command:send', (target, value) => {
-        const data = `${target};${Math.trunc(value).toString()}`
+        const data = `${target};${Math.trunc(Number(value)).toString()}`
 
         log('arduino', `< ${data}`)
         port.write(`${data}\n`, (err) => {

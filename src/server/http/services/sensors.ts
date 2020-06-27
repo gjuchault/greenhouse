@@ -1,14 +1,13 @@
-import { cache } from '../../cache'
+import { emitterCache } from '../../cache'
 import { createStorage } from '../../storage'
 
 export async function listSensorValues() {
-  return Array.from(cache.entries())
+  return Array.from(emitterCache.entries())
 }
 
-export async function listReceiverSensors() {
+export async function listActionables() {
   const storage = await createStorage()
-
-  return storage.listReceiverSensors()
+  return storage.listActionables()
 }
 
 export async function listEmitterSensors() {

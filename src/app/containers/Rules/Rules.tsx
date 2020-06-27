@@ -1,27 +1,33 @@
-import React from 'react'
-import { useQuery, useMutation } from '../../hooks/useQuery'
+import React, { useState, useEffect } from 'react'
+import { useQuery, useMutation, State } from '../../hooks/useQuery'
 import { useTextInput } from '../../hooks/useInput'
-import { ReceiverSensorValue } from '../../components/ReceiverSensorValue/ReceiverSensorValue'
-import { OperationInput } from '../../components/OperationInput/OperationInput'
+import { ActionableValue } from '../../components/ActionableValue/ActionableValue'
+import { RuleEditor } from '../../components/RuleEditor/RuleEditor'
+import { defaultRule } from './defaultRule'
 
-import styles, { rules } from './Rules.module.css'
+import styles from './Rules.module.css'
 
 type Rule = {
   id: string
-  operation: 'lt' | 'le' | 'eq' | 'ne' | 'ge' | 'gt'
-  source: string
-  target: string
-  targetValue: number
-  threshold: number
+  rule: string
+  priority: number
 }
 
 type Command = { id: string; target: string; value: string; expiresIn: string }
 
-type ReceiverSensor = {
+type Actionable = {
   id: string
+  target: string
   name: string
-  sensor: string
   value: '0-1' | '1-1024'
+}
+
+type EmitterSensor = {
+  id: string
+  sensor: string
+  name: string
+  min: number
+  max: number
 }
 
 type CreateCommandBody = {
@@ -31,11 +37,8 @@ type CreateCommandBody = {
 }
 
 type CreateRuleBody = {
-  source: string
-  operation: string
-  threshold: number
-  target: string
-  targetValue: number
+  rule: string
+  priority: number
 }
 
 const operatorsNames = {
@@ -53,10 +56,8 @@ export function Rules() {
     commands: Command[]
   }>('/api/rules-and-commands')
 
-  const { data: receiverSensors } = useQuery<ReceiverSensor[]>(
-    '/api/receiver-sensors'
-  )
-  const { data: emitterSensors } = useQuery<ReceiverSensor[]>(
+  const { data: actionables } = useQuery<Actionable[]>('/api/actionables')
+  const { data: emitterSensors } = useQuery<EmitterSensor[]>(
     '/api/emitter-sensors'
   )
 
@@ -64,17 +65,17 @@ export function Rules() {
     '/api/command'
   )
 
-  const [createRule] = useMutation<CreateRuleBody, unknown>('/api/rule')
+  const [createRule, state] = useMutation<CreateRuleBody, unknown>('/api/rule')
 
   const [commandTarget, setCommandTarget] = useTextInput('')
   const [commandValue, setCommandValue] = useTextInput('')
   const [commandExpires, setCommandExpires] = useTextInput('')
 
-  const [ruleSource, setRuleSource] = useTextInput('')
-  const [ruleOperation, setRuleOperation] = useTextInput('eq')
-  const [ruleThreshold, setRuleThreshold] = useTextInput('')
-  const [ruleTarget, setRuleTarget] = useTextInput('')
-  const [ruleValue, setRuleValue] = useTextInput('')
+  const [rule, setRule] = useState('')
+
+  useEffect(() => {
+    setRule(rulesAndCommands?.rules[0]?.rule || defaultRule)
+  }, [rulesAndCommands])
 
   const handleCreateCommand = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -90,32 +91,18 @@ export function Rules() {
   const handleCreateRule = async (e: React.FormEvent) => {
     e.preventDefault()
     await createRule({
-      source: ruleSource,
-      operation: ruleOperation,
-      threshold: Number(ruleThreshold),
-      target: ruleTarget,
-      targetValue: Number(ruleValue),
+      rule: rule,
+      priority: 1,
     })
 
     await refetch()
   }
 
-  if (!receiverSensors || !emitterSensors) {
+  if (!emitterSensors || !actionables) {
     return null
   }
 
-  const sortedReceiverSensors = receiverSensors.sort((left, right) => {
-    const leftMagnitude = Number(left.sensor.slice(0, 1))
-    const rightMagnitude = Number(right.sensor.slice(0, 1))
-
-    if (leftMagnitude !== rightMagnitude) {
-      return leftMagnitude - rightMagnitude
-    }
-
-    return left.name.localeCompare(right.name)
-  })
-
-  const sortedEmitterSensors = emitterSensors.sort((left, right) => {
+  const sortedActionables = actionables.sort((left, right) => {
     return left.name.localeCompare(right.name)
   })
 
@@ -125,19 +112,19 @@ export function Rules() {
       <form className={styles.form} onSubmit={handleCreateCommand}>
         <select value={commandTarget} onChange={setCommandTarget}>
           <option>Choisir une cible</option>
-          {sortedReceiverSensors.map((receiverSensor) => {
+          {sortedActionables.map((actionable) => {
             return (
-              <option key={receiverSensor.id} value={receiverSensor.sensor}>
-                {receiverSensor.name}
+              <option key={actionable.id} value={actionable.target}>
+                {actionable.name}
               </option>
             )
           })}
         </select>
-        <ReceiverSensorValue
+        <ActionableValue
           commandTarget={commandTarget}
           commandValue={commandValue}
           onChange={setCommandValue}
-          receiverSensors={receiverSensors}
+          actionables={actionables}
         />
         <input
           type="text"
@@ -159,72 +146,15 @@ export function Rules() {
       ))}
 
       <h2 className={styles.title}>Règles</h2>
-      <form className={styles.form} onSubmit={handleCreateRule}>
-        Quand &nbsp;
-        <select value={ruleSource} onChange={setRuleSource}>
-          <option>Choisir une source</option>
-          {sortedEmitterSensors.map((emitterSensors) => {
-            return (
-              <option key={emitterSensors.id} value={emitterSensors.sensor}>
-                {emitterSensors.name}
-              </option>
-            )
-          })}
-        </select>
-        <OperationInput operation={ruleOperation} onChange={setRuleOperation} />
-        <input
-          type="text"
-          name="threshold"
-          placeholder="Valeur"
-          value={ruleThreshold}
-          onChange={setRuleThreshold}
-        />
-        &nbsp;Alors &nbsp;
-        <select value={ruleTarget} onChange={setRuleTarget}>
-          <option>Choisir une cible</option>
-          {sortedReceiverSensors.map((receiverSensor) => {
-            return (
-              <option key={receiverSensor.id} value={receiverSensor.sensor}>
-                {receiverSensor.name}
-              </option>
-            )
-          })}
-        </select>
-        &nbsp;Prend &nbsp;
-        <ReceiverSensorValue
-          commandTarget={ruleTarget}
-          commandValue={ruleValue}
-          onChange={setRuleValue}
-          receiverSensors={receiverSensors}
-        />
-        <button type="submit">Appliquer</button>
-      </form>
-      <div className={styles.rules}>
-        {rulesAndCommands?.rules.map((rule) => {
-          const sourceName = emitterSensors.find(
-            (sensor) => sensor.sensor === rule.source
-          )?.name
-          const targetName = receiverSensors.find(
-            (sensor) => sensor.sensor === rule.target
-          )?.name
-
-          const operation = operatorsNames[rule.operation]
-
-          return (
-            <div key={rule.id} className={styles.rule}>
-              <span>Quand</span>
-              <strong>{rule.source}</strong>
-              <span>({sourceName || 'inconnu'})</span>
-              <strong>{operation}</strong>
-              <strong>{rule.threshold}</strong>
-              <span>Alors</span>
-              <strong>{targetName}</strong>
-              <span>Prend</span>
-              <strong>{rule.targetValue}</strong>
-            </div>
-          )
-        })}
-      </div>
+      <button
+        type="button"
+        className={styles.save}
+        disabled={state === State.Fetching}
+        onClick={handleCreateRule}
+      >
+        Sauvegarder
+      </button>
+      <RuleEditor value={rule} onChange={setRule} />
     </div>
   )
 }

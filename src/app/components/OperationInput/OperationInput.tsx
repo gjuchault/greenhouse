@@ -13,7 +13,7 @@ export function OperationInput({ operation, onChange }: Props) {
       <option value="eq">= (égal à)</option>
       <option value="ne">≠ (non égal à)</option>
       <option value="ge">≥ (supérieur ou égal à)</option>
-      <option value="gt">> (supérieur à)</option>
+      <option value="gt">{'>'} (supérieur à)</option>
     </select>
   )
 }

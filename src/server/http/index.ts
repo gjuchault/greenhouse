@@ -9,7 +9,7 @@ import { isLoggedIn } from './isLoggedIn'
 import { handleLogin } from './controllers/login'
 import {
   handleSensors,
-  handleListReceiverSensors,
+  handleListActionables,
   handleListEmitterSensors,
 } from './controllers/sensors'
 import {
@@ -42,7 +42,7 @@ export async function createHttp() {
   app.post('/api/login', handleLogin)
   app.get('/api/sensors', isLoggedIn, handleSensors)
   app.get('/api/rules-and-commands', isLoggedIn, handleRulesAndCommands)
-  app.get('/api/receiver-sensors', isLoggedIn, handleListReceiverSensors)
+  app.get('/api/actionables', isLoggedIn, handleListActionables)
   app.get('/api/emitter-sensors', isLoggedIn, handleListEmitterSensors)
   app.post('/api/command', isLoggedIn, handleCreateCommand)
   app.post('/api/rule', isLoggedIn, handleCreateRule)
