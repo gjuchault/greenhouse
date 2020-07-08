@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from 'react'
-
-type Actionable = {
-  id: string
-  name: string
-  target: string
-  value: '0-1' | '1-1024'
-}
+import { Actionable } from '../../hooks/useQuery'
 
 type Props = {
   commandTarget: string
@@ -36,7 +30,7 @@ export function ActionableValue({
     return <input type="text" name="value" placeholder="Valeur" disabled />
   }
 
-  if (selectedActionable.value === '0-1') {
+  if (selectedActionable.valueType.range === '0-1') {
     return (
       <select value={commandValue} onChange={onChange}>
         <option value="0">0</option>

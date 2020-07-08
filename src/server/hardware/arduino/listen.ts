@@ -1,8 +1,8 @@
 import SerialPort from 'serialport'
 import Delimiter from '@serialport/parser-delimiter'
 import { USBDevice } from '../usb'
-import { log } from '../log'
-import { events } from '../events'
+import { log } from '../../log'
+import { events } from '../../events'
 
 export type Arduino = {
   send: (data: string) => Promise<void>

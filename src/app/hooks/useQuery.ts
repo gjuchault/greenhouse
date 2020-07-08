@@ -1,82 +1,126 @@
-import { useState, useEffect } from 'react'
+import {
+  useQuery,
+  useMutation,
+  queryCache,
+  MutationResultPair,
+} from 'react-query'
 import { api } from '../api'
+import { AxiosResponse } from 'axios'
 
-export enum State {
-  Idle,
-  Fetching,
-  Success,
-  Error,
-}
-
-type UseQuery<TResponse> = {
-  data: TResponse | undefined
-  state: State
-  refetch: () => void
-}
-
-export function useQuery<TResponse>(url: string): UseQuery<TResponse> {
-  const [state, setState] = useState<State>(State.Idle)
-  const [response, setResponse] = useState<TResponse>()
-  const [refetchToken, setRefetchToken] = useState(0)
-
-  useEffect(() => {
-    async function fetchData() {
-      setState(State.Fetching)
-      let response: TResponse
-
-      try {
-        const { data } = await api.get<TResponse>(url)
-        response = data
-      } catch (err) {
-        setState(State.Error)
-        return
-      }
-
-      setState(State.Success)
-      setResponse(response)
-    }
-
-    fetchData()
-  }, [refetchToken])
-
-  function refetch() {
-    setRefetchToken((value) => value + 1)
+export interface EmitterSensor {
+  id: string
+  sensor: string
+  name: string
+  range: {
+    min: number
+    max: number
   }
+  lastStatement?: {
+    value: string
+    sentAt: string
+    source: string
+  }
+}
+
+export interface Actionable {
+  id: string
+  target: string
+  name: string
+  valueType: {
+    range: '0-1' | '1-1024'
+    default: string
+  }
+  lastAction?: {
+    value: string
+    sentAt: string
+  }
+}
+
+type Rule = {
+  id: string
+  rule: string
+  priority: number
+}
+
+type Command = { id: string; target: string; value: string; expiresIn: string }
+
+export const useActionables = () => {
+  const q = useQuery<AxiosResponse<[string, Actionable][]>, string>(
+    'GET /api/actionables',
+    () => api.get('/api/actionables')
+  )
 
   return {
-    data: response,
-    state,
-    refetch,
+    ...q,
+    data: q.data ? new Map(q.data.data) : undefined,
   }
 }
 
-type UseMutation<TBody, TResponse> = [
-  (body: TBody) => Promise<TResponse | undefined>,
-  State
-]
+export const useSensors = () => {
+  const q = useQuery<AxiosResponse<[string, EmitterSensor][]>, string>(
+    'GET /api/sensors',
+    () => api.get('/api/sensors')
+  )
 
-export function useMutation<TBody, TResponse>(
-  url: string
-): UseMutation<TBody, TResponse> {
-  const [state, setState] = useState<State>(State.Idle)
+  return {
+    ...q,
+    data: q.data ? new Map(q.data.data) : undefined,
+  }
+}
 
-  async function postData(body: TBody) {
-    let response: TResponse
+export const useRulesAndCommands = () => {
+  const q = useQuery<
+    AxiosResponse<{
+      rules: Rule[]
+      commands: Command[]
+    }>,
+    string
+  >('GET /api/rules-and-commands', () => api.get('/api/rules-and-commands'))
 
-    setState(State.Fetching)
+  return {
+    ...q,
+    data: q.data?.data,
+  }
+}
 
-    try {
-      const { data } = await api.post(url, body)
-      response = data
-    } catch (err) {
-      setState(State.Error)
-      return
+type LoginBody = {
+  user: string
+  password: string
+}
+
+type LoginResponse =
+  | { outcome: 'notLoggedIn'; reason: 'invalidBody' }
+  | { outcome: 'notLoggedIn'; reason: 'userNotFound' }
+  | { outcome: 'notLoggedIn'; reason: 'invalidPassword' }
+  | { outcome: 'loggedIn'; name: string; token: string }
+
+export const useLogin = () =>
+  useMutation<LoginResponse, LoginBody>(
+    async (body) => (await api.post('/api/login', body)).data
+  )
+
+type CreateCommandBody = {
+  target: string
+  value: string
+  expiresIn: string
+}
+
+export const useCreateCommand = () =>
+  useMutation<void, CreateCommandBody>(
+    (body) => api.post('/api/command', body),
+    {
+      onSuccess: () =>
+        queryCache.invalidateQueries('GET /api/rules-and-commands'),
     }
+  )
 
-    setState(State.Success)
-
-    return response
-  }
-
-  return [postData, state]
+type CreateRuleBody = {
+  rule: string
+  priority: number
 }
+
+export const useCreateRule = () =>
+  useMutation<void, CreateRuleBody>((body) => api.post('/api/rule', body), {
+    onSuccess: () =>
+      queryCache.invalidateQueries('GET /api/rules-and-commands'),
+  })
