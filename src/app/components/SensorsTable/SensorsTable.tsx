@@ -6,21 +6,12 @@ import {
   useAsyncDebounce,
   Column,
 } from 'react-table'
+import { EmitterSensor } from '../../hooks/useQuery'
+import { formatDate } from '../../helpers/date'
 import styles from './SensorsTable.module.css'
 
 type Props = {
   emitterSensors: EmitterSensor[]
-}
-
-type EmitterSensor = {
-  id: string
-  sensor: string
-  name: string
-  min: number
-  max: number
-  lastValue?: string
-  lastValueSentAt?: string
-  lastValueSentFrom?: string
 }
 
 export function SensorsTable({ emitterSensors }: Props) {
@@ -36,23 +27,35 @@ export function SensorsTable({ emitterSensors }: Props) {
       },
       {
         Header: 'Minimum',
-        accessor: 'min',
+        accessor: (item) => item.range.min,
       },
       {
         Header: 'Maximum',
-        accessor: 'max',
+        accessor: (item) => item.range.max,
       },
       {
         Header: 'Dernière valeur',
-        accessor: 'lastValue',
+        accessor: (item) => item.lastStatement?.value,
       },
       {
         Header: 'Envoyée le',
-        accessor: 'lastValueSentAt',
+        accessor: (item) => new Date(item.lastStatement?.sentAt ?? 0),
+        Cell: (input: { value: Date }) => {
+          if (
+            !input.value ||
+            Number.isNaN(input.value.getTime()) ||
+            input.value.getFullYear() === new Date(0).getFullYear()
+          ) {
+            return '-'
+          }
+
+          return formatDate(input.value)
+        },
+        sortType: 'datetime',
       },
       {
         Header: 'Source',
-        accessor: 'lastValueSentFrom',
+        accessor: (item) => item.lastStatement?.source,
       },
     ],
     []

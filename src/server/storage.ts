@@ -4,12 +4,16 @@ import sql from 'sql-template-strings'
 import { log } from './log'
 import { reshapeRule, Rule } from './rules/rule'
 import { reshapeCommand, Command } from './rules/command'
+import { EmitterSensor } from './sensors'
+import { keyByWith } from './helpers/iterables'
+import { Actionable } from './actionables'
+import { raw } from 'body-parser'
 
 export type Storage = {
   getUserByName: (
     name: string
   ) => Promise<{ id: string; name: string; password: string } | undefined>
-  postEntry: (sensor: string, value: string) => Promise<void>
+  postEntry: (sensor: string, value: string, source: string) => Promise<void>
   listRules: () => Promise<Rule[]>
   postRule: (rule: string, priority: number) => Promise<void>
   listCommands: () => Promise<Command[]>
@@ -18,21 +22,20 @@ export type Storage = {
     value: string,
     expiresIn: string
   ) => Promise<void>
-  listActionables: () => Promise<
-    {
-      id: string
-      target: string
-      name: string
-      value: '0-1' | '1-1024'
-      default_value: string
-    }[]
-  >
-  listEmitterSensors: () => Promise<
-    { id: string; sensor: string; name: string; min: number; max: number }[]
-  >
+  listActionables: () => Promise<Map<string, Actionable>>
+  listEmitterSensors: () => Promise<Map<string, EmitterSensor>>
 }
 
 let db: pg.Client
+let storage: Storage
+
+export function getStorage() {
+  if (!storage) {
+    throw new Error('Please call createStorage before getStorage')
+  }
+
+  return storage
+}
 
 export async function createStorage(): Promise<Storage> {
   if (!db) {
@@ -54,11 +57,11 @@ export async function createStorage(): Promise<Storage> {
     }
   }
 
-  async function postEntry(sensor: string, value: string) {
+  async function postEntry(sensor: string, value: string, source: string) {
     try {
       await db.query(sql`
-        insert into statement(id, sensor, value, date)
-        values (${uuid()}, ${sensor}, ${value}, now())
+        insert into statement(id, sensor, value, source, date)
+        values (${uuid()}, ${sensor}, ${value}, ${source}, now())
       `)
     } catch (err) {
       console.log(err)
@@ -142,9 +145,11 @@ export async function createStorage(): Promise<Storage> {
 
   async function postRule(rule: string, priority: number) {
     try {
-      const l = await db.query(sql`select count(1) as count from rules`)
+      const existingRule = await db.query<{ count: number }>(sql`
+        select count(1) as count from rules
+      `)
 
-      if (Number(l.rows[0].count) > 0) {
+      if (Number(existingRule.rows[0].count) > 0) {
         await db.query(sql`
           update rules
           set rule = ${rule}
@@ -162,33 +167,143 @@ export async function createStorage(): Promise<Storage> {
     }
   }
 
-  async function listActionables() {
+  async function getLastValueBySensor() {
     try {
-      const data = await db.query(sql`
+      const data = await db.query<{
+        id: string
+        sensor: string
+        value: string
+        date: Date
+        source: string
+      }>(sql`
+        select distinct on (sensor) * from statement
+        order by sensor, date desc;
+      `)
+
+      return new Map(
+        data.rows.map((sensor) => [
+          sensor.sensor,
+          {
+            value: sensor.value,
+            lastSentAt: sensor.date.toISOString(),
+            source: sensor.sensor,
+          },
+        ])
+      )
+    } catch (err) {
+      console.log(err)
+      return new Map()
+    }
+  }
+
+  async function listActionables() {
+    let actionables: Map<string, Actionable>
+
+    try {
+      const data = await db.query<{
+        id: string
+        target: string
+        name: string
+        value: '0-1' | '1-1024'
+        default_value: string
+        last_value: string
+        last_value_sent_at: string
+      }>(sql`
         select * from actionables
       `)
 
-      return data.rows
+      actionables = keyByWith(
+        data.rows,
+        (rawActionable) => rawActionable.target,
+        (rawActionable) => ({
+          id: rawActionable.id,
+          name: rawActionable.name,
+          target: rawActionable.target,
+          valueType: {
+            range: rawActionable.value,
+            default: rawActionable.default_value,
+          },
+          lastAction: rawActionable.last_value
+            ? {
+                value: rawActionable.last_value,
+                sentAt: rawActionable.last_value_sent_at,
+              }
+            : undefined,
+        })
+      )
     } catch (err) {
       console.log(err)
-      return []
+      return new Map()
     }
+
+    return actionables
   }
 
   async function listEmitterSensors() {
+    let emitterSensors: Map<string, EmitterSensor>
+
     try {
-      const data = await db.query(sql`
+      const data = await db.query<{
+        id: string
+        sensor: string
+        name: string
+        min: number
+        max: number
+      }>(sql`
         select * from emitter_sensors
       `)
 
-      return data.rows
+      emitterSensors = keyByWith(
+        data.rows,
+        (rawSensor) => rawSensor.sensor,
+        (rawSensor) => ({
+          id: rawSensor.id,
+          name: rawSensor.name,
+          sensor: rawSensor.sensor,
+          range: {
+            min: rawSensor.min,
+            max: rawSensor.max,
+          },
+        })
+      )
     } catch (err) {
       console.log(err)
-      return []
+      return new Map()
     }
+
+    try {
+      const data = await db.query<{
+        id: string
+        sensor: string
+        value: string
+        date: Date
+        source: string
+      }>(sql`
+        select distinct on (sensor) * from statement
+        order by sensor, date desc;
+      `)
+
+      for (const lastStatement of data.rows) {
+        if (emitterSensors.get(lastStatement.sensor)) {
+          emitterSensors.set(lastStatement.sensor, {
+            ...emitterSensors.get(lastStatement.sensor)!,
+            lastStatement: {
+              value: lastStatement.value,
+              sentAt: lastStatement.date.toISOString(),
+              source: lastStatement.source,
+            },
+          })
+        }
+      }
+    } catch (err) {
+      console.log(err)
+      return new Map()
+    }
+
+    return emitterSensors
   }
 
-  return {
+  storage = {
     getUserByName,
     postEntry,
     listRules,
@@ -198,4 +313,6 @@ export async function createStorage(): Promise<Storage> {
     listActionables,
     listEmitterSensors,
   }
+
+  return storage
 }

@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { ControlledEditor, monaco } from '@monaco-editor/react'
+import { Actionable, EmitterSensor } from '../../hooks/useQuery'
 import styles from './RuleEditor.module.css'
 
 type Props = {
@@ -7,21 +8,6 @@ type Props = {
   onChange: (value: string) => void
   actionables: Actionable[]
   emitterSensors: EmitterSensor[]
-}
-
-type Actionable = {
-  id: string
-  target: string
-  name: string
-  value: '0-1' | '1-1024'
-}
-
-type EmitterSensor = {
-  id: string
-  sensor: string
-  name: string
-  min: number
-  max: number
 }
 
 export function RuleEditor({
@@ -35,41 +21,58 @@ export function RuleEditor({
       const instance = await monaco.init()
 
       const Actionables = [
-        'declare const Actionables = {',
+        'declare const Actionables: {',
         ...actionables.map((actionable) => `"${actionable.name}": string`),
         '}',
       ].join('\n')
 
       const Sensors = [
-        'declare const Sensors = {',
+        'declare const Sensors: {',
         ...emitterSensors.map((sensor) => `"${sensor.name}": string`),
         '}',
       ].join('\n')
 
+      const greenhouseLib = `
+        declare const date: Date;
+
+        ${Actionables}
+        ${Sensors}
+
+        interface EmitterSensor {
+          id: string
+          sensor: string
+          name: string
+          range: {
+            min: number
+            max: number
+          }
+          lastStatement?: {
+            value: string
+            sentAt: string
+            source: string
+          }
+        }
+
+        interface Actionable {
+          id: string
+          target: string
+          name: string
+          valueType: {
+            range: '0-1' | '1-1024'
+            default: string
+          }
+          lastAction?: {
+            value: string
+            sentAt: string
+          }
+        }
+
+        declare const emitterSensors: Map<string, EmitterSensor>;
+        declare const actionables: Map<string, Actionable>;
+      `
+
       instance.languages.typescript.javascriptDefaults.addExtraLib(
-        `
-          declare const date: Date;
-
-          ${Actionables}
-          ${Sensors}
-
-          declare const emitterSensors: Map<
-            string,
-            {
-              value: string
-              lastSentAt: string
-              source: string
-            }
-          >;
-
-          declare const actionables: Map<
-            string,
-            {
-              value: string
-              lastSentAt: string
-            }
-          >;
-        `,
+        greenhouseLib,
         'ts:greenhouse.d.ts'
       )
     })()
@@ -88,7 +91,7 @@ export function RuleEditor({
           },
         }}
         value={value}
-        onChange={(ev, value) => onChange(value || '')}
+        onChange={(_, value) => onChange(value || '')}
       />
     </div>
   )

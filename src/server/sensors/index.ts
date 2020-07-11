@@ -1,3 +1,18 @@
+export interface EmitterSensor {
+  id: string
+  sensor: string
+  name: string
+  range: {
+    min: number
+    max: number
+  }
+  lastStatement?: {
+    value: string
+    sentAt: string
+    source: string
+  }
+}
+
 export function parse(data: number) {
   const rawSensorId = (data & 0b111111100000000000000000) >> 17
   const rawSign = (data & 0b000000010000000000000000) >> 16

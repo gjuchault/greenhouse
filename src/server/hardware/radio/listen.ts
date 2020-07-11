@@ -1,7 +1,7 @@
 import rfxcom from 'rfxcom'
 import { USBDevice } from '../usb'
-import { log } from '../log'
-import { events } from '../events'
+import { log } from '../../log'
+import { events } from '../../events'
 
 const lightning4Type = 0x13
 
