@@ -6,20 +6,11 @@ import {
   useAsyncDebounce,
   Column,
 } from 'react-table'
+import { Actionable } from '../../hooks/useQuery'
 import styles from './ActionablesTable.module.css'
 
 type Props = {
   actionables: Actionable[]
-}
-
-type Actionable = {
-  id: string
-  target: string
-  name: string
-  value: '0-1' | '1-1024'
-  default_value: string
-  lastValue?: string
-  lastSentAt?: string
 }
 
 export function ActionablesTable({ actionables }: Props) {
@@ -35,11 +26,11 @@ export function ActionablesTable({ actionables }: Props) {
       },
       {
         Header: 'Type de valeur',
-        accessor: 'value',
+        accessor: (item) => item.valueType.range,
       },
       {
         Header: 'Valeur actuelle',
-        accessor: 'lastValue',
+        accessor: (item) => item.lastAction?.value,
       },
     ],
     []

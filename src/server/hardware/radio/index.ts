@@ -1,8 +1,8 @@
 import { USBDevice } from '../usb'
 import { buildListenRadio } from './listen'
-import { log } from '../log'
-import { parse } from '../sensors'
-import { events } from '../events'
+import { log } from '../../log'
+import { parse } from '../../sensors'
+import { events } from '../../events'
 
 export async function createRadio({ usbDevices }: { usbDevices: USBDevice[] }) {
   if (process.env.DISABLE_RADIO) {

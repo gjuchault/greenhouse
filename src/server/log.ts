@@ -1,5 +1,7 @@
 import chalk from 'chalk'
 
+export type Log = (service: string, message: string) => void
+
 export const log = (service: string, message: string) => {
   let coloredService = chalk.green(service)
 

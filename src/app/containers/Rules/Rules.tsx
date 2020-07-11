@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { useQuery, useMutation, State } from '../../hooks/useQuery'
+import {
+  useRulesAndCommands,
+  useActionables,
+  useSensors,
+  useCreateCommand,
+  useCreateRule,
+} from '../../hooks/useQuery'
 import { useTextInput } from '../../hooks/useInput'
 import { ActionableValue } from '../../components/ActionableValue/ActionableValue'
 import { RuleEditor } from '../../components/RuleEditor/RuleEditor'
@@ -7,60 +13,13 @@ import { defaultRule } from './defaultRule'
 
 import styles from './Rules.module.css'
 
-type Rule = {
-  id: string
-  rule: string
-  priority: number
-}
-
-type Command = { id: string; target: string; value: string; expiresIn: string }
-
-type Actionable = {
-  id: string
-  target: string
-  name: string
-  value: '0-1' | '1-1024'
-  default_value: string
-  lastValue?: string
-  lastSentAt?: string
-}
-
-type EmitterSensor = {
-  id: string
-  sensor: string
-  name: string
-  min: number
-  max: number
-  lastValue?: string
-  lastSentAt?: string
-  lastSentFrom?: string
-}
-
-type CreateCommandBody = {
-  target: string
-  value: string
-  expiresIn: string
-}
-
-type CreateRuleBody = {
-  rule: string
-  priority: number
-}
-
 export function Rules() {
-  const { data: rulesAndCommands, refetch } = useQuery<{
-    rules: Rule[]
-    commands: Command[]
-  }>('/api/rules-and-commands')
+  const { data: rulesAndCommands, refetch } = useRulesAndCommands()
 
-  const { data: actionables } = useQuery<Actionable[]>('/api/actionables')
-  const { data: emitterSensors } = useQuery<EmitterSensor[]>('/api/sensors')
-
-  const [createCommand] = useMutation<CreateCommandBody, unknown>(
-    '/api/command'
-  )
-
-  const [createRule, state] = useMutation<CreateRuleBody, unknown>('/api/rule')
+  const { data: actionables } = useActionables()
+  const { data: emitterSensors } = useSensors()
+  const [createCommand] = useCreateCommand()
+  const [createRule, { status: createRuleStatus }] = useCreateRule()
 
   const [commandTarget, setCommandTarget] = useTextInput('')
   const [commandValue, setCommandValue] = useTextInput('')
@@ -93,13 +52,15 @@ export function Rules() {
     await refetch()
   }
 
-  if (!emitterSensors || !actionables) {
+  if (!emitterSensors || !actionables || !rulesAndCommands) {
     return null
   }
 
-  const sortedActionables = actionables.sort((left, right) => {
-    return left.name.localeCompare(right.name)
-  })
+  const sortedActionables = Array.from(actionables.values()).sort(
+    (left, right) => {
+      return left.name.localeCompare(right.name)
+    }
+  )
 
   return (
     <div className={styles.rulesAndCommands}>
@@ -119,7 +80,7 @@ export function Rules() {
           commandTarget={commandTarget}
           commandValue={commandValue}
           onChange={setCommandValue}
-          actionables={actionables}
+          actionables={Array.from(actionables.values())}
         />
         <input
           type="text"
@@ -144,7 +105,7 @@ export function Rules() {
       <button
         type="button"
         className={styles.save}
-        disabled={state === State.Fetching}
+        disabled={createRuleStatus === 'loading'}
         onClick={handleCreateRule}
       >
         Sauvegarder
@@ -152,8 +113,8 @@ export function Rules() {
       <RuleEditor
         value={rule}
         onChange={setRule}
-        actionables={actionables}
-        emitterSensors={emitterSensors}
+        actionables={Array.from(actionables.values())}
+        emitterSensors={Array.from(emitterSensors.values())}
       />
     </div>
   )

@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Card } from '../../components/Card/Card'
 
-import { useMutation, State } from '../../hooks/useQuery'
+import { useLogin } from '../../hooks/useQuery'
 import { useTextInput } from '../../hooks/useInput'
 
 import styles from './Login.module.css'
@@ -25,7 +25,7 @@ type LoginResponse =
 export function Login({ onLoggedIn }: LoginProps) {
   const [name, setName] = useTextInput('')
   const [password, setPassword] = useTextInput('')
-  const [sendLogin, state] = useMutation<LoginBody, LoginResponse>('/api/login')
+  const [sendLogin, { isLoading }] = useLogin()
 
   const login = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -43,17 +43,17 @@ export function Login({ onLoggedIn }: LoginProps) {
         <form className={styles.form} onSubmit={login}>
           <input
             type="text"
-            disabled={state === State.Fetching}
+            disabled={isLoading}
             placeholder="Nom"
             onChange={setName}
           />
           <input
             type="password"
-            disabled={state === State.Fetching}
+            disabled={isLoading}
             placeholder="Mot de passe"
             onChange={setPassword}
           />
-          <button type="submit" disabled={state === State.Fetching}>
+          <button type="submit" disabled={isLoading}>
             Connexion
           </button>
         </form>

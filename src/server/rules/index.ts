@@ -1,112 +1,27 @@
-import vm from 'vm'
 import { log } from '../log'
-import { Storage } from '../storage'
-import { Rule } from './rule'
-import { Command } from './command'
-import { events } from '../events'
-import { actionableCache } from '../cache'
+import { getStorage } from '../storage'
+import { processRules } from './rules'
+import { debounce } from '../helpers/debounce'
 
-export async function createRules({ storage }: { storage: Storage }) {
-  let rules: Rule[] = []
-  let commands: Command[] = []
+async function _executeRules(): Promise<void> {
+  const now = new Date()
+  const storage = getStorage()
 
-  function executeRules(
-    emitterSensors: Map<
-      string,
-      {
-        value: string
-        lastSentAt: string
-        source: string
-      }
-    >,
-    actionables: Map<
-      string,
-      {
-        value: string
-        lastSentAt: string
-      }
-    >,
-    sensorsList: {
-      sensor: string
-      name: string
-    }[],
-    actionablesList: {
-      target: string
-      name: string
-    }[]
-  ): Map<string, string> {
-    const now = new Date()
+  const [rules, commands, emitterSensors, actionables] = await Promise.all([
+    storage.listRules(),
+    storage.listCommands(),
+    storage.listEmitterSensors(),
+    storage.listActionables(),
+  ])
 
-    log('rules', `Executing ${rules.length} rules (${now.toISOString()})`)
+  log('rules', `Executing ${rules.length} rules (${now.toISOString()})`)
 
-    const sortedRules = rules.sort(
-      (left, right) => left.priority - right.priority
-    )
-
-    let result: Map<string, string> = new Map(
-      Array.from(actionables.keys()).map((key) => [key, '1'])
-    )
-
-    const Actionables: Record<string, string> = {}
-    for (const actionable of actionablesList) {
-      Actionables[actionable.name] = actionable.target
-    }
-
-    const Sensors: Record<string, string> = {}
-    for (const sensor of sensorsList) {
-      Sensors[sensor.name] = sensor.sensor
-    }
-
-    for (const rule of sortedRules) {
-      const vmContext = vm.createContext({
-        date: now,
-        emitterSensors,
-        actionables,
-        Actionables,
-        Sensors,
-      })
-
-      try {
-        const output = vm.runInContext(rule.rule, vmContext)
-
-        if (output instanceof Map) {
-          throw new TypeError(`Code is not returning a Map`)
-        }
-
-        for (const [key, value] of output as Map<string, number>) {
-          result.set(key, value.toString())
-        }
-      } catch (err) {
-        console.log(err)
-        continue
-      }
-    }
-
-    for (const command of commands) {
-      if (command.expiresIn <= now) {
-        result.set(command.target, command.value)
-      }
-    }
-
-    return result
-  }
-
-  async function refreshRulesAndCommands() {
-    commands = await storage.listCommands()
-    rules = await storage.listRules()
-  }
-
-  function listCommands() {
-    return storage.listCommands()
-  }
-
-  await refreshRulesAndCommands()
-
-  events.on('rules:new', refreshRulesAndCommands)
-  setInterval(refreshRulesAndCommands, 30000)
-
-  return {
-    listCommands,
-    executeRules,
-  }
+  return processRules({
+    rules,
+    commands,
+    emitterSensors,
+    actionables,
+  })
 }
+
+export const executeRules = debounce(_executeRules, 3500)
