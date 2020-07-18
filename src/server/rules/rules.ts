@@ -18,7 +18,7 @@ export function processRules({
   commands,
   emitterSensors,
   actionables,
-}: ProcessRulesParameters): void {
+}: ProcessRulesParameters): Map<string, string> {
   const now = new Date()
 
   log('rules', `Executing ${rules.length} rules (${now.toISOString()})`)
@@ -72,11 +72,17 @@ export function processRules({
     }
   }
 
-  for (const [target, value] of result) {
-    if (value !== actionables.get(target)?.lastAction?.value) {
-      log('rules', `${target} : ${value}`)
+  const filteredResult = new Map(
+    Array.from(result).filter(([target, value]) => {
+      return value !== actionables.get(target)?.lastAction?.value
+    })
+  )
 
-      events.emit('command:send', target, value)
-    }
+  for (const [target, value] of filteredResult) {
+    log('rules', `${target} : ${value}`)
+
+    events.emit('command:send', target, value)
   }
+
+  return filteredResult
 }
