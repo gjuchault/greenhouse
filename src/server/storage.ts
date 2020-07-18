@@ -242,8 +242,21 @@ export async function createStorage(): Promise<Storage> {
         name: string
         min: number
         max: number
+        value?: string
+        date?: Date
+        source?: string
       }>(sql`
-        select * from emitter_sensors
+        select
+          emitter_sensors.id,
+          emitter_sensors.sensor,
+          emitter_sensors.name,
+          emitter_sensors.min,
+          emitter_sensors.max,
+          statement.value,
+          statement.date,
+          statement.source
+        from emitter_sensors
+        left join statement on statement.id = emitter_sensors.last_statement
       `)
 
       emitterSensors = keyByWith(
@@ -257,37 +270,16 @@ export async function createStorage(): Promise<Storage> {
             min: rawSensor.min,
             max: rawSensor.max,
           },
+          lastStatement:
+            rawSensor.value && rawSensor.date && rawSensor.source
+              ? {
+                  value: rawSensor.value,
+                  sentAt: rawSensor.date.toISOString(),
+                  source: rawSensor.source,
+                }
+              : undefined,
         })
       )
-    } catch (err) {
-      console.log(err)
-      return new Map()
-    }
-
-    try {
-      const data = await db.query<{
-        id: string
-        sensor: string
-        value: string
-        date: Date
-        source: string
-      }>(sql`
-        select distinct on (sensor) * from statement
-        order by sensor, date desc;
-      `)
-
-      for (const lastStatement of data.rows) {
-        if (emitterSensors.get(lastStatement.sensor)) {
-          emitterSensors.set(lastStatement.sensor, {
-            ...emitterSensors.get(lastStatement.sensor)!,
-            lastStatement: {
-              value: lastStatement.value,
-              sentAt: lastStatement.date.toISOString(),
-              source: lastStatement.source,
-            },
-          })
-        }
-      }
     } catch (err) {
       console.log(err)
       return new Map()
