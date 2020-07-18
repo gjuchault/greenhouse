@@ -155,7 +155,7 @@ export async function createStorage(): Promise<Storage> {
 
       await db.query(sql`
         update actionables set
-          last_value = ${value}
+          last_value = ${value},
           last_value_sent_at = ${new Date()}
         where target = ${target}
       `)
@@ -205,7 +205,7 @@ export async function createStorage(): Promise<Storage> {
       for (const [target, value] of newValues) {
         await db.query(sql`
           update actionables set
-            last_value = ${value}
+            last_value = ${value},
             last_value_sent_at = ${now}
           where target = ${target}
         `)
