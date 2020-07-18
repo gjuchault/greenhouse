@@ -7,7 +7,6 @@ import { reshapeCommand, Command } from './rules/command'
 import { EmitterSensor } from './sensors'
 import { keyByWith } from './helpers/iterables'
 import { Actionable } from './actionables'
-import { raw } from 'body-parser'
 
 export type Storage = {
   getUserByName: (
@@ -22,6 +21,7 @@ export type Storage = {
     value: string,
     expiresIn: string
   ) => Promise<void>
+  setLastActionablesValues: (newValues: Map<string, string>) => Promise<void>
   listActionables: () => Promise<Map<string, Actionable>>
   listEmitterSensors: () => Promise<Map<string, EmitterSensor>>
 }
@@ -59,7 +59,7 @@ export async function createStorage(): Promise<Storage> {
 
   async function postEntry(sensor: string, value: string, source: string) {
     try {
-      await db.query('begin')
+      await db.query(sql`begin`)
 
       const { rows } = await db.query<{ id: string }>(sql`
         insert into statement(id, sensor, value, source, date)
@@ -73,9 +73,9 @@ export async function createStorage(): Promise<Storage> {
         where sensor = ${sensor}
       `)
 
-      await db.query('commit')
+      await db.query(sql`commit`)
     } catch (err) {
-      await db.query('rollback')
+      await db.query(sql`rollback`)
       console.log(err)
     }
   }
@@ -142,7 +142,7 @@ export async function createStorage(): Promise<Storage> {
 
   async function postCommand(target: string, value: string, expiresIn: string) {
     try {
-      await db.query('begin')
+      await db.query(sql`begin`)
 
       await db.query(sql`
         delete from commands where target=${target}
@@ -153,16 +153,23 @@ export async function createStorage(): Promise<Storage> {
         values (${uuid()}, ${target}, ${value}, ${expiresIn})
       `)
 
-      await db.query('commit')
+      await db.query(sql`
+        update actionables set
+          last_value = ${value}
+          last_value_sent_at = ${new Date()}
+        where target = ${target}
+      `)
+
+      await db.query(sql`commit`)
     } catch (err) {
-      await db.query('rollback')
+      await db.query(sql`rollback`)
       console.log(err)
     }
   }
 
   async function postRule(rule: string, priority: number) {
     try {
-      await db.query('begin')
+      await db.query(sql`begin`)
 
       const existingRule = await db.query<{ count: number }>(sql`
         select count(1) as count from rules
@@ -182,9 +189,31 @@ export async function createStorage(): Promise<Storage> {
         values (${uuid()}, ${rule}, ${priority})
       `)
 
-      await db.query('commit')
+      await db.query(sql`commit`)
     } catch (err) {
-      await db.query('rollback')
+      await db.query(sql`rollback`)
+      console.log(err)
+    }
+  }
+
+  async function setLastActionablesValues(newValues: Map<string, string>) {
+    const now = new Date()
+
+    try {
+      await db.query(sql`begin`)
+
+      for (const [target, value] of newValues) {
+        await db.query(sql`
+          update actionables set
+            last_value = ${value}
+            last_value_sent_at = ${now}
+          where target = ${target}
+        `)
+      }
+
+      await db.query(sql`commit`)
+    } catch (err) {
+      await db.query(sql`rollback`)
       console.log(err)
     }
   }
@@ -295,6 +324,7 @@ export async function createStorage(): Promise<Storage> {
     postRule,
     listCommands,
     postCommand,
+    setLastActionablesValues,
     listActionables,
     listEmitterSensors,
   }

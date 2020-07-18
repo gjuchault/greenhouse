@@ -16,12 +16,14 @@ async function _executeRules(): Promise<void> {
 
   log('rules', `Executing ${rules.length} rules (${now.toISOString()})`)
 
-  return processRules({
+  const newActionablesValues = processRules({
     rules,
     commands,
     emitterSensors,
     actionables,
   })
+
+  storage.setLastActionablesValues(newActionablesValues)
 }
 
 export const executeRules = debounce(_executeRules, 3500)
