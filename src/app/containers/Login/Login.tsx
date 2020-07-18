@@ -1,26 +1,19 @@
 import React from 'react'
-
-import { Card } from '../../components/Card/Card'
+import {
+  Pane,
+  Button,
+  Card,
+  TextInput,
+  Heading,
+  majorScale,
+} from 'evergreen-ui'
 
 import { useLogin } from '../../hooks/useQuery'
 import { useTextInput } from '../../hooks/useInput'
 
-import styles from './Login.module.css'
-
 type LoginProps = {
   onLoggedIn: (name: string, token: string) => void
 }
-
-type LoginBody = {
-  user: string
-  password: string
-}
-
-type LoginResponse =
-  | { outcome: 'notLoggedIn'; reason: 'invalidBody' }
-  | { outcome: 'notLoggedIn'; reason: 'userNotFound' }
-  | { outcome: 'notLoggedIn'; reason: 'invalidPassword' }
-  | { outcome: 'loggedIn'; name: string; token: string }
 
 export function Login({ onLoggedIn }: LoginProps) {
   const [name, setName] = useTextInput('')
@@ -37,27 +30,44 @@ export function Login({ onLoggedIn }: LoginProps) {
   }
 
   return (
-    <div className={styles.login}>
-      <Card className={styles.card}>
-        <h3 className={styles.title}>Serre</h3>
-        <form className={styles.form} onSubmit={login}>
-          <input
-            type="text"
-            disabled={isLoading}
-            placeholder="Nom"
-            onChange={setName}
-          />
-          <input
-            type="password"
-            disabled={isLoading}
-            placeholder="Mot de passe"
-            onChange={setPassword}
-          />
-          <button type="submit" disabled={isLoading}>
-            Connexion
-          </button>
+    <Pane
+      display="flex"
+      flex="1"
+      justifyContent="center"
+      alignItems="center"
+      marginTop="-20vh"
+    >
+      <Card elevation={2} padding={majorScale(3)} background="white">
+        <Heading textAlign="center" marginBottom={majorScale(2)} size={700}>
+          Serre
+        </Heading>
+        <form onSubmit={login}>
+          <Pane display="flex" flexDirection="column">
+            <TextInput
+              type="text"
+              disabled={isLoading}
+              placeholder="Nom"
+              marginBottom={majorScale(2)}
+              onChange={setName}
+            />
+            <TextInput
+              type="password"
+              disabled={isLoading}
+              placeholder="Mot de passe"
+              marginBottom={majorScale(2)}
+              onChange={setPassword}
+            />
+            <Button
+              appearance="primary"
+              type="submit"
+              disabled={isLoading}
+              justifyContent="center"
+            >
+              Connexion
+            </Button>
+          </Pane>
         </form>
       </Card>
-    </div>
+    </Pane>
   )
 }

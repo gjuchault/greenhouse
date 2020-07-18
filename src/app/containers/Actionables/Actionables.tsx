@@ -1,7 +1,7 @@
 import React from 'react'
+import { Pane, Card, Heading, majorScale } from 'evergreen-ui'
 import { useActionables } from '../../hooks/useQuery'
 import { ActionablesTable } from '../../components/ActionablesTable/ActionablesTable'
-import styles from './Actionables.module.css'
 
 export function Actionables() {
   const { data: actionables } = useActionables()
@@ -11,11 +11,18 @@ export function Actionables() {
   }
 
   return (
-    <div className={styles.actionables}>
-      <h2>Actionables</h2>
-      <div>
+    <Card
+      background="white"
+      padding={majorScale(3)}
+      elevation={1}
+      margin={majorScale(3)}
+    >
+      <Heading size={900} marginBottom={majorScale(3)}>
+        Actionables
+      </Heading>
+      <Pane>
         <ActionablesTable actionables={Array.from(actionables.values())} />
-      </div>
-    </div>
+      </Pane>
+    </Card>
   )
 }
