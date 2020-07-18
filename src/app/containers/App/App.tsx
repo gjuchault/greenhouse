@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom'
+import { Pane, useTheme } from 'evergreen-ui'
 import { Provider as AuthProvider } from '../../context/auth'
 import { isLoggedIn, getName, offlineLogin } from '../../auth'
 import { Login } from '../Login/Login'
@@ -9,6 +10,8 @@ import { Actionables } from '../Actionables/Actionables'
 import { Rules } from '../Rules/Rules'
 
 export function App() {
+  const theme = useTheme()
+
   const [auth, setAuth] = useState({
     isLoggedIn: false,
     name: '',
@@ -33,25 +36,31 @@ export function App() {
   }
 
   return (
-    <Router>
-      <AuthProvider value={auth}>
-        {!auth.isLoggedIn && <Login onLoggedIn={handleLoggedIn} />}
-        {auth.isLoggedIn && <Sidebar />}
-        {auth.isLoggedIn && (
-          <main>
-            <Route path="/sensors">
-              <Sensors />
-            </Route>
-            <Route path="/rules">
-              <Rules />
-            </Route>
-            <Route path="/actionables">
-              <Actionables />
-            </Route>
-            <Redirect from="/" exact to="/sensors" />
-          </main>
-        )}
-      </AuthProvider>
-    </Router>
+    <Pane
+      display="flex"
+      minHeight="100%"
+      background={theme.palette.neutral.lightest}
+    >
+      <Router>
+        <AuthProvider value={auth}>
+          {!auth.isLoggedIn && <Login onLoggedIn={handleLoggedIn} />}
+          {auth.isLoggedIn && <Sidebar />}
+          {auth.isLoggedIn && (
+            <Pane flex="1">
+              <Route path="/sensors">
+                <Sensors />
+              </Route>
+              <Route path="/rules">
+                <Rules />
+              </Route>
+              <Route path="/actionables">
+                <Actionables />
+              </Route>
+              <Redirect from="/" exact to="/sensors" />
+            </Pane>
+          )}
+        </AuthProvider>
+      </Router>
+    </Pane>
   )
 }

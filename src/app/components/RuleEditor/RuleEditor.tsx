@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
+import { Pane } from 'evergreen-ui'
 import { ControlledEditor, monaco } from '@monaco-editor/react'
 import { Actionable, EmitterSensor } from '../../hooks/useQuery'
-import styles from './RuleEditor.module.css'
 
 type Props = {
   value: string
@@ -79,7 +79,7 @@ export function RuleEditor({
   }, [])
 
   return (
-    <div className={styles.editor}>
+    <Pane height="100%">
       <ControlledEditor
         language="javascript"
         height="500px"
@@ -93,6 +93,6 @@ export function RuleEditor({
         value={value}
         onChange={(_, value) => onChange(value || '')}
       />
-    </div>
+    </Pane>
   )
 }

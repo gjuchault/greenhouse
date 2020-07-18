@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
+import { TextInput, Select, PaneProps } from 'evergreen-ui'
 import { Actionable } from '../../hooks/useQuery'
 
-type Props = {
+type Props = PaneProps & {
   commandTarget: string
   actionables: Actionable[]
   commandValue: string
@@ -13,6 +14,7 @@ export function ActionableValue({
   actionables,
   commandValue,
   onChange,
+  ...props
 }: Props) {
   const [selectedActionable, setSelectedActionable] = useState<
     Actionable | undefined
@@ -27,27 +29,38 @@ export function ActionableValue({
   }, [actionables, commandTarget])
 
   if (!selectedActionable) {
-    return <input type="text" name="value" placeholder="Valeur" disabled />
+    return (
+      <TextInput
+        type="text"
+        name="value"
+        placeholder="Valeur"
+        width="100px"
+        disabled
+        {...props}
+      />
+    )
   }
 
   if (selectedActionable.valueType.range === '0-1') {
     return (
-      <select value={commandValue} onChange={onChange}>
+      <Select value={commandValue} onChange={onChange} width={100} {...props}>
         <option value="0">0</option>
         <option value="1">1</option>
-      </select>
+      </Select>
     )
   }
 
   return (
-    <input
+    <TextInput
       type="number"
       name="value"
       placeholder="Valeur"
+      width="100px"
       min="1"
       max="1024"
       value={commandValue}
       onChange={onChange}
+      {...props}
     />
   )
 }

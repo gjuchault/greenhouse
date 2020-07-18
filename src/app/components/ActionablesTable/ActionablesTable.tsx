@@ -6,8 +6,8 @@ import {
   useAsyncDebounce,
   Column,
 } from 'react-table'
+import { Pane, Table, SearchInput, majorScale } from 'evergreen-ui'
 import { Actionable } from '../../hooks/useQuery'
-import styles from './ActionablesTable.module.css'
 import { formatDate } from '../../helpers/date'
 
 type Props = {
@@ -75,48 +75,47 @@ export function ActionablesTable({ actionables }: Props) {
   )
 
   return (
-    <table {...getTableProps()} className={styles.table}>
-      <thead>
-        {headerGroups.map((headerGroup) => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column) => (
-              <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+    <>
+      <Pane marginBottom={majorScale(3)}>
+        <GlobalFilter
+          preGlobalFilteredRows={preGlobalFilteredRows}
+          globalFilter={state.globalFilter}
+          setGlobalFilter={setGlobalFilter}
+        />
+      </Pane>
+      <Table border {...getTableProps()}>
+        <Table.Head>
+          {headerGroups.map((headerGroup) => {
+            return headerGroup.headers.map((column) => (
+              <Table.TextHeaderCell
+                {...column.getHeaderProps(column.getSortByToggleProps())}
+              >
                 {column.render('Header')}
                 <span>
                   {column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}
                 </span>
-              </th>
-            ))}
-          </tr>
-        ))}
-        <tr>
-          <th
-            colSpan={visibleColumns.length}
-            style={{
-              textAlign: 'left',
-            }}
-          >
-            <GlobalFilter
-              preGlobalFilteredRows={preGlobalFilteredRows}
-              globalFilter={state.globalFilter}
-              setGlobalFilter={setGlobalFilter}
-            />
-          </th>
-        </tr>
-      </thead>
-      <tbody {...getTableBodyProps()}>
-        {rows.map((row, i) => {
-          prepareRow(row)
-          return (
-            <tr {...row.getRowProps()}>
-              {row.cells.map((cell) => {
-                return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-              })}
-            </tr>
-          )
-        })}
-      </tbody>
-    </table>
+              </Table.TextHeaderCell>
+            ))
+          })}
+        </Table.Head>
+        <Table.Body {...getTableBodyProps()} height={500}>
+          {rows.map((row, i) => {
+            prepareRow(row)
+            return (
+              <Table.Row {...row.getRowProps()}>
+                {row.cells.map((cell) => {
+                  return (
+                    <Table.TextCell {...cell.getCellProps()}>
+                      {cell.render('Cell')}
+                    </Table.TextCell>
+                  )
+                })}
+              </Table.Row>
+            )
+          })}
+        </Table.Body>
+      </Table>
+    </>
   )
 }
 
@@ -138,20 +137,15 @@ function GlobalFilter({
   }, 200)
 
   return (
-    <span>
-      Search:{' '}
-      <input
-        value={value || ''}
-        onChange={(e) => {
-          setValue(e.target.value)
-          onChange(e.target.value)
-        }}
-        placeholder={`${count} records...`}
-        style={{
-          fontSize: '1.1rem',
-          border: '0',
-        }}
-      />
-    </span>
+    <SearchInput
+      value={value || ''}
+      height={40}
+      width={350}
+      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+        setValue(e.target.value)
+        onChange(e.target.value)
+      }}
+      placeholder={`Rechercher parmis ${count} actionables...`}
+    />
   )
 }

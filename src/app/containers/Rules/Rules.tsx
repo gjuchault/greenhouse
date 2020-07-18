@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import {
+  Pane,
+  Card,
+  Heading,
+  Select,
+  TextInput,
+  Button,
+  Text,
+  majorScale,
+} from 'evergreen-ui'
+import {
   useRulesAndCommands,
   useActionables,
   useSensors,
@@ -10,8 +20,6 @@ import { useTextInput } from '../../hooks/useInput'
 import { ActionableValue } from '../../components/ActionableValue/ActionableValue'
 import { RuleEditor } from '../../components/RuleEditor/RuleEditor'
 import { defaultRule } from './defaultRule'
-
-import styles from './Rules.module.css'
 
 export function Rules() {
   const { data: rulesAndCommands, refetch } = useRulesAndCommands()
@@ -63,60 +71,101 @@ export function Rules() {
   )
 
   return (
-    <div className={styles.rulesAndCommands}>
-      <h2 className={styles.title}>Contrôle manuel</h2>
-      <form className={styles.form} onSubmit={handleCreateCommand}>
-        <select value={commandTarget} onChange={setCommandTarget}>
-          <option>Choisir une cible</option>
-          {sortedActionables.map((actionable) => {
-            return (
-              <option key={actionable.id} value={actionable.target}>
-                {actionable.name}
-              </option>
-            )
-          })}
-        </select>
-        <ActionableValue
-          commandTarget={commandTarget}
-          commandValue={commandValue}
-          onChange={setCommandValue}
+    <Card
+      background="white"
+      padding={majorScale(3)}
+      elevation={1}
+      margin={majorScale(3)}
+    >
+      <Heading size={800} marginBottom={majorScale(3)}>
+        Contrôle manuel
+      </Heading>
+      <Pane>
+        <form onSubmit={handleCreateCommand}>
+          <Pane
+            display="flex"
+            alignItems="center"
+            justifyContent="flex-start"
+            marginTop={majorScale(2)}
+            marginBottom={majorScale(2)}
+          >
+            <Pane>
+              <Select
+                marginRight={majorScale(1)}
+                value={commandTarget}
+                onChange={setCommandTarget}
+              >
+                <option>Choisir une cible</option>
+                {sortedActionables.map((actionable) => {
+                  return (
+                    <option key={actionable.id} value={actionable.target}>
+                      {actionable.name}
+                    </option>
+                  )
+                })}
+              </Select>
+            </Pane>
+            <Pane>
+              <ActionableValue
+                commandTarget={commandTarget}
+                commandValue={commandValue}
+                onChange={setCommandValue}
+                actionables={Array.from(actionables.values())}
+                marginRight={majorScale(2)}
+              />
+            </Pane>
+            <TextInput
+              type="text"
+              name="mins"
+              placeholder="Minutes"
+              value={commandExpires}
+              onChange={setCommandExpires}
+              width="100px"
+              marginRight={majorScale(2)}
+            />
+            <Button type="submit">Appliquer</Button>
+          </Pane>
+        </form>
+
+        <Pane display="flex" marginBottom={majorScale(3)}>
+          {rulesAndCommands?.commands.map((rule, i, { length }) => (
+            <Card
+              key={rule.id}
+              elevation={1}
+              display="flex"
+              flexDirection="column"
+              padding={majorScale(2)}
+              marginRight={i === length - 1 ? 0 : majorScale(2)}
+            >
+              <Text marginBottom={majorScale(1)}>Cible: {rule.target}</Text>
+              <Text marginBottom={majorScale(1)}>Valeur: {rule.value}</Text>
+              <Text>Expire: {makeMinsFromExpires(rule.expiresIn)}</Text>
+            </Card>
+          ))}
+        </Pane>
+      </Pane>
+
+      <Heading size={800} marginBottom={majorScale(3)}>
+        Règles
+      </Heading>
+      <Pane>
+        <Button
+          type="button"
+          appearance="primary"
+          disabled={createRuleStatus === 'loading'}
+          onClick={handleCreateRule}
+          marginBottom={majorScale(2)}
+        >
+          Sauvegarder
+        </Button>
+        <RuleEditor
+          value={rule}
+          onChange={setRule}
           actionables={Array.from(actionables.values())}
+          emitterSensors={Array.from(emitterSensors.values())}
         />
-        <input
-          type="text"
-          name="mins"
-          placeholder="Minutes"
-          value={commandExpires}
-          onChange={setCommandExpires}
-        />
-        <button type="submit">Appliquer</button>
-      </form>
-
-      {rulesAndCommands?.commands.map((rule) => (
-        <div key={rule.id}>
-          <strong>Commande</strong>
-          <div>Cible: {rule.target}</div>
-          <div>Valeur: {rule.value}</div>
-          <div>Expire: {makeMinsFromExpires(rule.expiresIn)}</div>
-        </div>
-      ))}
-
-      <h2 className={styles.title}>Règles</h2>
-      <button
-        type="button"
-        className={styles.save}
-        disabled={createRuleStatus === 'loading'}
-        onClick={handleCreateRule}
-      >
-        Sauvegarder
-      </button>
-      <RuleEditor
-        value={rule}
-        onChange={setRule}
-        actionables={Array.from(actionables.values())}
-        emitterSensors={Array.from(emitterSensors.values())}
-      />
-    </div>
+      </Pane>
+    </Card>
   )
 }
 

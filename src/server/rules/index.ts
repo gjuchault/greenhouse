@@ -14,8 +14,6 @@ async function _executeRules(): Promise<void> {
     storage.listActionables(),
   ])
 
-  log('rules', `Executing ${rules.length} rules (${now.toISOString()})`)
-
   const newActionablesValues = processRules({
     rules,
     commands,
