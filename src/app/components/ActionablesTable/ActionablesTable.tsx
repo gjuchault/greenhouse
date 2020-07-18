@@ -8,6 +8,7 @@ import {
 } from 'react-table'
 import { Actionable } from '../../hooks/useQuery'
 import styles from './ActionablesTable.module.css'
+import { formatDate } from '../../helpers/date'
 
 type Props = {
   actionables: Actionable[]
@@ -31,6 +32,22 @@ export function ActionablesTable({ actionables }: Props) {
       {
         Header: 'Valeur actuelle',
         accessor: (item) => item.lastAction?.value,
+      },
+      {
+        Header: 'Envoyée le',
+        accessor: (item) => new Date(item.lastAction?.sentAt ?? 0),
+        Cell: (input: { value: Date }) => {
+          if (
+            !input.value ||
+            Number.isNaN(input.value.getTime()) ||
+            input.value.getFullYear() === new Date(0).getFullYear()
+          ) {
+            return '-'
+          }
+
+          return formatDate(input.value)
+        },
+        sortType: 'datetime',
       },
     ],
     []
