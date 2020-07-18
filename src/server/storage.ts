@@ -59,11 +59,23 @@ export async function createStorage(): Promise<Storage> {
 
   async function postEntry(sensor: string, value: string, source: string) {
     try {
-      await db.query(sql`
+      await db.query('begin')
+
+      const { rows } = await db.query<{ id: string }>(sql`
         insert into statement(id, sensor, value, source, date)
         values (${uuid()}, ${sensor}, ${value}, ${source}, now())
+        returning id
       `)
+
+      await db.query(sql`
+        update emitter_sensors set
+          last_statement = ${rows[0].id}
+        where sensor = ${sensor}
+      `)
+
+      await db.query('commit')
     } catch (err) {
+      await db.query('rollback')
       console.log(err)
     }
   }
@@ -130,6 +142,8 @@ export async function createStorage(): Promise<Storage> {
 
   async function postCommand(target: string, value: string, expiresIn: string) {
     try {
+      await db.query('begin')
+
       await db.query(sql`
         delete from commands where target=${target}
       `)
@@ -138,13 +152,18 @@ export async function createStorage(): Promise<Storage> {
         insert into commands(id, target, value, expires_in)
         values (${uuid()}, ${target}, ${value}, ${expiresIn})
       `)
+
+      await db.query('commit')
     } catch (err) {
+      await db.query('rollback')
       console.log(err)
     }
   }
 
   async function postRule(rule: string, priority: number) {
     try {
+      await db.query('begin')
+
       const existingRule = await db.query<{ count: number }>(sql`
         select count(1) as count from rules
       `)
@@ -162,37 +181,11 @@ export async function createStorage(): Promise<Storage> {
         insert into rules(id, rule, priority)
         values (${uuid()}, ${rule}, ${priority})
       `)
-    } catch (err) {
-      console.log(err)
-    }
-  }
 
-  async function getLastValueBySensor() {
-    try {
-      const data = await db.query<{
-        id: string
-        sensor: string
-        value: string
-        date: Date
-        source: string
-      }>(sql`
-        select distinct on (sensor) * from statement
-        order by sensor, date desc;
-      `)
-
-      return new Map(
-        data.rows.map((sensor) => [
-          sensor.sensor,
-          {
-            value: sensor.value,
-            lastSentAt: sensor.date.toISOString(),
-            source: sensor.sensor,
-          },
-        ])
-      )
+      await db.query('commit')
     } catch (err) {
+      await db.query('rollback')
       console.log(err)
-      return new Map()
     }
   }
 
