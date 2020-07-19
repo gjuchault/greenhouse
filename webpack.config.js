@@ -1,10 +1,23 @@
 const path = require('path')
+const { config: dotenv } = require('dotenv')
+const { EnvironmentPlugin } = require('webpack')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const postcssNormalize = require('postcss-normalize')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 
 const isProd = process.env.NODE_ENV === 'production'
+
+function getEnvironmentVariables() {
+  dotenv({ path: path.resolve(__dirname, './.env.local') })
+  dotenv({ path: path.resolve(__dirname, './.env') })
+
+  const resultEnvKeys = Object.keys(process.env).filter((key) =>
+    key.startsWith('APP_')
+  )
+
+  return resultEnvKeys
+}
 
 function getCssLoader(cssOptions) {
   const loaders = []
@@ -109,6 +122,7 @@ module.exports = {
       async: !isProd,
       logger: { infrastructure: 'silent', issues: 'silent' },
     }),
+    new EnvironmentPlugin(getEnvironmentVariables()),
   ].filter(Boolean),
   devServer: {
     hot: true,
