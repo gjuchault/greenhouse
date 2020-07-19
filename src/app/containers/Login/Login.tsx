@@ -39,7 +39,7 @@ export function Login({ onLoggedIn }: LoginProps) {
     >
       <Card elevation={2} padding={majorScale(3)} background="white">
         <Heading textAlign="center" marginBottom={majorScale(2)} size={700}>
-          Serre
+          {process.env.APP_NAME}
         </Heading>
         <form onSubmit={login}>
           <Pane display="flex" flexDirection="column">

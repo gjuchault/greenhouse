@@ -1,13 +1,20 @@
 import React from 'react'
 import { useHistory } from 'react-router-dom'
-import { Pane, Text, Heading, useTheme } from 'evergreen-ui'
+import { Pane, Text, Heading, useTheme, majorScale } from 'evergreen-ui'
 import Logout from './logout.svg'
-import Map from './map.svg'
+import Sensors from './sensors.svg'
 import Rules from './rules.svg'
 import Actionables from './actionables.svg'
+import Bee from './bee.svg'
+import Fish from './fish.svg'
 import styles from './Sidebar.module.css'
 
 import { offlineLogout } from '../../auth'
+
+const logos = new Map([
+  ['bee', <Bee />],
+  ['fish', <Fish />],
+])
 
 export function Sidebar() {
   const theme = useTheme()
@@ -20,17 +27,20 @@ export function Sidebar() {
 
   return (
     <Pane width="200px" background={theme.palette.blue.base}>
+      <Pane display="flex" marginTop={majorScale(3)} justifyContent="center">
+        {logos.get(process.env.APP_LOGO || 'fish')}
+      </Pane>
       <Heading
         color="white"
         textAlign="center"
         paddingTop="20px"
         paddingBottom="20px"
       >
-        Serre
+        {process.env.APP_NAME}
       </Heading>
       <SidebarButton
         onClick={() => history.push('/sensors')}
-        renderIcon={() => <Map />}
+        renderIcon={() => <Sensors />}
       >
         <Text color="white">Capteurs</Text>
       </SidebarButton>
