@@ -21,8 +21,6 @@ export function processRules({
 }: ProcessRulesParameters): Map<string, string> {
   const now = new Date()
 
-  log('rules', `Executing ${rules.length} rules (${now.toISOString()})`)
-
   const sortedRules = rules.sort(
     (left, right) => left.priority - right.priority
   )

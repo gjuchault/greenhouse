@@ -8,6 +8,7 @@ import { Sidebar } from '../../components/Sidebar/Sidebar'
 import { Sensors } from '../Sensors/Sensors'
 import { Actionables } from '../Actionables/Actionables'
 import { Rules } from '../Rules/Rules'
+import { Logs } from '../Logs/Logs'
 
 export function App() {
   const theme = useTheme()
@@ -55,6 +56,9 @@ export function App() {
               </Route>
               <Route path="/actionables">
                 <Actionables />
+              </Route>
+              <Route path="/logs">
+                <Logs />
               </Route>
               <Redirect from="/" exact to="/sensors" />
             </Pane>

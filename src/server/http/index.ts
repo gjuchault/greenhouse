@@ -16,6 +16,7 @@ import {
   handleCreateCommand,
   handleCreateRule,
 } from './controllers/rules'
+import { handleGetLogs } from './services/logs'
 
 export async function createHttp() {
   if (process.env.DISABLE_HTTP) {
@@ -42,6 +43,7 @@ export async function createHttp() {
   app.get('/api/rules-and-commands', isLoggedIn, handleRulesAndCommands)
   app.get('/api/sensors', isLoggedIn, handleListEmitterSensors)
   app.get('/api/actionables', isLoggedIn, handleListActionables)
+  app.get('/api/logs', isLoggedIn, handleGetLogs)
   app.post('/api/command', isLoggedIn, handleCreateCommand)
   app.post('/api/rule', isLoggedIn, handleCreateRule)
 
