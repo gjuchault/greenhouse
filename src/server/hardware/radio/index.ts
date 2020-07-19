@@ -24,7 +24,7 @@ export async function createRadio({ usbDevices }: { usbDevices: USBDevice[] }) {
     const numericValue = parseInt(data, 2)
 
     const { sensorId, value } = parse(numericValue)
-    log('radio', `sensor: ${sensorId} value: ${value}`)
+    log('radio-receiver', `(sensor: ${sensorId} value: ${value})`)
 
     events.emit('radio:entry', sensorId, value)
   })

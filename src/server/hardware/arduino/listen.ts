@@ -51,7 +51,6 @@ export function buildListenArduino({
       })
 
       parser.on('data', (data: Buffer) => {
-        log('arduino', data.toString().trim())
         const line = data.toString().trim().padStart(24, '0')
 
         events.emit('arduino:line', line)
@@ -60,7 +59,6 @@ export function buildListenArduino({
       events.on('command:send', (target, value) => {
         const data = `${target};${Math.trunc(Number(value)).toString()}`
 
-        log('arduino', `< ${data}`)
         port.write(`${data}\n`, (err) => {
           if (err) log('arduino', `Error when sending data to arduino ${err}`)
         })

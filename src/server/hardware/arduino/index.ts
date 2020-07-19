@@ -26,7 +26,7 @@ export async function createArduino({
 
   events.on('arduino:line', async (data: string) => {
     const { sensorId, value } = parse(parseInt(data, 2))
-    log('arduino', `> sensor: ${sensorId} value: ${value}`)
+    log('arduino-receiver', `(sensor: ${sensorId} value: ${value})`)
     events.emit('arduino:entry', sensorId, value)
   })
 }

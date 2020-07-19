@@ -38,14 +38,6 @@ export function buildListenRadio({ usbDevices }: { usbDevices: USBDevice[] }) {
         return
       }
 
-      log(
-        'radio',
-        `> ${buf
-          .slice(4, -3)
-          .map((n) => n.toString(2).padStart(8, '0'))
-          .join('')}`
-      )
-
       const line = buf
         .slice(4, -3)
         .map((n) => n.toString(2).padStart(8, '0'))
