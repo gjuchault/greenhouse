@@ -1,23 +1,26 @@
-import React, { useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import {
   useTable,
   useSortBy,
   useGlobalFilter,
   useAsyncDebounce,
+  TableOptions,
   Column,
 } from 'react-table'
 import {
   Pane,
   Table as EvergreenTable,
+  Button,
   SearchInput,
   majorScale,
 } from 'evergreen-ui'
 import { formatDate } from '../../helpers/date'
 
-type Props<T extends object> = {
+type Props<T extends object> = Omit<TableOptions<T>, 'data'> & {
   items: T[]
   columns: Column<T>[]
   renderFilterPlaceholder: (count: number) => string
+  onRefetch?: () => Promise<void>
   columnsSizes: (number | 'auto')[]
 }
 
@@ -25,9 +28,12 @@ export function Table<T extends object>({
   items,
   columns,
   renderFilterPlaceholder,
+  onRefetch,
   columnsSizes,
+  ...props
 }: Props<T>) {
   const data = useMemo(() => items, [items])
+  const [isRefetchDisabled, setIsRefetchDisabled] = useState(false)
 
   const {
     getTableProps,
@@ -42,20 +48,41 @@ export function Table<T extends object>({
     {
       data,
       columns,
+      ...props,
     },
     useGlobalFilter,
     useSortBy
   )
 
+  const handleRefetch = async () => {
+    if (!onRefetch) {
+      return
+    }
+
+    setIsRefetchDisabled(true)
+    await onRefetch()
+    setIsRefetchDisabled(false)
+  }
+
   return (
     <>
-      <Pane marginBottom={majorScale(3)}>
+      <Pane
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        marginBottom={majorScale(3)}
+      >
         <GlobalFilter
           preGlobalFilteredRows={preGlobalFilteredRows}
           globalFilter={state.globalFilter}
           setGlobalFilter={setGlobalFilter}
           renderFilterPlaceholder={renderFilterPlaceholder}
         />
+        {onRefetch && (
+          <Button onClick={handleRefetch} disabled={isRefetchDisabled}>
+            Rafraîchir
+          </Button>
+        )}
       </Pane>
       <EvergreenTable border {...getTableProps()}>
         <EvergreenTable.Head>
