@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Pane, Card, Heading, majorScale } from 'evergreen-ui'
 import { useLogs } from '../../hooks/useQuery'
 import { LogsTable } from '../../components/LogsTable/LogsTable'
 
 export function Logs() {
-  const { data: logs } = useLogs()
+  const { data: logs, refetch } = useLogs()
 
   if (!logs) {
     return null
@@ -21,7 +21,12 @@ export function Logs() {
         Logs
       </Heading>
       <Pane>
-        <LogsTable logs={logs} />
+        <LogsTable
+          logs={logs}
+          onRefetch={async () => {
+            await refetch()
+          }}
+        />
       </Pane>
     </Card>
   )
