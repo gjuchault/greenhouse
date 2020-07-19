@@ -1,4 +1,4 @@
-export const formatDate = (input: Date | string) => {
+export const formatDate = (input: Date | string, precise: boolean = false) => {
   let d = typeof input === 'string' ? new Date(input) : input
 
   return d.toLocaleDateString('fr-FR', {
@@ -6,5 +6,6 @@ export const formatDate = (input: Date | string) => {
     month: 'numeric',
     hour: 'numeric',
     minute: 'numeric',
+    second: precise ? 'numeric' : undefined,
   })
 }

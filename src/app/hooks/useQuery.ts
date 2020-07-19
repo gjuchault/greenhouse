@@ -83,6 +83,22 @@ export const useRulesAndCommands = () => {
   }
 }
 
+export const useLogs = () => {
+  const q = useQuery<AxiosResponse<[string, string, string][]>, string>(
+    'GET /api/logs',
+    () => api.get('/api/logs')
+  )
+
+  return {
+    ...q,
+    data: q.data?.data.map(([date, service, message]) => ({
+      date: new Date(date),
+      service,
+      message,
+    })),
+  }
+}
+
 type LoginBody = {
   user: string
   password: string

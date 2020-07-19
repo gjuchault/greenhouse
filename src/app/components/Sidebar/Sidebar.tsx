@@ -5,6 +5,7 @@ import Logout from './logout.svg'
 import Sensors from './sensors.svg'
 import Rules from './rules.svg'
 import Actionables from './actionables.svg'
+import Logs from './logs.svg'
 import Bee from './bee.svg'
 import Fish from './fish.svg'
 import styles from './Sidebar.module.css'
@@ -55,6 +56,12 @@ export function Sidebar() {
         renderIcon={() => <Rules />}
       >
         <Text color="white">Règles</Text>
+      </SidebarButton>
+      <SidebarButton
+        onClick={() => history.push('/logs')}
+        renderIcon={() => <Logs />}
+      >
+        <Text color="white">Logs</Text>
       </SidebarButton>
       <SidebarButton onClick={logout} renderIcon={() => <Logout />}>
         <Text color="white">Déconnexion</Text>

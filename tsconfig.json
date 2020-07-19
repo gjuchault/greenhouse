@@ -1,5 +1,6 @@
 {
   "include": ["src/server/**/*"],
+  "exclude": ["src/app"],
   "compilerOptions": {
     "target": "ES2019",
     "lib": ["ES2019"],
