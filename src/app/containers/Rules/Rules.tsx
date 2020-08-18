@@ -30,7 +30,7 @@ export function Rules() {
   const [createRule, { status: createRuleStatus }] = useCreateRule()
 
   const [commandTarget, setCommandTarget] = useTextInput('')
-  const [commandValue, setCommandValue] = useTextInput('')
+  const [commandValue, setCommandValue] = useState('')
   const [commandExpires, setCommandExpires] = useTextInput('')
 
   const [rule, setRule] = useState('')

@@ -6,7 +6,7 @@ type Props = PaneProps & {
   commandTarget: string
   actionables: Actionable[]
   commandValue: string
-  onChange: (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => void
+  onChange: (value: string) => void
 }
 
 export function ActionableValue({
@@ -21,11 +21,15 @@ export function ActionableValue({
   >()
 
   useEffect(() => {
-    setSelectedActionable(
-      actionables?.find(
-        (receiverSensor) => receiverSensor.target === commandTarget
-      )
+    const nextSelectedActionable = actionables?.find(
+      (receiverSensor) => receiverSensor.target === commandTarget
     )
+
+    setSelectedActionable(nextSelectedActionable)
+
+    if (nextSelectedActionable?.valueType.range === '0-1') {
+      onChange('0')
+    }
   }, [actionables, commandTarget])
 
   if (!selectedActionable) {
@@ -43,7 +47,12 @@ export function ActionableValue({
 
   if (selectedActionable.valueType.range === '0-1') {
     return (
-      <Select value={commandValue} onChange={onChange} width={100} {...props}>
+      <Select
+        value={commandValue}
+        onChange={(e) => onChange(e.target.value)}
+        width={100}
+        {...props}
+      >
         <option value="0">0</option>
         <option value="1">1</option>
       </Select>
