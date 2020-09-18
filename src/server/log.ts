@@ -1,4 +1,6 @@
 import chalk from 'chalk'
+import fs from 'fs'
+import path from 'path'
 
 export const lruCache: [Date, string, string][] = []
 
@@ -18,6 +20,15 @@ export const log = (service: string, message: string) => {
   }
 
   console.log(`${getTimestamp(date)} [${coloredService}] ${message}`)
+}
+
+export const logError = (error: Error) => {
+  const errorFilePath = path.join(__dirname, '../../stderr.out')
+
+  fs.appendFileSync(errorFilePath, JSON.stringify({
+    message: error.message,
+    stack: error.stack
+  }) + '\n', { encoding: 'utf-8' })
 }
 
 export function getTimestamp(date: Date) {

@@ -1,10 +1,10 @@
 import { createServer } from 'http'
 import path from 'path'
-import express from 'express'
+import express, { NextFunction, Response, Request } from 'express'
 import bodyParser from 'body-parser'
 import helmet from 'helmet'
 import cors from 'cors'
-import { log } from '../log'
+import { log, logError } from '../log'
 import { isLoggedIn } from './isLoggedIn'
 import { handleLogin } from './controllers/login'
 import {
@@ -52,6 +52,16 @@ export async function createHttp() {
   })
 
   const server = createServer(app)
+
+  app.use(function (err: Error, _: Request, res: Response, __: NextFunction) {
+    logError(err)
+
+    if (res.headersSent) {
+      return
+    }
+
+    return res.status(500).send('Server Error')
+  })
 
   return new Promise((resolve) => {
     server.listen(
