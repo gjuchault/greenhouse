@@ -1,6 +1,6 @@
 import path from 'path'
 import { config as dotenv } from 'dotenv'
-import { log } from './log'
+import { log, logError } from './log'
 import { createHardware } from './hardware'
 import { createStorage, getStorage } from './storage'
 import { createHttp } from './http'
@@ -42,5 +42,11 @@ async function main() {
 
   log('main', 'Greenhouse ready')
 }
+
+process.on('uncaughtException', (err) => logError(err))
+process.on('unhandledRejection', (err) => {
+  if (err instanceof Error) logError(err)
+  else logError(new Error(JSON.stringify(err)))
+})
 
 main()
