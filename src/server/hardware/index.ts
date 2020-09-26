@@ -1,7 +1,7 @@
 import { listUsbDevices, USBDevice } from './usb'
 import { createArduino } from './arduino'
 import { createRadio } from './radio'
-import { log } from '../log'
+import { log, logError } from '../log'
 
 export async function createHardware() {
   let usbDevices: USBDevice[]
@@ -10,7 +10,7 @@ export async function createHardware() {
     usbDevices = await listUsbDevices()
     log('hardware', 'Done')
   } catch (err) {
-    console.log(err)
+    logError(err)
     process.exit(1)
   }
 

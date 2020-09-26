@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid'
 import pg from 'pg'
 import sql from 'sql-template-strings'
-import { log } from './log'
+import { log, logError } from './log'
 import { reshapeRule, Rule } from './rules/rule'
 import { reshapeCommand, Command } from './rules/command'
 import { EmitterSensor } from './sensors'
@@ -52,7 +52,7 @@ export async function createStorage(): Promise<Storage> {
       await db.connect()
       log('db', 'Connected')
     } catch (err) {
-      console.log(err)
+      logError(err)
       process.exit(1)
     }
   }
@@ -76,7 +76,7 @@ export async function createStorage(): Promise<Storage> {
       await db.query(sql`commit`)
     } catch (err) {
       await db.query(sql`rollback`)
-      console.log(err)
+      logError(err)
     }
   }
 
@@ -98,7 +98,7 @@ export async function createStorage(): Promise<Storage> {
 
       return data.rows[0]
     } catch (err) {
-      console.log(err)
+      logError(err)
       return
     }
   }
@@ -116,7 +116,7 @@ export async function createStorage(): Promise<Storage> {
 
       return data.rows.map(reshapeRule)
     } catch (err) {
-      console.log(err)
+      logError(err)
       return []
     }
   }
@@ -135,7 +135,7 @@ export async function createStorage(): Promise<Storage> {
 
       return data.rows.map(reshapeCommand)
     } catch (err) {
-      console.log(err)
+      logError(err)
       return []
     }
   }
@@ -163,7 +163,7 @@ export async function createStorage(): Promise<Storage> {
       await db.query(sql`commit`)
     } catch (err) {
       await db.query(sql`rollback`)
-      console.log(err)
+      logError(err)
     }
   }
 
@@ -192,7 +192,7 @@ export async function createStorage(): Promise<Storage> {
       await db.query(sql`commit`)
     } catch (err) {
       await db.query(sql`rollback`)
-      console.log(err)
+      logError(err)
     }
   }
 
@@ -214,7 +214,7 @@ export async function createStorage(): Promise<Storage> {
       await db.query(sql`commit`)
     } catch (err) {
       await db.query(sql`rollback`)
-      console.log(err)
+      logError(err)
     }
   }
 
@@ -254,7 +254,7 @@ export async function createStorage(): Promise<Storage> {
         })
       )
     } catch (err) {
-      console.log(err)
+      logError(err)
       return new Map()
     }
 
@@ -310,7 +310,7 @@ export async function createStorage(): Promise<Storage> {
         })
       )
     } catch (err) {
-      console.log(err)
+      logError(err)
       return new Map()
     }
 

@@ -1,6 +1,6 @@
 import { USBDevice } from '../usb'
 import { buildListenRadio } from './listen'
-import { log } from '../../log'
+import { log, logError } from '../../log'
 import { parse } from '../../sensors'
 import { events } from '../../events'
 
@@ -16,7 +16,7 @@ export async function createRadio({ usbDevices }: { usbDevices: USBDevice[] }) {
     log('radio', 'Connecting to Radio...')
     await listenRadio()
   } catch (err) {
-    console.log(err)
+    logError(err)
     return
   }
 

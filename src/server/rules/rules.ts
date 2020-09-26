@@ -1,5 +1,5 @@
 import vm from 'vm'
-import { log } from '../log'
+import { log, logError } from '../log'
 import { Rule } from './rule'
 import { Command } from './command'
 import { events } from '../events'
@@ -59,7 +59,7 @@ export function processRules({
         result.set(key, value.toString())
       }
     } catch (err) {
-      console.log(err)
+      logError(err)
       continue
     }
   }
