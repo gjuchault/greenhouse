@@ -45,6 +45,8 @@ export async function createStorage(): Promise<Storage> {
       host: process.env.DATABASE_HOST,
       port: Number(process.env.DATABASE_PORT),
       database: process.env.DATABASE_NAME,
+      statement_timeout: 10000,
+      query_timeout: 10000,
     })
 
     try {
