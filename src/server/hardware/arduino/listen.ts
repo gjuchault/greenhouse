@@ -1,7 +1,7 @@
 import SerialPort from 'serialport'
 import Delimiter from '@serialport/parser-delimiter'
 import { USBDevice } from '../usb'
-import { log } from '../../log'
+import { log, logError } from '../../log'
 import { events } from '../../events'
 
 export type Arduino = {
@@ -47,7 +47,7 @@ export function buildListenArduino({
       const parser = port.pipe(new Delimiter({ delimiter: '\r\n' }))
 
       port.on('error', (err) => {
-        console.log(err)
+        logError(err)
       })
 
       parser.on('data', (data: Buffer) => {
@@ -60,7 +60,7 @@ export function buildListenArduino({
         const data = `${target};${Math.trunc(Number(value)).toString()}`
 
         port.write(`${data}\n`, (err) => {
-          if (err) log('arduino', `Error when sending data to arduino ${err}`)
+          if (err) logError(err)
         })
       })
     }

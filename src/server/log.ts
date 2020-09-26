@@ -25,10 +25,17 @@ export const log = (service: string, message: string) => {
 export const logError = (error: Error) => {
   const errorFilePath = path.join(__dirname, '../../stderr.out')
 
-  fs.appendFileSync(errorFilePath, JSON.stringify({
-    message: error.message,
-    stack: error.stack
-  }) + '\n', { encoding: 'utf-8' })
+  fs.appendFileSync(
+    errorFilePath,
+    JSON.stringify({
+      timestamp: Date.now(),
+      message: error.message,
+      stack: error.stack,
+    }) + '\n',
+    { encoding: 'utf-8' }
+  )
+
+  log('errors', error.message)
 }
 
 export function getTimestamp(date: Date) {

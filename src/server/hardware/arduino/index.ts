@@ -1,7 +1,7 @@
 import { USBDevice } from '../usb'
 import { buildListenArduino } from './listen'
 import { parse } from '../../sensors'
-import { log } from '../../log'
+import { log, logError } from '../../log'
 import { events } from '../../events'
 
 export async function createArduino({
@@ -20,7 +20,7 @@ export async function createArduino({
     log('arduino', 'Connecting to Arduino...')
     await listenArduino()
   } catch (err) {
-    console.log(err)
+    logError(err)
     return
   }
 
