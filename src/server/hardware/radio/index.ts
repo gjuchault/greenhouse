@@ -15,6 +15,7 @@ export async function createRadio({ usbDevices }: { usbDevices: USBDevice[] }) {
   try {
     log('radio', 'Connecting to Radio...')
     await listenRadio()
+    log('radio', 'Connected to Radio')
   } catch (err) {
     logError(err)
     return
