@@ -3,7 +3,7 @@ export function keyBy<K, T>(list: T[], iteratee: (item: T) => K): Map<K, T> {
 }
 
 export function keyByWith<K, T, R>(
-  list: T[],
+  list: T[] | readonly T[],
   iteratee: (item: T) => K,
   reshaper: (item: T) => R
 ): Map<K, R> {
