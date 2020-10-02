@@ -5,6 +5,7 @@ import { Command } from './command'
 import { events } from '../events'
 import { EmitterSensor } from '../sensors'
 import { Actionable } from '../actionables'
+import { isIterable } from '../helpers/iterables'
 
 interface ProcessRulesParameters {
   rules: Rule[]
@@ -51,8 +52,9 @@ export function processRules({
     try {
       const output = vm.runInContext(rule.rule, vmContext)
 
-      if (output instanceof Map) {
-        throw new TypeError(`Code is not returning a Map`)
+      if (!isIterable(output)) {
+        logError(new Error(`${JSON.stringify(output)}`))
+        continue
       }
 
       for (const [key, value] of output as Map<string, number>) {

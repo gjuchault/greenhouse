@@ -1,3 +1,11 @@
+export function isIterable(obj: unknown) {
+  if (obj === null || obj === undefined) {
+    return false
+  }
+
+  return typeof (obj as any)[Symbol.iterator] === 'function'
+}
+
 export function keyBy<K, T>(list: T[], iteratee: (item: T) => K): Map<K, T> {
   return keyByWith(list, iteratee, (item) => item)
 }
