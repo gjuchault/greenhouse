@@ -44,15 +44,16 @@ export function createStorage(): Storage {
     try {
       return pool.connect(async (connection) => {
         return connection.transaction(async (transaction) => {
-          const { rows } = await transaction.query<{ id: string }>(sql`
+          const id = uuid()
+
+          await transaction.query<{ id: string }>(sql`
             insert into statement(id, sensor, value, source, date)
-            values (${uuid()}, ${sensor}, ${value}, ${source}, now())
-            returning id
+            values (${id}, ${sensor}, ${value}, ${source}, now())
           `)
 
           await transaction.query(sql`
             update emitter_sensors set
-              last_statement = ${rows[0].id}
+              last_statement = ${id}
             where sensor = ${sensor}
           `)
         })
