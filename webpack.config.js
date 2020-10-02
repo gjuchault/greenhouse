@@ -5,6 +5,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const postcssNormalize = require('postcss-normalize')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
+const PnpWebpackPlugin = require('pnp-webpack-plugin')
 
 const isProd = process.env.NODE_ENV === 'production'
 
@@ -66,6 +67,10 @@ module.exports = {
   },
   resolve: {
     extensions: ['.js', '.json', '.ts', '.tsx'],
+    plugins: [PnpWebpackPlugin],
+  },
+  resolveLoader: {
+    plugins: [PnpWebpackPlugin.moduleLoader(module)],
   },
   module: {
     rules: [
