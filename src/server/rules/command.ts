@@ -14,10 +14,10 @@ export const reshapeCommand = ({
   id: string
   target: string
   value: string
-  expires_in: Date
+  expires_in: number
 }) => ({
   id,
   target,
   value,
-  expiresIn: expires_in,
+  expiresIn: new Date(expires_in),
 })

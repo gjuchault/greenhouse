@@ -1,11 +1,9 @@
-import { log } from '../log'
-import { getStorage } from '../storage'
+import { createStorage } from '../storage'
 import { processRules } from './rules'
 import { debounce } from '../helpers/debounce'
 
 async function _executeRules(): Promise<void> {
-  const now = new Date()
-  const storage = getStorage()
+  const storage = createStorage()
 
   const [rules, commands, emitterSensors, actionables] = await Promise.all([
     storage.listRules(),
