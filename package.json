@@ -48,8 +48,8 @@
     "rfxcom": "^2.3.1",
     "serialport": "^9.0.1",
     "slonik": "^22.5.0",
-    "uuid": "^8.2.0",
-    "zod": "^1.9.0"
+    "uuid": "^8.3.0",
+    "zod": "^1.11.9"
   },
   "devDependencies": {
     "@babel/runtime": "^7.11.2",
@@ -87,11 +87,11 @@
     "prettier": "^2.1.2",
     "prop-types": "^15.7.2",
     "style-loader": "^1.2.1",
-    "ts-loader": "^8.0.0",
-    "ts-node-dev": "^1.0.0-pre.44",
+    "ts-loader": "^8.0.4",
+    "ts-node-dev": "^1.0.0-pre.63",
     "typescript": "^3.9.6",
-    "typescript-plugin-css-modules": "^2.4.0",
-    "webpack": "^4.43.0",
+    "typescript-plugin-css-modules": "^2.7.0",
+    "webpack": "^4.44.2",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0"
   }
