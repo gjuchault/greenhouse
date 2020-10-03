@@ -1,6 +1,6 @@
 import rfxcom from 'rfxcom'
 import { USBDevice } from '../usb'
-import { log } from '../../log'
+import { log, logError } from '../../log'
 import { events } from '../../events'
 
 const lightning4Type = 0x13
@@ -15,6 +15,14 @@ export function buildListenRadio({ usbDevices }: { usbDevices: USBDevice[] }) {
       const rfxtrx = new rfxcom.RfxCom(path, { debug: false })
       rfxtrx.initialise(() => {
         resolve(rfxtrx)
+      })
+
+      rfxtrx.on('connectfailed', (err: string) => {
+        logError(new Error(err))
+      })
+
+      rfxtrx.on('disconnect', (err: string) => {
+        logError(new Error(err))
       })
     })
   }
