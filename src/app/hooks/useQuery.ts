@@ -111,7 +111,7 @@ type LoginResponse =
   | { outcome: 'loggedIn'; name: string; token: string }
 
 export const useLogin = () =>
-  useMutation<LoginResponse, LoginBody>(
+  useMutation<LoginResponse, unknown, LoginBody>(
     async (body) => (await api.post('/api/login', body)).data
   )
 
@@ -122,7 +122,7 @@ type CreateCommandBody = {
 }
 
 export const useCreateCommand = () =>
-  useMutation<void, CreateCommandBody>(
+  useMutation<void, unknown, CreateCommandBody>(
     (body) => api.post('/api/command', body),
     {
       onSuccess: () =>
@@ -136,7 +136,10 @@ type CreateRuleBody = {
 }
 
 export const useCreateRule = () =>
-  useMutation<void, CreateRuleBody>((body) => api.post('/api/rule', body), {
-    onSuccess: () =>
-      queryCache.invalidateQueries('GET /api/rules-and-commands'),
-  })
+  useMutation<void, unknown, CreateRuleBody>(
+    (body) => api.post('/api/rule', body),
+    {
+      onSuccess: () =>
+        queryCache.invalidateQueries('GET /api/rules-and-commands'),
+    }
+  )
