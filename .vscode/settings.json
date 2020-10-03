@@ -1,5 +1,5 @@
 {
-  "typescript.tsdk": "/Users/gjuchault/Workspace/greenhouse/.yarn/sdks/typescript/lib",
+  "typescript.tsdk": ".yarn/sdks/typescript/lib",
   "search.exclude": {
     "**/.yarn": true,
     "**/.pnp.*": true
