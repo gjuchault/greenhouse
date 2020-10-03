@@ -1241,7 +1241,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.11.2":
+"@babel/runtime@npm:^7.11.0, @babel/runtime@npm:^7.11.2":
   version: 7.11.2
   resolution: "@babel/runtime@npm:7.11.2"
   dependencies:
@@ -1561,15 +1561,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@monaco-editor/react@npm:^3.4.1":
-  version: 3.4.1
-  resolution: "@monaco-editor/react@npm:3.4.1"
+"@monaco-editor/react@npm:^3.6.3":
+  version: 3.6.3
+  resolution: "@monaco-editor/react@npm:3.6.3"
+  dependencies:
+    "@babel/runtime": ^7.11.0
+    state-local: ^1.0.1
   peerDependencies:
     monaco-editor: ^0.20.0
     prop-types: ^15.7.2
     react: ^16.8.6
     react-dom: ^16.8.6
-  checksum: 02b00d9f9d22b93713f479dca195c88d91c83c1d29b2e97b8712f21d3dad95ee753942f62fbf8932339580bd8afe59ff424c9ed54fa0b22289ea3c115e1a1c14
+  checksum: aaa6286f7a4c72372174fc63145e2a95f03e3860a8d01966dd440a7c97ef01fad7a1fe5bc31323ad0fd16228e6276f6bcc5b8e502a18a19acbcb0c72541e562b
   languageName: node
   linkType: hard
 
@@ -1680,6 +1683,13 @@ __metadata:
   version: 9.0.0
   resolution: "@serialport/parser-delimiter@npm:9.0.0"
   checksum: 06b74825388fc44d2f54a3bf3dd4d385a13612a24d41daad52bef164ea58ee76fe874ed9d7ba9e7e8687ebfcff8cefce7789d183baccba8ca3778c1f8a695cd8
+  languageName: node
+  linkType: hard
+
+"@serialport/parser-delimiter@npm:^9.0.1":
+  version: 9.0.1
+  resolution: "@serialport/parser-delimiter@npm:9.0.1"
+  checksum: d30f3e8204208076f9aa4519bc3dc4bce3ec06a5fd4756593fe8aab334a2b996331a8a29bc2f4394c82c34613bb2ebdc2535ba099d2ec3919a961c35cab92054
   languageName: node
   linkType: hard
 
@@ -1984,12 +1994,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/cors@npm:^2.8.6":
-  version: 2.8.6
-  resolution: "@types/cors@npm:2.8.6"
+"@types/cors@npm:^2.8.7":
+  version: 2.8.7
+  resolution: "@types/cors@npm:2.8.7"
   dependencies:
     "@types/express": "*"
-  checksum: 911a8696e8a8b26687de5facabe78d9966a9970f7489e3cd42589115173eee0b7fcf7cc8941fe25054fc43f4c81c6977582d84cd52c26b6675a9ddac5776c8ca
+  checksum: 5a2f88615b6ca26f354adf1b1f06eb304c2c78278225c903d6ade68fb5390727a717c33dd4e49d241a2ad01b2ddb020cc2ea87fa354233adbf7d27c52720013c
   languageName: node
   linkType: hard
 
@@ -2004,7 +2014,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express@npm:*, @types/express@npm:^4.17.7":
+"@types/express@npm:*":
   version: 4.17.7
   resolution: "@types/express@npm:4.17.7"
   dependencies:
@@ -2013,6 +2023,18 @@ __metadata:
     "@types/qs": "*"
     "@types/serve-static": "*"
   checksum: 99b795c60e7368b575794574c35d0ffd0d119c52bc681af6beda2fee70aada78e8aef07fc0db3b88f594d5d935847de4187561d2456760eeb4fde5d10dbb3780
+  languageName: node
+  linkType: hard
+
+"@types/express@npm:^4.17.8":
+  version: 4.17.8
+  resolution: "@types/express@npm:4.17.8"
+  dependencies:
+    "@types/body-parser": "*"
+    "@types/express-serve-static-core": "*"
+    "@types/qs": "*"
+    "@types/serve-static": "*"
+  checksum: 9220ef3cb010faea3f77f85453b0ef3bd41e70003ac7d0ea2b7611ac9c36184995256cc61a7bb205f80a3bc51006cf7ccb29a0186c0d1fe0c0582946a0e65e7a
   languageName: node
   linkType: hard
 
@@ -2035,12 +2057,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/helmet@npm:0.0.47":
-  version: 0.0.47
-  resolution: "@types/helmet@npm:0.0.47"
+"@types/helmet@npm:0.0.48":
+  version: 0.0.48
+  resolution: "@types/helmet@npm:0.0.48"
   dependencies:
     "@types/express": "*"
-  checksum: 0222c7a0e12df5c40f4101f8d7cdded8b124d46c36b48fdd9158afb32912e1172541353c713fb3ab7c777fb30a6ea4a1e237edc2d9a51376460916ffd11c1490
+  checksum: 6ac3e2031bd2739817e78cdd52af762da896444b7488b789b26cafd840c2d5654186eafeaa1a45352b901c3f8fc9db6b2016e5c60029837e8000707d63854bdf
   languageName: node
   linkType: hard
 
@@ -2084,13 +2106,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jest@npm:^26.0.5":
-  version: 26.0.5
-  resolution: "@types/jest@npm:26.0.5"
+"@types/jest@npm:^26.0.14":
+  version: 26.0.14
+  resolution: "@types/jest@npm:26.0.14"
   dependencies:
     jest-diff: ^25.2.1
     pretty-format: ^25.2.1
-  checksum: ffe129cacd0b1472ab8018d1cd5e88cd66f31223d1cc02f2366143e792eba59031432065c37199d7351da5c2b4a6cea21c4a6d30075f925dff3a9f32ba8dc04d
+  checksum: bddbe82d12217c5217efabcad09e4fbe2c5eaecf9392da9b0edbe4c3d9fb240b3fab914f88c5f3708f6d5046640a2782458944873eae4ac01abcb17d32d3c78f
   languageName: node
   linkType: hard
 
@@ -6363,16 +6385,16 @@ fsevents@^1.2.7:
   resolution: "greenhouse@workspace:."
   dependencies:
     "@babel/runtime": ^7.11.2
-    "@monaco-editor/react": ^3.4.1
-    "@serialport/parser-delimiter": ^9.0.0
+    "@monaco-editor/react": ^3.6.3
+    "@serialport/parser-delimiter": ^9.0.1
     "@svgr/webpack": ^5.4.0
     "@types/bcryptjs": ^2.4.2
     "@types/body-parser": ^1.19.0
     "@types/classnames": ^2.2.10
-    "@types/cors": ^2.8.6
-    "@types/express": ^4.17.7
-    "@types/helmet": 0.0.47
-    "@types/jest": ^26.0.5
+    "@types/cors": ^2.8.7
+    "@types/express": ^4.17.8
+    "@types/helmet": 0.0.48
+    "@types/jest": ^26.0.14
     "@types/jsonwebtoken": ^8.5.0
     "@types/node": ^14.11.2
     "@types/react": ^16.9.42
@@ -12673,6 +12695,13 @@ resolve@^1.17.0:
   dependencies:
     escape-string-regexp: ^2.0.0
   checksum: a9fa702767defa95a14fe7a78083eadfc254c5e12e105b034242b47cc4e9ba4ba345b54b7218b8abbbf8f38d6a327b20aa0fdebb582eae5118f2cd004e7bace5
+  languageName: node
+  linkType: hard
+
+"state-local@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "state-local@npm:1.0.1"
+  checksum: 12cbb5198ff2cf1abfa9250893be852bc9f231073cc81d80639ef072e57fc3505924ee514a9525fc2ec9a798b4b4c8dd9ad8970e154d0e8001105db217ee56eb
   languageName: node
   linkType: hard
 
