@@ -8,6 +8,7 @@
     "outDir": "dist/server",
     "strict": true,
     "strictNullChecks": true,
+    "skipLibCheck": true,
     "incremental": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
