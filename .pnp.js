@@ -93,10 +93,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-dom", "virtual:a9e50f682d3ded858de0f1f3334444fe01a6ff5bd0441cded5e07844464de5229e82f487db10774be2976297f6cf3b15c2fd05668daeaded9113c50fd9456afc#npm:16.13.1"],
             ["react-query", "virtual:a9e50f682d3ded858de0f1f3334444fe01a6ff5bd0441cded5e07844464de5229e82f487db10774be2976297f6cf3b15c2fd05668daeaded9113c50fd9456afc#npm:2.23.0"],
             ["react-router-dom", "virtual:a9e50f682d3ded858de0f1f3334444fe01a6ff5bd0441cded5e07844464de5229e82f487db10774be2976297f6cf3b15c2fd05668daeaded9113c50fd9456afc#npm:5.2.0"],
-            ["react-table", "virtual:a9e50f682d3ded858de0f1f3334444fe01a6ff5bd0441cded5e07844464de5229e82f487db10774be2976297f6cf3b15c2fd05668daeaded9113c50fd9456afc#npm:7.2.2"],
-            ["regenerator-runtime", "npm:0.13.5"],
+            ["react-table", "virtual:a9e50f682d3ded858de0f1f3334444fe01a6ff5bd0441cded5e07844464de5229e82f487db10774be2976297f6cf3b15c2fd05668daeaded9113c50fd9456afc#npm:7.5.1"],
+            ["regenerator-runtime", "npm:0.13.7"],
             ["rfxcom", "npm:2.3.1"],
-            ["serialport", "npm:9.0.0"],
+            ["serialport", "npm:9.0.1"],
             ["slonik", "npm:22.5.0"],
             ["style-loader", "virtual:a9e50f682d3ded858de0f1f3334444fe01a6ff5bd0441cded5e07844464de5229e82f487db10774be2976297f6cf3b15c2fd05668daeaded9113c50fd9456afc#npm:1.2.1"],
             ["ts-loader", "virtual:a9e50f682d3ded858de0f1f3334444fe01a6ff5bd0441cded5e07844464de5229e82f487db10774be2976297f6cf3b15c2fd05668daeaded9113c50fd9456afc#npm:8.0.0"],
@@ -2224,10 +2224,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "HARD",
         }],
-        ["npm:9.0.0", {
-          "packageLocation": "./.yarn/cache/@serialport-binding-abstract-npm-9.0.0-29bca2819d-fa3f1ee9e1.zip/node_modules/@serialport/binding-abstract/",
+        ["npm:9.0.1", {
+          "packageLocation": "./.yarn/cache/@serialport-binding-abstract-npm-9.0.1-ff96acabbb-880f40c4ef.zip/node_modules/@serialport/binding-abstract/",
           "packageDependencies": [
-            ["@serialport/binding-abstract", "npm:9.0.0"],
+            ["@serialport/binding-abstract", "npm:9.0.1"],
             ["debug", "virtual:1706985115519ddadd9f2f5c081138e0d4607cf41d2f99372c8fce9fa169da340694e8b59730dffa3d38830ba586f38be9ab3fb7f4bfe019e70ef404fb38bfe9#npm:4.1.1"]
           ],
           "linkType": "HARD",
@@ -2243,11 +2243,11 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "HARD",
         }],
-        ["npm:9.0.0", {
-          "packageLocation": "./.yarn/cache/@serialport-binding-mock-npm-9.0.0-8616858810-071847de0b.zip/node_modules/@serialport/binding-mock/",
+        ["npm:9.0.1", {
+          "packageLocation": "./.yarn/cache/@serialport-binding-mock-npm-9.0.1-e2c5706a69-e6a04bf858.zip/node_modules/@serialport/binding-mock/",
           "packageDependencies": [
-            ["@serialport/binding-mock", "npm:9.0.0"],
-            ["@serialport/binding-abstract", "npm:9.0.0"],
+            ["@serialport/binding-mock", "npm:9.0.1"],
+            ["@serialport/binding-abstract", "npm:9.0.1"],
             ["debug", "virtual:1706985115519ddadd9f2f5c081138e0d4607cf41d2f99372c8fce9fa169da340694e8b59730dffa3d38830ba586f38be9ab3fb7f4bfe019e70ef404fb38bfe9#npm:4.1.1"]
           ],
           "linkType": "HARD",
@@ -2268,12 +2268,12 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "HARD",
         }],
-        ["npm:9.0.0", {
-          "packageLocation": "./.yarn/unplugged/@serialport-bindings-npm-9.0.0-48b83b2aae/node_modules/@serialport/bindings/",
+        ["npm:9.0.1", {
+          "packageLocation": "./.yarn/unplugged/@serialport-bindings-npm-9.0.1-d7b8542138/node_modules/@serialport/bindings/",
           "packageDependencies": [
-            ["@serialport/bindings", "npm:9.0.0"],
-            ["@serialport/binding-abstract", "npm:9.0.0"],
-            ["@serialport/parser-readline", "npm:9.0.0"],
+            ["@serialport/bindings", "npm:9.0.1"],
+            ["@serialport/binding-abstract", "npm:9.0.1"],
+            ["@serialport/parser-readline", "npm:9.0.1"],
             ["bindings", "npm:1.5.0"],
             ["debug", "virtual:1706985115519ddadd9f2f5c081138e0d4607cf41d2f99372c8fce9fa169da340694e8b59730dffa3d38830ba586f38be9ab3fb7f4bfe019e70ef404fb38bfe9#npm:4.1.1"],
             ["nan", "npm:2.14.1"],
@@ -2291,10 +2291,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "HARD",
         }],
-        ["npm:9.0.0", {
-          "packageLocation": "./.yarn/cache/@serialport-parser-byte-length-npm-9.0.0-7e75f29a01-9967d4f9f5.zip/node_modules/@serialport/parser-byte-length/",
+        ["npm:9.0.1", {
+          "packageLocation": "./.yarn/cache/@serialport-parser-byte-length-npm-9.0.1-f1b8066120-50c17fa5a8.zip/node_modules/@serialport/parser-byte-length/",
           "packageDependencies": [
-            ["@serialport/parser-byte-length", "npm:9.0.0"]
+            ["@serialport/parser-byte-length", "npm:9.0.1"]
           ],
           "linkType": "HARD",
         }]
@@ -2307,10 +2307,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "HARD",
         }],
-        ["npm:9.0.0", {
-          "packageLocation": "./.yarn/cache/@serialport-parser-cctalk-npm-9.0.0-9fd7d3f912-a5578b4e2d.zip/node_modules/@serialport/parser-cctalk/",
+        ["npm:9.0.1", {
+          "packageLocation": "./.yarn/cache/@serialport-parser-cctalk-npm-9.0.1-55c6c46205-44f9c14bde.zip/node_modules/@serialport/parser-cctalk/",
           "packageDependencies": [
-            ["@serialport/parser-cctalk", "npm:9.0.0"]
+            ["@serialport/parser-cctalk", "npm:9.0.1"]
           ],
           "linkType": "HARD",
         }]
@@ -2320,13 +2320,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@serialport-parser-delimiter-npm-8.0.6-5b449152ee-5f741a5104.zip/node_modules/@serialport/parser-delimiter/",
           "packageDependencies": [
             ["@serialport/parser-delimiter", "npm:8.0.6"]
-          ],
-          "linkType": "HARD",
-        }],
-        ["npm:9.0.0", {
-          "packageLocation": "./.yarn/cache/@serialport-parser-delimiter-npm-9.0.0-da600c1154-06b7482538.zip/node_modules/@serialport/parser-delimiter/",
-          "packageDependencies": [
-            ["@serialport/parser-delimiter", "npm:9.0.0"]
           ],
           "linkType": "HARD",
         }],
@@ -2347,11 +2340,11 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "HARD",
         }],
-        ["npm:9.0.0", {
-          "packageLocation": "./.yarn/cache/@serialport-parser-readline-npm-9.0.0-2587657d4d-6a3ce6be85.zip/node_modules/@serialport/parser-readline/",
+        ["npm:9.0.1", {
+          "packageLocation": "./.yarn/cache/@serialport-parser-readline-npm-9.0.1-964dbd3213-e9bcdae183.zip/node_modules/@serialport/parser-readline/",
           "packageDependencies": [
-            ["@serialport/parser-readline", "npm:9.0.0"],
-            ["@serialport/parser-delimiter", "npm:9.0.0"]
+            ["@serialport/parser-readline", "npm:9.0.1"],
+            ["@serialport/parser-delimiter", "npm:9.0.1"]
           ],
           "linkType": "HARD",
         }]
@@ -2364,10 +2357,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "HARD",
         }],
-        ["npm:9.0.0", {
-          "packageLocation": "./.yarn/cache/@serialport-parser-ready-npm-9.0.0-50fe98100d-ffd389503a.zip/node_modules/@serialport/parser-ready/",
+        ["npm:9.0.1", {
+          "packageLocation": "./.yarn/cache/@serialport-parser-ready-npm-9.0.1-4459edf275-9446dc3af7.zip/node_modules/@serialport/parser-ready/",
           "packageDependencies": [
-            ["@serialport/parser-ready", "npm:9.0.0"]
+            ["@serialport/parser-ready", "npm:9.0.1"]
           ],
           "linkType": "HARD",
         }]
@@ -2380,10 +2373,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "HARD",
         }],
-        ["npm:9.0.0", {
-          "packageLocation": "./.yarn/cache/@serialport-parser-regex-npm-9.0.0-2fc56e7088-dae1ca01da.zip/node_modules/@serialport/parser-regex/",
+        ["npm:9.0.1", {
+          "packageLocation": "./.yarn/cache/@serialport-parser-regex-npm-9.0.1-cafab33e9e-fb97b03ea8.zip/node_modules/@serialport/parser-regex/",
           "packageDependencies": [
-            ["@serialport/parser-regex", "npm:9.0.0"]
+            ["@serialport/parser-regex", "npm:9.0.1"]
           ],
           "linkType": "HARD",
         }]
@@ -2397,10 +2390,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "HARD",
         }],
-        ["npm:9.0.0", {
-          "packageLocation": "./.yarn/cache/@serialport-stream-npm-9.0.0-b127a266fb-e17669d2e2.zip/node_modules/@serialport/stream/",
+        ["npm:9.0.1", {
+          "packageLocation": "./.yarn/cache/@serialport-stream-npm-9.0.1-41401b9c2a-76b5138ef3.zip/node_modules/@serialport/stream/",
           "packageDependencies": [
-            ["@serialport/stream", "npm:9.0.0"],
+            ["@serialport/stream", "npm:9.0.1"],
             ["debug", "virtual:1706985115519ddadd9f2f5c081138e0d4607cf41d2f99372c8fce9fa169da340694e8b59730dffa3d38830ba586f38be9ab3fb7f4bfe019e70ef404fb38bfe9#npm:4.1.1"]
           ],
           "linkType": "HARD",
@@ -7723,10 +7716,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-dom", "virtual:a9e50f682d3ded858de0f1f3334444fe01a6ff5bd0441cded5e07844464de5229e82f487db10774be2976297f6cf3b15c2fd05668daeaded9113c50fd9456afc#npm:16.13.1"],
             ["react-query", "virtual:a9e50f682d3ded858de0f1f3334444fe01a6ff5bd0441cded5e07844464de5229e82f487db10774be2976297f6cf3b15c2fd05668daeaded9113c50fd9456afc#npm:2.23.0"],
             ["react-router-dom", "virtual:a9e50f682d3ded858de0f1f3334444fe01a6ff5bd0441cded5e07844464de5229e82f487db10774be2976297f6cf3b15c2fd05668daeaded9113c50fd9456afc#npm:5.2.0"],
-            ["react-table", "virtual:a9e50f682d3ded858de0f1f3334444fe01a6ff5bd0441cded5e07844464de5229e82f487db10774be2976297f6cf3b15c2fd05668daeaded9113c50fd9456afc#npm:7.2.2"],
-            ["regenerator-runtime", "npm:0.13.5"],
+            ["react-table", "virtual:a9e50f682d3ded858de0f1f3334444fe01a6ff5bd0441cded5e07844464de5229e82f487db10774be2976297f6cf3b15c2fd05668daeaded9113c50fd9456afc#npm:7.5.1"],
+            ["regenerator-runtime", "npm:0.13.7"],
             ["rfxcom", "npm:2.3.1"],
-            ["serialport", "npm:9.0.0"],
+            ["serialport", "npm:9.0.1"],
             ["slonik", "npm:22.5.0"],
             ["style-loader", "virtual:a9e50f682d3ded858de0f1f3334444fe01a6ff5bd0441cded5e07844464de5229e82f487db10774be2976297f6cf3b15c2fd05668daeaded9113c50fd9456afc#npm:1.2.1"],
             ["ts-loader", "virtual:a9e50f682d3ded858de0f1f3334444fe01a6ff5bd0441cded5e07844464de5229e82f487db10774be2976297f6cf3b15c2fd05668daeaded9113c50fd9456afc#npm:8.0.0"],
@@ -13186,10 +13179,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["react-table", [
-        ["virtual:a9e50f682d3ded858de0f1f3334444fe01a6ff5bd0441cded5e07844464de5229e82f487db10774be2976297f6cf3b15c2fd05668daeaded9113c50fd9456afc#npm:7.2.2", {
-          "packageLocation": "./.yarn/unplugged/react-table-virtual-62f0159998/node_modules/react-table/",
+        ["virtual:a9e50f682d3ded858de0f1f3334444fe01a6ff5bd0441cded5e07844464de5229e82f487db10774be2976297f6cf3b15c2fd05668daeaded9113c50fd9456afc#npm:7.5.1", {
+          "packageLocation": "./.yarn/$$virtual/react-table-virtual-8a24f4fef1/0/cache/react-table-npm-7.5.1-cc7184a42a-92b94706be.zip/node_modules/react-table/",
           "packageDependencies": [
-            ["react-table", "virtual:a9e50f682d3ded858de0f1f3334444fe01a6ff5bd0441cded5e07844464de5229e82f487db10774be2976297f6cf3b15c2fd05668daeaded9113c50fd9456afc#npm:7.2.2"],
+            ["react-table", "virtual:a9e50f682d3ded858de0f1f3334444fe01a6ff5bd0441cded5e07844464de5229e82f487db10774be2976297f6cf3b15c2fd05668daeaded9113c50fd9456afc#npm:7.5.1"],
             ["@types/react", "npm:16.9.50"],
             ["react", "npm:16.13.1"]
           ],
@@ -13381,6 +13374,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/regenerator-runtime-npm-0.13.5-290ae86e15-8d8ee0eca2.zip/node_modules/regenerator-runtime/",
           "packageDependencies": [
             ["regenerator-runtime", "npm:0.13.5"]
+          ],
+          "linkType": "HARD",
+        }],
+        ["npm:0.13.7", {
+          "packageLocation": "./.yarn/cache/regenerator-runtime-npm-0.13.7-41bcbe64ea-6ef567c662.zip/node_modules/regenerator-runtime/",
+          "packageDependencies": [
+            ["regenerator-runtime", "npm:0.13.7"]
           ],
           "linkType": "HARD",
         }]
@@ -14077,19 +14077,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "HARD",
         }],
-        ["npm:9.0.0", {
-          "packageLocation": "./.yarn/unplugged/serialport-npm-9.0.0-dd0c30ed08/node_modules/serialport/",
+        ["npm:9.0.1", {
+          "packageLocation": "./.yarn/unplugged/serialport-npm-9.0.1-8ef685bd03/node_modules/serialport/",
           "packageDependencies": [
-            ["serialport", "npm:9.0.0"],
-            ["@serialport/binding-mock", "npm:9.0.0"],
-            ["@serialport/bindings", "npm:9.0.0"],
-            ["@serialport/parser-byte-length", "npm:9.0.0"],
-            ["@serialport/parser-cctalk", "npm:9.0.0"],
-            ["@serialport/parser-delimiter", "npm:9.0.0"],
-            ["@serialport/parser-readline", "npm:9.0.0"],
-            ["@serialport/parser-ready", "npm:9.0.0"],
-            ["@serialport/parser-regex", "npm:9.0.0"],
-            ["@serialport/stream", "npm:9.0.0"],
+            ["serialport", "npm:9.0.1"],
+            ["@serialport/binding-mock", "npm:9.0.1"],
+            ["@serialport/bindings", "npm:9.0.1"],
+            ["@serialport/parser-byte-length", "npm:9.0.1"],
+            ["@serialport/parser-cctalk", "npm:9.0.1"],
+            ["@serialport/parser-delimiter", "npm:9.0.1"],
+            ["@serialport/parser-readline", "npm:9.0.1"],
+            ["@serialport/parser-ready", "npm:9.0.1"],
+            ["@serialport/parser-regex", "npm:9.0.1"],
+            ["@serialport/stream", "npm:9.0.1"],
             ["debug", "virtual:1706985115519ddadd9f2f5c081138e0d4607cf41d2f99372c8fce9fa169da340694e8b59730dffa3d38830ba586f38be9ab3fb7f4bfe019e70ef404fb38bfe9#npm:4.1.1"]
           ],
           "linkType": "HARD",
