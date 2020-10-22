@@ -36,7 +36,8 @@ export function createStorage(): Storage {
     const database = process.env.DATABASE_NAME
 
     pool = createPool(
-      `postgres://${user}:${password}@${host}:${port}/${database}`
+      `postgres://${user}:${password}@${host}:${port}/${database}`,
+      { maximumPoolSize: 30 }
     )
   }
 
