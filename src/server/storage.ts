@@ -1,11 +1,12 @@
 import { v4 as uuid } from 'uuid'
-import { createPool, sql, DatabasePoolType } from 'slonik'
+import pg from 'pg'
+import sql from 'sql-template-strings'
 import { logError } from './log'
 import { reshapeRule, Rule } from './rules/rule'
 import { reshapeCommand, Command } from './rules/command'
-import { EmitterSensor } from './sensors'
+import { reshapeSensor, EmitterSensor } from './sensors'
+import { reshapeActionable, Actionable } from './actionables'
 import { keyByWith } from './helpers/iterables'
-import { Actionable } from './actionables'
 
 export type Storage = {
   getUserByName: (
@@ -25,283 +26,244 @@ export type Storage = {
   listEmitterSensors: () => Promise<Map<string, EmitterSensor>>
 }
 
-let pool: DatabasePoolType
+let pool: pg.Pool
 
-export function createStorage(): Storage {
+export async function setupStorage() {
   if (!pool) {
     const user = process.env.DATABASE_USER
     const password = process.env.DATABASE_PASSWORD
     const host = process.env.DATABASE_HOST
-    const port = process.env.DATABASE_PORT
+    const port = Number(process.env.DATABASE_PORT || '5432')
     const database = process.env.DATABASE_NAME
 
-    pool = createPool(
-      `postgres://${user}:${password}@${host}:${port}/${database}`,
-      { maximumPoolSize: 30 }
-    )
-  }
+    pool = new pg.Pool({
+      host,
+      port,
+      user,
+      password,
+      database,
+      max: 25,
+      min: 2,
+    })
 
-  async function postEntry(sensor: string, value: string, source: string) {
     try {
-      return pool.connect(async (connection) => {
-        return connection.transaction(async (transaction) => {
-          const id = uuid()
-
-          await transaction.query<{ id: string }>(sql`
-            insert into statement(id, sensor, value, source, date)
-            values (${id}, ${sensor}, ${value}, ${source}, now())
-          `)
-
-          await transaction.query(sql`
-            update emitter_sensors set
-              last_statement = ${id}
-            where sensor = ${sensor}
-          `)
-        })
-      })
+      const client = await createDb()
+      await client.query<{ healthcheck: number }>('select 1 as healthcheck')
+      client.release()
     } catch (err) {
       logError(err)
-      return
+      process.exit(1)
     }
+  }
+}
+
+export async function createDb() {
+  if (!pool) {
+    throw new Error('DB was not initialized')
+  }
+
+  const client = await pool.connect()
+
+  return client
+}
+
+async function runTransactionInPoolClient<T>(
+  cb: (client: pg.PoolClient) => Promise<T>
+) {
+  const client = await createDb()
+
+  try {
+    await client.query('begin')
+    const result = await cb(client)
+    await client.query('commit')
+
+    return result
+  } catch (err) {
+    await client.query('rollback')
+    throw err
+  } finally {
+    client.release()
+  }
+}
+
+export function createStorage(): Storage {
+  async function postEntry(sensor: string, value: string, source: string) {
+    return await runTransactionInPoolClient(async (client) => {
+      const id = uuid()
+
+      await client.query<{ id: string }>(sql`
+        insert into statement(id, sensor, value, source, date)
+        values (${id}, ${sensor}, ${value}, ${source}, now())
+      `)
+
+      await client.query(sql`
+        update emitter_sensors set
+          last_statement = ${id}
+        where sensor = ${sensor}
+      `)
+    })
   }
 
   async function getUserByName(name: string) {
-    try {
-      return pool.connect(async (connection) => {
-        const data = await connection.query<{
-          id: string
-          name: string
-          password: string
-        }>(sql`
-          select id, name, password
-          from "user"
-          where name = ${name}
-        `)
+    return await runTransactionInPoolClient(async (client) => {
+      const data = await client.query<{
+        id: string
+        name: string
+        password: string
+      }>(sql`
+        select id, name, password
+        from "user"
+        where name = ${name}
+      `)
 
-        if (data.rows.length !== 1) {
-          return
-        }
+      if (data.rows.length !== 1) {
+        return
+      }
 
-        return data.rows[0]
-      })
-    } catch (err) {
-      logError(err)
-      return
-    }
+      return data.rows[0]
+    })
   }
 
   async function listRules() {
-    try {
-      return pool.connect(async (connection) => {
-        const data = await connection.query<{
-          id: string
-          rule: string
-          priority: number
-        }>(sql`
-          select id, rule, priority
-          from "rules"
-        `)
-
-        return data.rows.map(reshapeRule)
-      })
-    } catch (err) {
-      logError(err)
-      return []
-    }
+    return await runTransactionInPoolClient(async (client) => {
+      const data = await client.query<{
+        id: string
+        rule: string
+        priority: number
+      }>(sql`
+        select id, rule, priority
+        from "rules"
+      `)
+      return data.rows.map(reshapeRule)
+    })
   }
 
   async function listCommands() {
-    try {
-      return pool.connect(async (connection) => {
-        const data = await connection.query<{
-          id: string
-          target: string
-          value: string
-          expires_in: number
-        }>(sql`
-          select id, target, value, expires_in from "commands"
-          where expires_in > NOW()
-        `)
+    return await runTransactionInPoolClient(async (client) => {
+      const data = await client.query<{
+        id: string
+        target: string
+        value: string
+        expires_in: number
+      }>(sql`
+        select id, target, value, expires_in from "commands"
+        where expires_in > NOW()
+      `)
 
-        return data.rows.map(reshapeCommand)
-      })
-    } catch (err) {
-      logError(err)
-      return []
-    }
+      return data.rows.map(reshapeCommand)
+    })
   }
 
   async function postCommand(target: string, value: string, expiresIn: string) {
-    try {
-      return pool.connect(async (connection) => {
-        return connection.transaction(async (transaction) => {
-          await transaction.query(sql`
-            delete from commands where target=${target}
-          `)
+    return await runTransactionInPoolClient(async (client) => {
+      await client.query(sql`
+        delete from commands where target=${target}
+      `)
 
-          await transaction.query(sql`
-            insert into commands(id, target, value, expires_in)
-            values (${uuid()}, ${target}, ${value}, ${expiresIn})
-          `)
+      await client.query(sql`
+        insert into commands(id, target, value, expires_in)
+        values (${uuid()}, ${target}, ${value}, ${expiresIn})
+      `)
 
-          await transaction.query(sql`
-            update actionables set
-              last_value = ${value},
-              last_value_sent_at = ${new Date().toISOString()}
-            where target = ${target}
-          `)
-        })
-      })
-    } catch (err) {
-      logError(err)
-      return
-    }
+      await client.query(sql`
+        update actionables set
+          last_value = ${value},
+          last_value_sent_at = ${new Date().toISOString()}
+        where target = ${target}
+      `)
+    })
   }
 
   async function postRule(rule: string, priority: number) {
-    try {
-      return pool.connect(async (connection) => {
-        return connection.transaction(async (transaction) => {
-          const existingRule = await transaction.query<{ count: number }>(sql`
-            select count(1) as count from rules
-          `)
+    return await runTransactionInPoolClient(async (client) => {
+      const existingRule = await client.query<{ count: number }>(sql`
+        select count(1) as count from rules
+      `)
 
-          if (Number(existingRule.rows[0].count) > 0) {
-            await transaction.query(sql`
-              update rules
-              set rule = ${rule}
-            `)
+      if (Number(existingRule.rows[0].count) > 0) {
+        await client.query(sql`
+          update rules
+          set rule = ${rule}
+        `)
 
-            return
-          }
+        return
+      }
 
-          await transaction.query(sql`
-            insert into rules(id, rule, priority)
-            values (${uuid()}, ${rule}, ${priority})
-          `)
-        })
-      })
-    } catch (err) {
-      logError(err)
-      return
-    }
+      await client.query(sql`
+        insert into rules(id, rule, priority)
+        values (${uuid()}, ${rule}, ${priority})
+      `)
+    })
   }
 
   async function setLastActionablesValues(newValues: Map<string, string>) {
     const now = new Date().toISOString()
 
-    try {
-      return pool.connect(async (connection) => {
-        return connection.transaction(async (transaction) => {
-          for (const [target, value] of newValues) {
-            await transaction.query(sql`
-              update actionables set
-                last_value = ${value},
-                last_value_sent_at = ${now}
-              where target = ${target}
-            `)
-          }
-        })
-      })
-    } catch (err) {
-      logError(err)
-      return
-    }
+    return await runTransactionInPoolClient(async (client) => {
+      for (const [target, value] of newValues) {
+        await client.query(sql`
+          update actionables set
+            last_value = ${value},
+            last_value_sent_at = ${now}
+          where target = ${target}
+        `)
+      }
+    })
   }
 
   async function listActionables(): Promise<Map<string, Actionable>> {
-    try {
-      return pool.connect(async (connection) => {
-        const data = await connection.query<{
-          id: string
-          target: string
-          name: string
-          value: '0-1' | '1-1024'
-          default_value: string
-          last_value: string
-          last_value_sent_at: string
-        }>(sql`
-          select * from actionables
-        `)
+    return await runTransactionInPoolClient(async (client) => {
+      const data = await client.query<{
+        id: string
+        target: string
+        name: string
+        value: '0-1' | '1-1024'
+        default_value: string
+        last_value: string
+        last_value_sent_at: string
+      }>(sql`
+        select * from actionables
+      `)
 
-        return keyByWith(
-          data.rows,
-          (rawActionable) => rawActionable.target,
-          (rawActionable) => ({
-            id: rawActionable.id,
-            name: rawActionable.name,
-            target: rawActionable.target,
-            valueType: {
-              range: rawActionable.value,
-              default: rawActionable.default_value,
-            },
-            lastAction: rawActionable.last_value
-              ? {
-                  value: rawActionable.last_value,
-                  sentAt: rawActionable.last_value_sent_at,
-                }
-              : undefined,
-          })
-        )
-      })
-    } catch (err) {
-      logError(err)
-      return new Map()
-    }
+      return keyByWith(
+        data.rows,
+        (rawActionable) => rawActionable.target,
+        reshapeActionable
+      )
+    })
   }
 
   async function listEmitterSensors(): Promise<Map<string, EmitterSensor>> {
-    try {
-      return pool.connect(async (connection) => {
-        const data = await connection.query<{
-          id: string
-          sensor: string
-          name: string
-          min: number
-          max: number
-          value?: string
-          date?: number
-          source?: string
-        }>(sql`
-          select
-            emitter_sensors.id,
-            emitter_sensors.sensor,
-            emitter_sensors.name,
-            emitter_sensors.min,
-            emitter_sensors.max,
-            statement.value,
-            statement.date,
-            statement.source
-          from emitter_sensors
-          left join statement on statement.id = emitter_sensors.last_statement
-        `)
+    return await runTransactionInPoolClient(async (client) => {
+      const data = await client.query<{
+        id: string
+        sensor: string
+        name: string
+        min: number
+        max: number
+        value?: string
+        date?: number
+        source?: string
+      }>(sql`
+        select
+          emitter_sensors.id,
+          emitter_sensors.sensor,
+          emitter_sensors.name,
+          emitter_sensors.min,
+          emitter_sensors.max,
+          statement.value,
+          statement.date,
+          statement.source
+        from emitter_sensors
+        left join statement on statement.id = emitter_sensors.last_statement
+      `)
 
-        return keyByWith(
-          data.rows,
-          (rawSensor) => rawSensor.sensor,
-          (rawSensor) => ({
-            id: rawSensor.id,
-            name: rawSensor.name,
-            sensor: rawSensor.sensor,
-            range: {
-              min: rawSensor.min,
-              max: rawSensor.max,
-            },
-            lastStatement:
-              rawSensor.value && rawSensor.date && rawSensor.source
-                ? {
-                    value: rawSensor.value,
-                    sentAt: new Date(rawSensor.date).toISOString(),
-                    source: rawSensor.source,
-                  }
-                : undefined,
-          })
-        )
-      })
-    } catch (err) {
-      logError(err)
-      return new Map()
-    }
+      return keyByWith(
+        data.rows,
+        (rawSensor) => rawSensor.sensor,
+        reshapeSensor
+      )
+    })
   }
 
   return {
