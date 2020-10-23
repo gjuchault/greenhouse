@@ -2,7 +2,7 @@ import path from 'path'
 import { config as dotenv } from 'dotenv'
 import { log, logError } from './log'
 import { createHardware } from './hardware'
-import { createStorage } from './storage'
+import { setupStorage, createStorage } from './storage'
 import { createHttp } from './http'
 import { executeRules } from './rules'
 import { events } from './events'
@@ -16,6 +16,7 @@ async function main() {
 
   await createHardware()
   await createHttp()
+  await setupStorage()
   const storage = await createStorage()
 
   const handleSensorValue = async (
