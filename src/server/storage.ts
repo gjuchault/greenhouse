@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid'
 import pg from 'pg'
 import sql from 'sql-template-strings'
-import { logError } from './log'
+import { log, logError } from './log'
 import { reshapeRule, Rule } from './rules/rule'
 import { reshapeCommand, Command } from './rules/command'
 import { reshapeSensor, EmitterSensor } from './sensors'
@@ -30,6 +30,7 @@ let pool: pg.Pool
 
 export async function setupStorage() {
   if (!pool) {
+    log('storage', 'Creating storage...')
     const user = process.env.DATABASE_USER
     const password = process.env.DATABASE_PASSWORD
     const host = process.env.DATABASE_HOST
