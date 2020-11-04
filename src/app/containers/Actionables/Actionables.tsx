@@ -1,13 +1,18 @@
 import React from 'react'
 import { Pane, Card, Heading, majorScale } from 'evergreen-ui'
-import { useActionables } from '../../hooks/useQuery'
+import { useActionables, useRemoveActionable } from '../../hooks/useQuery'
 import { ActionablesTable } from '../../components/ActionablesTable/ActionablesTable'
 
 export function Actionables() {
   const { data: actionables } = useActionables()
+  const [removeActionable] = useRemoveActionable()
 
   if (!actionables) {
     return null
+  }
+
+  function onRemoveActionable(actionableId: string) {
+    removeActionable({ id: actionableId })
   }
 
   return (
@@ -21,7 +26,10 @@ export function Actionables() {
         Actionables
       </Heading>
       <Pane>
-        <ActionablesTable actionables={Array.from(actionables.values())} />
+        <ActionablesTable
+          actionables={Array.from(actionables.values())}
+          onRemoveActionable={onRemoveActionable}
+        />
       </Pane>
     </Card>
   )

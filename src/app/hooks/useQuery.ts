@@ -56,6 +56,14 @@ export const useActionables = () => {
   }
 }
 
+export const useRemoveActionable = () =>
+  useMutation<void, unknown, { id: string }>(
+    ({ id }) => api.delete(`/api/actionables/${id}`),
+    {
+      onSuccess: () => queryCache.invalidateQueries('GET /api/actionables'),
+    }
+  )
+
 export const useSensors = () => {
   const q = useQuery<AxiosResponse<[string, EmitterSensor][]>, string>(
     'GET /api/sensors',

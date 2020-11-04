@@ -1,6 +1,8 @@
+/// <reference path="../../typings/rfxcom.d.ts" />
+
 import rfxcom from 'rfxcom'
 import { USBDevice } from '../usb'
-import { log, logError } from '../../log'
+import { logError } from '../../log'
 import { events } from '../../events'
 
 const lightning4Type = 0x13
