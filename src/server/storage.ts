@@ -23,6 +23,7 @@ export type Storage = {
   ) => Promise<void>
   setLastActionablesValues: (newValues: Map<string, string>) => Promise<void>
   listActionables: () => Promise<Map<string, Actionable>>
+  removeActionable: (actionableId: string) => Promise<void>
   listEmitterSensors: () => Promise<Map<string, EmitterSensor>>
 }
 
@@ -234,6 +235,15 @@ export function createStorage(): Storage {
     })
   }
 
+  async function removeActionable(actionableId: string): Promise<void> {
+    return await runTransactionInPoolClient(async (client) => {
+      await client.query(sql`
+        delete from actionables
+        where id = ${actionableId}
+      `)
+    })
+  }
+
   async function listEmitterSensors(): Promise<Map<string, EmitterSensor>> {
     return await runTransactionInPoolClient(async (client) => {
       const data = await client.query<{
@@ -276,6 +286,7 @@ export function createStorage(): Storage {
     postCommand,
     setLastActionablesValues,
     listActionables,
+    removeActionable,
     listEmitterSensors,
   }
 }

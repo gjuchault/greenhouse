@@ -1,12 +1,14 @@
 import React from 'react'
+import { Menu } from 'evergreen-ui'
 import { Actionable } from '../../hooks/useQuery'
 import { Table, makeDateCell } from '../Table/Table'
 
 type Props = {
   actionables: Actionable[]
+  onRemoveActionable: (actionableId: string) => void
 }
 
-export function ActionablesTable({ actionables }: Props) {
+export function ActionablesTable({ actionables, onRemoveActionable }: Props) {
   return (
     <Table<Actionable>
       items={actionables}
@@ -37,6 +39,21 @@ export function ActionablesTable({ actionables }: Props) {
           ...makeDateCell(),
         },
       ]}
+      renderMenu={(actionable, close) => (
+        <Menu>
+          <Menu.Group>
+            <Menu.Item
+              intent="danger"
+              onClick={() => {
+                onRemoveActionable(actionable.id)
+                close()
+              }}
+            >
+              Supprimer
+            </Menu.Item>
+          </Menu.Group>
+        </Menu>
+      )}
     />
   )
 }

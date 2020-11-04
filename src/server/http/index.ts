@@ -7,10 +7,11 @@ import cors from 'cors'
 import { log, logError } from '../log'
 import { isLoggedIn } from './isLoggedIn'
 import { handleLogin } from './controllers/login'
+import { handleListEmitterSensors } from './controllers/sensors'
 import {
   handleListActionables,
-  handleListEmitterSensors,
-} from './controllers/sensors'
+  handleRemoveActionable,
+} from './controllers/actionables'
 import {
   handleRulesAndCommands,
   handleCreateCommand,
@@ -43,6 +44,7 @@ export async function createHttp() {
   app.get('/api/rules-and-commands', isLoggedIn, handleRulesAndCommands)
   app.get('/api/sensors', isLoggedIn, handleListEmitterSensors)
   app.get('/api/actionables', isLoggedIn, handleListActionables)
+  app.delete('/api/actionables/:id', isLoggedIn, handleRemoveActionable)
   app.get('/api/logs', isLoggedIn, handleGetLogs)
   app.post('/api/command', isLoggedIn, handleCreateCommand)
   app.post('/api/rule', isLoggedIn, handleCreateRule)

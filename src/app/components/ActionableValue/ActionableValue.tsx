@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { TextInput, Select, PaneProps } from 'evergreen-ui'
 import { Actionable } from '../../hooks/useQuery'
 
-type Props = PaneProps & {
+type Props = Pick<PaneProps, 'marginRight'> & {
   commandTarget: string
   actionables: Actionable[]
   commandValue: string
@@ -68,7 +68,9 @@ export function ActionableValue({
       min="1"
       max="1024"
       value={commandValue}
-      onChange={onChange}
+      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+        onChange(e.target.value)
+      }
       {...props}
     />
   )

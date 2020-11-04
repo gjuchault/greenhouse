@@ -1,7 +1,9 @@
+/// <reference path="../../typings/serialport-parser-delimiter.d.ts" />
+
 import SerialPort from 'serialport'
 import Delimiter from '@serialport/parser-delimiter'
 import { USBDevice } from '../usb'
-import { log, logError } from '../../log'
+import { logError } from '../../log'
 import { events } from '../../events'
 
 export type Arduino = {

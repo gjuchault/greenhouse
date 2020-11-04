@@ -10,6 +10,10 @@ import {
 import {
   Pane,
   Table as EvergreenTable,
+  Popover,
+  Position,
+  MoreIcon,
+  IconButton,
   Button,
   SearchInput,
   majorScale,
@@ -19,6 +23,7 @@ import { formatDate } from '../../helpers/date'
 type Props<T extends object> = Omit<TableOptions<T>, 'data'> & {
   items: T[]
   columns: Column<T>[]
+  renderMenu?: (row: T, close: () => void) => React.ReactNode
   renderFilterPlaceholder: (count: number) => string
   onRefetch?: () => Promise<void>
   columnsSizes: (number | 'auto')[]
@@ -27,6 +32,7 @@ type Props<T extends object> = Omit<TableOptions<T>, 'data'> & {
 export function Table<T extends object>({
   items,
   columns,
+  renderMenu,
   renderFilterPlaceholder,
   onRefetch,
   columnsSizes,
@@ -107,6 +113,7 @@ export function Table<T extends object>({
               )
             })
           })}
+          <EvergreenTable.HeaderCell width={48} flex="none" />
         </EvergreenTable.Head>
         <EvergreenTable.Body {...getTableBodyProps()} maxHeight={500}>
           {rows.map((row) => {
@@ -125,6 +132,20 @@ export function Table<T extends object>({
                     </EvergreenTable.TextCell>
                   )
                 })}
+                {renderMenu && (
+                  <EvergreenTable.Cell width={48} flex="none">
+                    <Popover
+                      content={({ close }) => renderMenu(row.original, close)}
+                      position={Position.BOTTOM_RIGHT}
+                    >
+                      <IconButton
+                        icon={MoreIcon}
+                        height={24}
+                        appearance="minimal"
+                      />
+                    </Popover>
+                  </EvergreenTable.Cell>
+                )}
               </EvergreenTable.Row>
             )
           })}
