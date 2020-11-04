@@ -11,8 +11,8 @@ export function Actionables() {
     return null
   }
 
-  function onRemoveActionable(actionableId: string) {
-    removeActionable({ id: actionableId })
+  async function onRemoveActionable(actionableId: string) {
+    await removeActionable({ id: actionableId })
   }
 
   return (

@@ -12,5 +12,5 @@ export async function handleRemoveActionable(
   res: Response
 ) {
   await removeActionable(req.params.id)
-  res.status(204)
+  res.status(204).end()
 }
