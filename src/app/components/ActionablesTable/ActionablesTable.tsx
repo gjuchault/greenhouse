@@ -1,18 +1,26 @@
 import React, { useState } from 'react'
 import { Menu } from 'evergreen-ui'
-import { Actionable } from '../../hooks/useQuery'
+import { Actionable, ActionableInput } from '../../models'
 import { Table, makeDateCell } from '../Table/Table'
 import { Confirm } from '../Confirm/Confirm'
+import { CreateActionable } from '../CreateActionable/CreateActionable'
 
 type Props = {
   actionables: Actionable[]
   onRemoveActionable: (actionableId: string) => Promise<void>
+  onCreateActionable: (actionableInput: ActionableInput) => Promise<void>
 }
 
-export function ActionablesTable({ actionables, onRemoveActionable }: Props) {
+export function ActionablesTable({
+  actionables,
+  onRemoveActionable,
+  onCreateActionable,
+}: Props) {
   const [actionableToDelete, setActionableToDelete] = useState<
     Actionable | undefined
   >(undefined)
+  const [showCreateActionable, setShowCreateActionable] = useState(false)
+  const [isCreatingActionable, setIsCreatingActionable] = useState(false)
   const [isRemoving, setIsRemoving] = useState<boolean>(false)
 
   return (
@@ -29,6 +37,18 @@ export function ActionablesTable({ actionables, onRemoveActionable }: Props) {
             await onRemoveActionable(actionableToDelete.id)
             setIsRemoving(false)
             setActionableToDelete(undefined)
+          }}
+        />
+      )}
+      {showCreateActionable && (
+        <CreateActionable
+          isLoading={isCreatingActionable}
+          onClose={() => setShowCreateActionable(false)}
+          onConfirm={async (actionable) => {
+            setIsCreatingActionable(true)
+            await onCreateActionable(actionable)
+            setIsCreatingActionable(false)
+            setShowCreateActionable(false)
           }}
         />
       )}
@@ -61,6 +81,9 @@ export function ActionablesTable({ actionables, onRemoveActionable }: Props) {
             ...makeDateCell(),
           },
         ]}
+        onNewItem={() => {
+          setShowCreateActionable(true)
+        }}
         renderMenu={(actionable, close) => (
           <Menu>
             <Menu.Group>

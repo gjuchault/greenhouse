@@ -1,48 +1,13 @@
-import {
-  useQuery,
-  useMutation,
-  queryCache,
-  MutationResultPair,
-} from 'react-query'
-import { api } from '../api'
+import { useQuery, useMutation, queryCache } from 'react-query'
 import { AxiosResponse } from 'axios'
-
-export interface EmitterSensor {
-  id: string
-  sensor: string
-  name: string
-  range: {
-    min: number
-    max: number
-  }
-  lastStatement?: {
-    value: string
-    sentAt: string
-    source: string
-  }
-}
-
-export interface Actionable {
-  id: string
-  target: string
-  name: string
-  valueType: {
-    range: '0-1' | '1-1024'
-    default: string
-  }
-  lastAction?: {
-    value: string
-    sentAt: string
-  }
-}
-
-type Rule = {
-  id: string
-  rule: string
-  priority: number
-}
-
-type Command = { id: string; target: string; value: string; expiresIn: string }
+import { api } from '../api'
+import {
+  Actionable,
+  ActionableInput,
+  EmitterSensor,
+  Command,
+  Rule,
+} from '../models'
 
 export const useActionables = () => {
   const q = useQuery<AxiosResponse<[string, Actionable][]>, string>(
@@ -59,6 +24,14 @@ export const useActionables = () => {
 export const useRemoveActionable = () =>
   useMutation<void, unknown, { id: string }>(
     ({ id }) => api.delete(`/api/actionables/${id}`),
+    {
+      onSuccess: () => queryCache.invalidateQueries('GET /api/actionables'),
+    }
+  )
+
+export const useCreateActionable = () =>
+  useMutation<void, unknown, ActionableInput>(
+    (actionableInput) => api.post(`/api/actionables`, actionableInput),
     {
       onSuccess: () => queryCache.invalidateQueries('GET /api/actionables'),
     }

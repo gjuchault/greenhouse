@@ -25,6 +25,7 @@ type Props<T extends object> = Omit<TableOptions<T>, 'data'> & {
   columns: Column<T>[]
   renderMenu?: (row: T, close: () => void) => React.ReactNode
   renderFilterPlaceholder: (count: number) => string
+  onNewItem: () => void
   onRefetch?: () => Promise<void>
   columnsSizes: (number | 'auto')[]
 }
@@ -35,6 +36,7 @@ export function Table<T extends object>({
   renderMenu,
   renderFilterPlaceholder,
   onRefetch,
+  onNewItem,
   columnsSizes,
   ...props
 }: Props<T>) {
@@ -78,14 +80,28 @@ export function Table<T extends object>({
         alignItems="center"
         marginBottom={majorScale(3)}
       >
-        <GlobalFilter
-          preGlobalFilteredRows={preGlobalFilteredRows}
-          globalFilter={state.globalFilter}
-          setGlobalFilter={setGlobalFilter}
-          renderFilterPlaceholder={renderFilterPlaceholder}
-        />
+        <Pane display="flex" justifyContent="flex-start" alignItems="center">
+          <GlobalFilter
+            preGlobalFilteredRows={preGlobalFilteredRows}
+            globalFilter={state.globalFilter}
+            setGlobalFilter={setGlobalFilter}
+            renderFilterPlaceholder={renderFilterPlaceholder}
+          />
+          <Button
+            height={40}
+            appearance="primary"
+            marginLeft={majorScale(3)}
+            onClick={onNewItem}
+          >
+            Nouveau
+          </Button>
+        </Pane>
         {onRefetch && (
-          <Button onClick={handleRefetch} disabled={isRefetchDisabled}>
+          <Button
+            height={40}
+            onClick={handleRefetch}
+            disabled={isRefetchDisabled}
+          >
             Rafraîchir
           </Button>
         )}

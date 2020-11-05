@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { Pane } from 'evergreen-ui'
 import { ControlledEditor, monaco } from '@monaco-editor/react'
-import { Actionable, EmitterSensor } from '../../hooks/useQuery'
+import { Actionable, EmitterSensor } from '../../models'
 
 type Props = {
   value: string

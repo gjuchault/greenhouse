@@ -19,6 +19,7 @@ export function LogsTable({ logs, onRefetch }: Props) {
       renderFilterPlaceholder={(count) => `Rechercher parmis ${count} lignes`}
       columnsSizes={[180, 140, 'auto']}
       onRefetch={onRefetch}
+      onNewItem={() => {}}
       columns={[
         {
           id: 'date',

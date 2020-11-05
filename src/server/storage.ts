@@ -5,7 +5,7 @@ import { log, logError } from './log'
 import { reshapeRule, Rule } from './rules/rule'
 import { reshapeCommand, Command } from './rules/command'
 import { reshapeSensor, EmitterSensor } from './sensors'
-import { reshapeActionable, Actionable } from './actionables'
+import { reshapeActionable, Actionable, ActionableInput } from './actionables'
 import { keyByWith } from './helpers/iterables'
 
 export type Storage = {
@@ -23,6 +23,7 @@ export type Storage = {
   ) => Promise<void>
   setLastActionablesValues: (newValues: Map<string, string>) => Promise<void>
   listActionables: () => Promise<Map<string, Actionable>>
+  createActionable: (actionableInput: ActionableInput) => Promise<void>
   removeActionable: (actionableId: string) => Promise<void>
   listEmitterSensors: () => Promise<Map<string, EmitterSensor>>
 }
@@ -235,6 +236,25 @@ export function createStorage(): Storage {
     })
   }
 
+  async function createActionable(
+    actionableInput: ActionableInput
+  ): Promise<void> {
+    return await runTransactionInPoolClient(async (client) => {
+      const id = uuid()
+
+      await client.query(sql`
+        insert into actionables(id, target, name, value, default_value)
+        values (
+          ${id},
+          ${actionableInput.target},
+          ${actionableInput.name},
+          ${actionableInput.valueType.range},
+          ${actionableInput.valueType.default}
+        )
+      `)
+    })
+  }
+
   async function removeActionable(actionableId: string): Promise<void> {
     return await runTransactionInPoolClient(async (client) => {
       await client.query(sql`
@@ -286,6 +306,7 @@ export function createStorage(): Storage {
     postCommand,
     setLastActionablesValues,
     listActionables,
+    createActionable,
     removeActionable,
     listEmitterSensors,
   }
