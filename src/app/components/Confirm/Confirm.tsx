@@ -19,19 +19,17 @@ export function Confirm({
   onConfirm,
 }: Props) {
   return (
-    <Pane>
-      <Dialog
-        isShown
-        title="Confirmation"
-        intent="danger"
-        isConfirmLoading={isLoading}
-        onCloseComplete={onClose}
-        onConfirm={onConfirm}
-        confirmLabel={confirmationText || 'Supprimer'}
-        cancelLabel={cancellationText || 'Annuler'}
-      >
-        {description}
-      </Dialog>
-    </Pane>
+    <Dialog
+      isShown
+      title="Confirmation"
+      intent="danger"
+      isConfirmLoading={isLoading}
+      onCloseComplete={onClose}
+      onConfirm={onConfirm}
+      confirmLabel={confirmationText || 'Supprimer'}
+      cancelLabel={cancellationText || 'Annuler'}
+    >
+      {description}
+    </Dialog>
   )
 }

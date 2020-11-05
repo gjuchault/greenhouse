@@ -10,6 +10,7 @@ import { handleLogin } from './controllers/login'
 import { handleListEmitterSensors } from './controllers/sensors'
 import {
   handleListActionables,
+  handleCreateActionable,
   handleRemoveActionable,
 } from './controllers/actionables'
 import {
@@ -45,6 +46,7 @@ export async function createHttp() {
   app.get('/api/sensors', isLoggedIn, handleListEmitterSensors)
   app.get('/api/actionables', isLoggedIn, handleListActionables)
   app.delete('/api/actionables/:id', isLoggedIn, handleRemoveActionable)
+  app.post('/api/actionables', isLoggedIn, handleCreateActionable)
   app.get('/api/logs', isLoggedIn, handleGetLogs)
   app.post('/api/command', isLoggedIn, handleCreateCommand)
   app.post('/api/rule', isLoggedIn, handleCreateRule)

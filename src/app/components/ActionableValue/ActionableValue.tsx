@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { TextInput, Select, PaneProps } from 'evergreen-ui'
-import { Actionable } from '../../hooks/useQuery'
+import { Actionable } from '../../models'
 
 type Props = Pick<PaneProps, 'marginRight'> & {
   commandTarget: string

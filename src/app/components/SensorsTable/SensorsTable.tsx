@@ -1,5 +1,5 @@
 import React from 'react'
-import { EmitterSensor } from '../../hooks/useQuery'
+import { EmitterSensor } from '../../models'
 import { Table, makeDateCell } from '../Table/Table'
 
 type Props = {
@@ -12,6 +12,7 @@ export function SensorsTable({ emitterSensors }: Props) {
       items={emitterSensors}
       renderFilterPlaceholder={(count) => `Rechercher parmis ${count} capteurs`}
       columnsSizes={['auto', 150, 150, 150, 180, 180, 150]}
+      onNewItem={() => {}}
       columns={[
         {
           Header: 'Nom',

@@ -12,6 +12,15 @@ export interface Actionable {
   }
 }
 
+export interface ActionableInput {
+  target: string
+  name: string
+  valueType: {
+    range: '0-1' | '1-1024'
+    default: string
+  }
+}
+
 export function reshapeActionable(rawActionable: any): Actionable {
   return {
     id: rawActionable.id,

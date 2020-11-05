@@ -1,11 +1,17 @@
 import React from 'react'
 import { Pane, Card, Heading, majorScale } from 'evergreen-ui'
-import { useActionables, useRemoveActionable } from '../../hooks/useQuery'
+import {
+  useActionables,
+  useCreateActionable,
+  useRemoveActionable,
+} from '../../hooks/useQuery'
 import { ActionablesTable } from '../../components/ActionablesTable/ActionablesTable'
+import { ActionableInput } from '../../models'
 
 export function Actionables() {
   const { data: actionables } = useActionables()
   const [removeActionable] = useRemoveActionable()
+  const [createActionable] = useCreateActionable()
 
   if (!actionables) {
     return null
@@ -13,6 +19,10 @@ export function Actionables() {
 
   async function onRemoveActionable(actionableId: string) {
     await removeActionable({ id: actionableId })
+  }
+
+  async function onCreateActionable(actionableInput: ActionableInput) {
+    await createActionable(actionableInput)
   }
 
   return (
@@ -29,6 +39,7 @@ export function Actionables() {
         <ActionablesTable
           actionables={Array.from(actionables.values())}
           onRemoveActionable={onRemoveActionable}
+          onCreateActionable={onCreateActionable}
         />
       </Pane>
     </Card>
