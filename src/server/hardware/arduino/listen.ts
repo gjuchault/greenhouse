@@ -3,7 +3,7 @@
 import SerialPort from 'serialport'
 import Delimiter from '@serialport/parser-delimiter'
 import { USBDevice } from '../usb'
-import { logError } from '../../log'
+import { log, logError } from '../../log'
 import { events } from '../../events'
 
 export type Arduino = {
@@ -58,8 +58,10 @@ export function buildListenArduino({
         events.emit('arduino:line', line)
       })
 
-      events.on('command:send', (target, value) => {
-        const data = `${target};${Math.trunc(Number(value)).toString()}`
+      events.on('command:send', (target, input) => {
+        const value = Math.trunc(Number(input)).toString()
+        const data = `${target};${value}`
+        log('arduino-sender', `(target: ${target} value: ${value})`)
 
         port.write(`${data}\n`, (err) => {
           if (err) logError(err)
