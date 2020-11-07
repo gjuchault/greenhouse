@@ -1,0 +1,5 @@
+- Move to yarn workspace
+- Proper log management
+- memcached queue for Postgres resiliency
+- move http services inside modules
+- move from containers/components to modules
