@@ -10,13 +10,9 @@ export async function listActionables() {
 }
 
 export async function createActionable(actionableInput: ActionableInput) {
-  const actionables = await storage.createActionable(actionableInput)
-
-  return actionables
+  await storage.createActionable(actionableInput)
 }
 
 export async function removeActionable(actionableId: string) {
-  const actionables = await storage.removeActionable(actionableId)
-
-  return actionables
+  await storage.removeActionable(actionableId)
 }

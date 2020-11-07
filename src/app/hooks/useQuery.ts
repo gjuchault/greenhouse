@@ -7,6 +7,7 @@ import {
   EmitterSensor,
   Command,
   Rule,
+  EmitterSensorInput,
 } from '../models'
 
 export const useActionables = () => {
@@ -48,6 +49,22 @@ export const useSensors = () => {
     data: q.data ? new Map(q.data.data) : undefined,
   }
 }
+
+export const useRemoveEmitterSensor = () =>
+  useMutation<void, unknown, { id: string }>(
+    ({ id }) => api.delete(`/api/sensors/${id}`),
+    {
+      onSuccess: () => queryCache.invalidateQueries('GET /api/sensors'),
+    }
+  )
+
+export const useCreateEmitterSensor = () =>
+  useMutation<void, unknown, EmitterSensorInput>(
+    (emitterSensorInput) => api.post(`/api/sensors`, emitterSensorInput),
+    {
+      onSuccess: () => queryCache.invalidateQueries('GET /api/sensors'),
+    }
+  )
 
 export const useRulesAndCommands = () => {
   const q = useQuery<

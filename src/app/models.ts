@@ -13,6 +13,13 @@ export interface EmitterSensor {
   }
 }
 
+export interface EmitterSensorInput {
+  sensor: string
+  name: string
+  min: number
+  max: number
+}
+
 export interface Actionable {
   id: string
   target: string
