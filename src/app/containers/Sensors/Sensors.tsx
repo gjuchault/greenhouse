@@ -1,13 +1,28 @@
 import React from 'react'
 import { Pane, Card, Heading, majorScale } from 'evergreen-ui'
-import { useSensors } from '../../hooks/useQuery'
+import {
+  useSensors,
+  useRemoveEmitterSensor,
+  useCreateEmitterSensor,
+} from '../../hooks/useQuery'
 import { SensorsTable } from '../../components/SensorsTable/SensorsTable'
+import { EmitterSensorInput } from '../../models'
 
 export function Sensors() {
   const { data: emitterSensors } = useSensors()
+  const [removeEmitterSensor] = useRemoveEmitterSensor()
+  const [createEmitterSensor] = useCreateEmitterSensor()
 
   if (!emitterSensors) {
     return null
+  }
+
+  async function onRemoveEmitterSensor(emittersensorId: string) {
+    await removeEmitterSensor({ id: emittersensorId })
+  }
+
+  async function onCreateEmitterSensor(emittersensorInput: EmitterSensorInput) {
+    await createEmitterSensor(emittersensorInput)
   }
 
   return (
@@ -21,7 +36,11 @@ export function Sensors() {
         Capteurs
       </Heading>
       <Pane>
-        <SensorsTable emitterSensors={Array.from(emitterSensors.values())} />
+        <SensorsTable
+          emitterSensors={Array.from(emitterSensors.values())}
+          onCreateEmitterSensor={onCreateEmitterSensor}
+          onRemoveEmitterSensor={onRemoveEmitterSensor}
+        />
       </Pane>
     </Card>
   )

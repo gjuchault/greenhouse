@@ -13,6 +13,13 @@ export interface EmitterSensor {
   }
 }
 
+export interface EmitterSensorInput {
+  sensor: string
+  name: string
+  min: number
+  max: number
+}
+
 export function reshapeSensor(rawSensor: any): EmitterSensor {
   return {
     id: rawSensor.id,

@@ -4,7 +4,7 @@ import sql from 'sql-template-strings'
 import { log, logError } from './log'
 import { reshapeRule, Rule } from './rules/rule'
 import { reshapeCommand, Command } from './rules/command'
-import { reshapeSensor, EmitterSensor } from './sensors'
+import { reshapeSensor, EmitterSensor, EmitterSensorInput } from './sensors'
 import { reshapeActionable, Actionable, ActionableInput } from './actionables'
 import { keyByWith } from './helpers/iterables'
 
@@ -26,6 +26,8 @@ export type Storage = {
   createActionable: (actionableInput: ActionableInput) => Promise<void>
   removeActionable: (actionableId: string) => Promise<void>
   listEmitterSensors: () => Promise<Map<string, EmitterSensor>>
+  createEmitterSensor: (emitterSensorInput: EmitterSensorInput) => Promise<void>
+  removeEmitterSensor: (emitterSensorId: string) => Promise<void>
 }
 
 let pool: pg.Pool
@@ -297,6 +299,32 @@ export function createStorage(): Storage {
     })
   }
 
+  async function createEmitterSensor(emitterSensorInput: EmitterSensorInput) {
+    return await runTransactionInPoolClient(async (client) => {
+      const id = uuid()
+
+      await client.query(sql`
+        insert into emitter_sensors(id, sensor, name, min, max)
+        values (
+          ${id},
+          ${emitterSensorInput.sensor},
+          ${emitterSensorInput.name},
+          ${emitterSensorInput.min},
+          ${emitterSensorInput.max}
+        )
+      `)
+    })
+  }
+
+  async function removeEmitterSensor(emitterSensorId: string) {
+    return await runTransactionInPoolClient(async (client) => {
+      await client.query(sql`
+        delete from emitter_sensors
+        where id = ${emitterSensorId}
+      `)
+    })
+  }
+
   return {
     getUserByName,
     postEntry,
@@ -309,5 +337,7 @@ export function createStorage(): Storage {
     createActionable,
     removeActionable,
     listEmitterSensors,
+    createEmitterSensor,
+    removeEmitterSensor,
   }
 }
