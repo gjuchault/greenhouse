@@ -1,5 +1,10 @@
-import React, { useEffect, useState } from 'react'
-import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom'
+import React, { useState } from 'react'
+import {
+  BrowserRouter as Router,
+  Route,
+  Redirect,
+  Switch,
+} from 'react-router-dom'
 import { Pane, useTheme } from 'evergreen-ui'
 import { Provider as AuthProvider } from '../../context/auth'
 import { isLoggedIn, getName, offlineLogin } from '../../auth'
@@ -13,19 +18,13 @@ import { Logs } from '../Logs/Logs'
 export function App() {
   const theme = useTheme()
 
-  const [auth, setAuth] = useState({
-    isLoggedIn: false,
-    name: '',
-  })
+  const isAuth = isLoggedIn()
+  const name = getName()
 
-  useEffect(() => {
-    if (isLoggedIn()) {
-      setAuth({
-        isLoggedIn: true,
-        name: getName(),
-      })
-    }
-  }, [])
+  const [auth, setAuth] = useState({
+    isLoggedIn: isAuth,
+    name: name,
+  })
 
   function handleLoggedIn(name: string, token: string) {
     setAuth({
@@ -48,19 +47,23 @@ export function App() {
           {auth.isLoggedIn && <Sidebar />}
           {auth.isLoggedIn && (
             <Pane flex="1">
-              <Route path="/sensors">
-                <Sensors />
-              </Route>
-              <Route path="/rules">
-                <Rules />
-              </Route>
-              <Route path="/actionables">
-                <Actionables />
-              </Route>
-              <Route path="/logs">
-                <Logs />
-              </Route>
-              <Redirect from="/" exact to="/sensors" />
+              <Switch>
+                <Route exact path="/">
+                  <Redirect to="/sensors" />
+                </Route>
+                <Route path="/sensors">
+                  <Sensors />
+                </Route>
+                <Route path="/rules">
+                  <Rules />
+                </Route>
+                <Route path="/actionables">
+                  <Actionables />
+                </Route>
+                <Route path="/logs">
+                  <Logs />
+                </Route>
+              </Switch>
             </Pane>
           )}
         </AuthProvider>
