@@ -1,0 +1,10 @@
+{
+  "name": "greenhouse",
+  "version": "1.0.0",
+  "description": "Greenhouse management through a Rapsberry PI and Arduinos",
+  "repository": "git@github.com:gjuchault/greenhouse.git",
+  "author": "Gabriel Juchault <gabriel.juchault@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "workspaces": ["backend", "frontend"]
+}
