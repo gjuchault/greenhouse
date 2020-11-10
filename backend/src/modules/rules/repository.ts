@@ -10,6 +10,7 @@ import {
   defaultRule,
   RuleInput,
 } from "./rule";
+import { keyByWith } from "../../helpers/iterables";
 
 export interface RulesRepositoryDependencies {
   database: Database;
@@ -18,7 +19,7 @@ export interface RulesRepositoryDependencies {
 export function buildRulesRepository({
   database,
 }: RulesRepositoryDependencies) {
-  async function listRule(): Promise<CustomRule | undefined> {
+  async function listRule(): Promise<CustomRule> {
     return await database.runInDatabaseClient(async (client) => {
       const data = await client.query<{
         rule: string;
@@ -65,7 +66,7 @@ export function buildRulesRepository({
         where expires_in > NOW()
       `);
 
-      return data.rows.map(decodeCommand);
+      return keyByWith(data.rows, (item) => item.id, decodeCommand);
     });
   }
 

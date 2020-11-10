@@ -6,6 +6,8 @@ import { buildActionablesRepository } from "./repository";
 import { EnsureAuthMiddleware } from "../auth";
 import { isUuidValid } from "../../helpers/refinements";
 
+export * from "./actionable";
+
 export interface ActionablesDependencies {
   router: Router;
   logger: Logger;
@@ -69,4 +71,9 @@ export async function createActionables({
   });
 
   logger.info("Service started");
+
+  return {
+    listActionables: repository.listActionables,
+    setLastActionablesValues: repository.setLastActionablesValues,
+  };
 }

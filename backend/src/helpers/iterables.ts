@@ -39,3 +39,11 @@ export function groupByWith<K, T, R>(
 
   return output;
 }
+
+export function isIterable(obj: unknown): obj is Iterable<unknown> {
+  if (obj === null || obj === undefined) {
+    return false;
+  }
+
+  return typeof (obj as any)[Symbol.iterator] === "function";
+}

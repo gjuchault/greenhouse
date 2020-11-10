@@ -1,6 +1,7 @@
 import { createDatabase } from "./database";
 import { createHttpServer } from "./httpServer";
 import { createLogger } from "./logger";
+import { createEvents } from "./events";
 import { createActionables } from "./modules/actionables";
 import { createAuth } from "./modules/auth";
 import { createRules } from "./modules/rules";
@@ -8,6 +9,7 @@ import { createSensors } from "./modules/sensors";
 const { version } = require("../../package.json");
 
 const logger = createLogger("app");
+const events = createEvents();
 
 async function main() {
   logger.info(`Greenhouse v${version} starting...`);
@@ -33,18 +35,23 @@ async function main() {
     ensureAuth: auth.ensureAuth,
   });
 
-  const rules = await createRules({
-    router: httpServer.router,
-    database,
-    logger: createLogger("rules"),
-    ensureAuth: auth.ensureAuth,
-  });
-
   const sensors = await createSensors({
     router: httpServer.router,
     database,
+    events,
     logger: createLogger("sensors"),
     ensureAuth: auth.ensureAuth,
+  });
+
+  const rules = await createRules({
+    router: httpServer.router,
+    database,
+    events,
+    logger: createLogger("rules"),
+    ensureAuth: auth.ensureAuth,
+    listSensors: sensors.listSensors,
+    listActionables: actionables.listActionables,
+    setLastActionablesValues: actionables.setLastActionablesValues,
   });
 
   async function shutdown() {

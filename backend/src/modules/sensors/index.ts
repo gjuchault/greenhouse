@@ -2,6 +2,7 @@ import { Router } from "express";
 import { Logger } from "winston";
 import * as z from "zod";
 import { Database } from "../../database";
+import { GreenhouseEvents } from "../../events";
 import { isUuidValid } from "../../helpers/refinements";
 import { EnsureAuthMiddleware } from "../auth";
 import { buildSensorsRepository } from "./repository";
@@ -10,6 +11,7 @@ export interface SensorsDependencies {
   router: Router;
   logger: Logger;
   database: Database;
+  events: GreenhouseEvents;
   ensureAuth: EnsureAuthMiddleware;
 }
 
@@ -17,11 +19,34 @@ export async function createSensors({
   router,
   logger,
   database,
+  events,
   ensureAuth,
 }: SensorsDependencies) {
   logger.info("Starting service...");
 
   const repository = buildSensorsRepository({ database });
+
+  events.on("arduino:entry", async (sensorId: string, value: string) => {
+    await repository.addSensorStatement({
+      date: new Date().toISOString(),
+      source: "arduino",
+      sensorId,
+      value,
+    });
+
+    events.emit("rules:process");
+  });
+
+  events.on("radio:entry", async (sensorId: string, value: string) => {
+    await repository.addSensorStatement({
+      date: new Date().toISOString(),
+      source: "radio",
+      sensorId,
+      value,
+    });
+
+    events.emit("rules:process");
+  });
 
   router.get("/api/sensors", ensureAuth, async (req, res) => {
     const sensors = await repository.listSensors();
@@ -75,4 +100,8 @@ export async function createSensors({
   });
 
   logger.info("Service started");
+
+  return {
+    listSensors: repository.listSensors,
+  };
 }
