@@ -6,5 +6,16 @@
   "author": "Gabriel Juchault <gabriel.juchault@gmail.com>",
   "license": "MIT",
   "private": true,
-  "workspaces": ["backend", "frontend"]
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "frontend:start": "yarn workspace frontend start",
+    "backend:start": "yarn workspace backend start",
+    "start": "concurrently \"yarn:frontend:start\" \"yarn:backend:start\""
+  },
+  "dependencies": {
+    "concurrently": "^5.3.0"
+  }
 }

@@ -5,6 +5,7 @@
   "repository": "git@github.com:gjuchault/greenhouse.git",
   "author": "Gabriel Juchault <gabriel.juchault@gmail.com>",
   "license": "MIT",
+  "private": true,
   "scripts": {
     "build": "tsc",
     "start": "NODE_ENV=production node ./build",
