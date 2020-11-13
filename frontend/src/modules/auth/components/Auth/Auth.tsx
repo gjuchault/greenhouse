@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { isLoggedIn, getName, offlineLogin } from "../authStorage";
-import { Login } from "./Login";
+import { isLoggedIn, getName, offlineLogin } from "../../authStorage";
+import { Login } from "../Login";
 
 interface AuthProps {
   renderApp(): JSX.Element;

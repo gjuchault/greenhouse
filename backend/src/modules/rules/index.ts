@@ -56,7 +56,7 @@ export async function createRules({
 
     res
       .status(200)
-      .json({ rule, commands: Object.fromEntries(commands) })
+      .json({ rule, commands: Array.from(commands) })
       .end();
   });
 

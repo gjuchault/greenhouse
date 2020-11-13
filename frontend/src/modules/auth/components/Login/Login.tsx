@@ -8,14 +8,19 @@ import {
   majorScale,
 } from "evergreen-ui";
 import { useForm } from "react-hook-form";
-import { useLogin } from "../api";
+import { useLogin } from "../../api";
 
 interface LoginProps {
   onLoggedIn(name: string, token: string): void;
 }
 
+interface LoginForm {
+  user: string;
+  password: string;
+}
+
 export function Login({ onLoggedIn }: LoginProps) {
-  const { handleSubmit, register } = useForm();
+  const { handleSubmit, register } = useForm<LoginForm>();
   const [sendLogin, { isLoading }] = useLogin();
 
   async function login(form: { user: string; password: string }) {

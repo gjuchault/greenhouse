@@ -28,7 +28,7 @@ export async function createActionables({
   router.get("/api/actionables", ensureAuth, async (req, res) => {
     const actionables = await repository.listActionables();
 
-    res.status(200).json(Object.fromEntries(actionables)).end();
+    res.status(200).json(Array.from(actionables)).end();
   });
 
   router.post("/api/actionables", ensureAuth, async (req, res) => {

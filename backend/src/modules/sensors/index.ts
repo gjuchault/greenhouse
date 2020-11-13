@@ -51,7 +51,7 @@ export async function createSensors({
   router.get("/api/sensors", ensureAuth, async (req, res) => {
     const sensors = await repository.listSensors();
 
-    res.status(200).json(Object.fromEntries(sensors)).end();
+    res.status(200).json(Array.from(sensors)).end();
   });
 
   router.post("/api/sensors", ensureAuth, async (req, res) => {

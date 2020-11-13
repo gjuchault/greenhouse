@@ -29,7 +29,7 @@ export function buildExecuteRules({
   async function executeRules() {
     logger.info("Executing rules");
 
-    const [rule, commands, emitterSensors, actionables] = await Promise.all([
+    const [rule, commands, sensors, actionables] = await Promise.all([
       listRule(),
       listCommands(),
       listSensors(),
@@ -48,13 +48,13 @@ export function buildExecuteRules({
     }
 
     const Sensors: Record<string, string> = {};
-    for (const sensor of emitterSensors.values()) {
+    for (const sensor of sensors.values()) {
       Sensors[sensor.name] = sensor.sensor;
     }
 
     const vmContext = vm.createContext({
       date: now,
-      emitterSensors,
+      sensors,
       actionables,
       Actionables,
       Sensors,

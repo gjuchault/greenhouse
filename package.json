@@ -11,7 +11,13 @@
     "frontend"
   ],
   "scripts": {
-    "frontend:start": "yarn workspace frontend start",
+    "frontend:dev": "yarn workspace frontend start",
+    "backend:dev": "yarn workspace backend dev",
+    "dev": "concurrently \"yarn:frontend:dev\" \"yarn:backend:dev\"",
+    "frontend:build": "yarn workspace frontend build",
+    "backend:build": "yarn workspace backend build",
+    "build": "yarn frontend:build && yarn backend:build",
+    "frontend:start": "yarn workspace frontend serve",
     "backend:start": "yarn workspace backend start",
     "start": "concurrently \"yarn:frontend:start\" \"yarn:backend:start\""
   },

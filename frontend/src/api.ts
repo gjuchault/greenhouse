@@ -1,6 +1,8 @@
 import axios, { AxiosResponse, AxiosError } from "axios";
 import { getToken, clearToken } from "./modules/auth";
 
+export type Response<TBody> = AxiosResponse<TBody>;
+
 export const api = axios.create({
   baseURL: createBaseUrl(),
 });

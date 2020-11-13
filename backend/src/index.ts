@@ -6,6 +6,7 @@ import { createActionables } from "./modules/actionables";
 import { createAuth } from "./modules/auth";
 import { createRules } from "./modules/rules";
 import { createSensors } from "./modules/sensors";
+import { createLogs } from "./modules/logs";
 const { version } = require("../../package.json");
 
 const logger = createLogger("app");
@@ -52,6 +53,13 @@ async function main() {
     listSensors: sensors.listSensors,
     listActionables: actionables.listActionables,
     setLastActionablesValues: actionables.setLastActionablesValues,
+  });
+
+  const logs = await createLogs({
+    router: httpServer.router,
+    events,
+    logger: createLogger("rules"),
+    ensureAuth: auth.ensureAuth,
   });
 
   async function shutdown() {
