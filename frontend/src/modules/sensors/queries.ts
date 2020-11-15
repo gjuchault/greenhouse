@@ -2,7 +2,7 @@ import { useQuery, useMutation, queryCache } from "react-query";
 import { api, Response } from "../../api";
 import { Sensor, SensorInput } from "./sensor";
 
-export const useSensors = () => {
+export function useSensors() {
   const q = useQuery<Response<[string, Sensor][]>, string>(
     "GET /api/sensors",
     () => api.get("/api/sensors")
@@ -12,20 +12,22 @@ export const useSensors = () => {
     ...q,
     data: q.data ? new Map(q.data.data) : undefined,
   };
-};
+}
 
-export const useCreateSensor = () =>
-  useMutation<void, unknown, SensorInput>(
+export function useCreateSensor() {
+  return useMutation<void, unknown, SensorInput>(
     (sensorInput) => api.post(`/api/sensors`, sensorInput),
     {
       onSuccess: () => queryCache.invalidateQueries("GET /api/sensors"),
     }
   );
+}
 
-export const useRemoveSensor = () =>
-  useMutation<void, unknown, { id: string }>(
+export function useRemoveSensor() {
+  return useMutation<void, unknown, { id: string }>(
     ({ id }) => api.delete(`/api/sensors/${id}`),
     {
       onSuccess: () => queryCache.invalidateQueries("GET /api/sensors"),
     }
   );
+}

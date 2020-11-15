@@ -1,7 +1,7 @@
 import { useQuery } from "react-query";
 import { api, Response } from "../../api";
 
-export const useLogs = () => {
+export function useLogs() {
   const q = useQuery<Response<[string, string, string][]>, string>(
     "GET /api/logs",
     () => api.get("/api/logs")
@@ -17,4 +17,4 @@ export const useLogs = () => {
       message,
     })),
   };
-};
+}

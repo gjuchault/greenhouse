@@ -9,6 +9,8 @@ import { Pane, useTheme } from "evergreen-ui";
 import { Auth } from "../../modules/auth";
 import { Sensors } from "../../modules/sensors";
 import { Logs } from "../../modules/logs";
+import { Actionables } from "../../modules/actionables";
+import { Rules } from "../../modules/rules";
 import { Sidebar } from "../Sidebar";
 
 export function App() {
@@ -34,12 +36,12 @@ export function App() {
                     <Route path="/sensors">
                       <Sensors />
                     </Route>
-                    {/* <Route path="/rules">
+                    <Route path="/rules">
                       <Rules />
                     </Route>
                     <Route path="/actionables">
                       <Actionables />
-                    </Route> */}
+                    </Route>
                     <Route path="/logs">
                       <Logs />
                     </Route>

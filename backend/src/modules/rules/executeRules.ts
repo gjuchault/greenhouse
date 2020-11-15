@@ -27,8 +27,6 @@ export function buildExecuteRules({
   setLastActionablesValues,
 }: ExecuteRulesDependencies) {
   async function executeRules() {
-    logger.info("Executing rules");
-
     const [rule, commands, sensors, actionables] = await Promise.all([
       listRule(),
       listCommands(),

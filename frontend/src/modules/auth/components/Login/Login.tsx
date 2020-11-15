@@ -23,7 +23,7 @@ export function Login({ onLoggedIn }: LoginProps) {
   const { handleSubmit, register } = useForm<LoginForm>();
   const [sendLogin, { isLoading }] = useLogin();
 
-  async function login(form: { user: string; password: string }) {
+  async function login(form: LoginForm) {
     const res = await sendLogin(form);
 
     if (res && res.outcome === "loggedIn") {
