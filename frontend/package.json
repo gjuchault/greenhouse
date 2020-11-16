@@ -36,6 +36,7 @@
     "serve": "serve -s build -l 8080",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "clear": "rm -rf build",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

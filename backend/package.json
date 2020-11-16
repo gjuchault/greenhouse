@@ -9,6 +9,7 @@
   "scripts": {
     "build": "tsc",
     "start": "NODE_ENV=production node ./build",
+    "clear": "rm -rf build",
     "debug": "node --inspect=127.0.0.1:12150 ./build",
     "dev": "tsc-watch -b --noClear --onSuccess 'yarn debug'",
     "lint": "prettier --write src",
