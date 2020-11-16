@@ -19,7 +19,10 @@
     "build": "yarn frontend:build && yarn backend:build",
     "frontend:start": "yarn workspace frontend serve",
     "backend:start": "yarn workspace backend start",
-    "start": "concurrently \"yarn:frontend:start\" \"yarn:backend:start\""
+    "start": "concurrently \"yarn:frontend:start\" \"yarn:backend:start\"",
+    "frontend:clear": "yarn workspace frontend clear",
+    "backend:clear": "yarn workspace backend clear",
+    "clear": "concurrently \"yarn:frontend:clear\" \"yarn:backend:clear\""
   },
   "dependencies": {
     "concurrently": "^5.3.0"
