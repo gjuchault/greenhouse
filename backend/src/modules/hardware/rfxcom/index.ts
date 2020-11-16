@@ -21,12 +21,16 @@ export async function createRfxcom(
 
   rfxtrx.on("receive", (buf: number[]) => {
     if (buf[0] + 1 !== buf.length) {
-      logger.error(`Invalid packet received (invalid length)`, buf.join(";"));
+      logger.error(
+        `Invalid packet received (invalid length): ${buf.join(";")}`
+      );
       return;
     }
 
     if (buf[1] !== lightning4Type) {
-      logger.error(`Invalid packet received (not lightning4)`, buf.join(";"));
+      logger.error(
+        `Invalid packet received (not lightning4): ${buf.join(";")}`
+      );
       return;
     }
 
@@ -39,7 +43,7 @@ export async function createRfxcom(
 
     const { sensorId, value } = decodeGreenhouseStatement(numericValue);
 
-    logger.debug("radio:entry", `(sensor: ${sensorId} value: ${value})`);
+    logger.debug(`radio:entry (sensor: ${sensorId} value: ${value})`);
     events.emit("radio:entry", sensorId, value);
   });
 

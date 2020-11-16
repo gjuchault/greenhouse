@@ -32,13 +32,13 @@ export async function createArduino(
 
     const { sensorId, value } = decodeGreenhouseStatement(parseInt(line, 2));
 
-    logger.debug("arduino:entry", `(sensor: ${sensorId} value: ${value})`);
+    logger.debug(`arduino:entry (sensor: ${sensorId} value: ${value})`);
     events.emit("arduino:entry", sensorId, value);
   });
 
   events.on("command:send", (target, input) => {
     const data = encodeGreenhouseCommand(target, input);
-    logger.debug("arduino:command", `(target: ${target} value: ${input})`);
+    logger.debug(`arduino:command (target: ${target} value: ${input})`);
 
     port.write(`${data}\n`, (err) => {
       if (err) logger.error(err);
