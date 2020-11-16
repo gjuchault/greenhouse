@@ -45,6 +45,7 @@
     "nanoevents": "^5.1.10",
     "ono": "^7.1.3",
     "pg": "^8.4.2",
+    "rfxcom": "^2.3.1",
     "serialport": "^9.0.2",
     "sql-template-strings": "^2.2.2",
     "uuid": "^8.3.1",
