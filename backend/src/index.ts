@@ -3,6 +3,7 @@ import { createHttpServer } from "./httpServer";
 import { createLogger } from "./logger";
 import { createEvents } from "./events";
 import { createActionables } from "./modules/actionables";
+import { createHardware } from "./modules/hardware";
 import { createAuth } from "./modules/auth";
 import { createRules } from "./modules/rules";
 import { createSensors } from "./modules/sensors";
@@ -53,6 +54,10 @@ async function main() {
     listSensors: sensors.listSensors,
     listActionables: actionables.listActionables,
     setLastActionablesValues: actionables.setLastActionablesValues,
+  });
+
+  const hardware = await createHardware({
+    events,
   });
 
   const logs = await createLogs({
