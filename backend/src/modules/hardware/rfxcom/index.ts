@@ -14,19 +14,19 @@ export async function createRfxcom(
   path: string,
   { logger, events }: RfxcomDependencies
 ) {
-  logger.info("Starting service...");
+  logger.info(`Starting rfxcom on ${path}...`);
 
   const rfxtrx = await open(path);
   const lightning4Type = 0x13;
 
   rfxtrx.on("receive", (buf: number[]) => {
     if (buf[0] + 1 !== buf.length) {
-      console.log(`Invalid packet received (invalid length)`, buf.join(";"));
+      logger.error(`Invalid packet received (invalid length)`, buf.join(";"));
       return;
     }
 
     if (buf[1] !== lightning4Type) {
-      console.log(`Invalid packet received (not lightning4)`, buf.join(";"));
+      logger.error(`Invalid packet received (not lightning4)`, buf.join(";"));
       return;
     }
 

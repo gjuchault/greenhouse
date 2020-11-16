@@ -57,8 +57,6 @@ export function Rules() {
     });
   }
 
-  console.log(rule);
-
   return (
     <Card
       background="white"
