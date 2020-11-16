@@ -38,7 +38,6 @@ export function CreateActionable({ isLoading, onClose, onConfirm }: Props) {
       onCloseComplete={onClose}
       onConfirm={() => {
         const { name, target, range } = getValues();
-        console.log(name, target, range, defaultValue);
 
         if (!isValidActionableRange(range)) {
           return;

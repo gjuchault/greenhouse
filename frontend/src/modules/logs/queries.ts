@@ -7,8 +7,6 @@ export function useLogs() {
     () => api.get("/api/logs")
   );
 
-  console.log(q.data);
-
   return {
     ...q,
     data: q.data?.data.map(([date, service, message]) => ({

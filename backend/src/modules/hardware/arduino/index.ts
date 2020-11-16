@@ -18,7 +18,7 @@ export async function createArduino(
   path: string,
   { logger, events }: ArduinoDependencies
 ) {
-  logger.info("Starting service...");
+  logger.info(`Starting arduino on ${path}...`);
 
   const port = await openPort(path);
   const parser = port.pipe(new Delimiter({ delimiter: "\r\n" }));
