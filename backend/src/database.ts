@@ -12,7 +12,18 @@ export interface Database {
   runInDatabaseClient<TResult>(
     callback: (client: pg.PoolClient) => Promise<TResult>
   ): Promise<TResult>;
+  safelyRunInFreshDatabaseConnection(
+    callback: (client: pg.Client) => Promise<void>
+  ): Promise<void>;
 }
+
+const databaseConfig = {
+  host: config.database.host,
+  port: config.database.port,
+  user: config.database.username,
+  password: config.database.password,
+  database: config.database.name,
+};
 
 export async function createDatabase({
   logger,
@@ -20,11 +31,7 @@ export async function createDatabase({
   logger.info("Connecting...");
 
   const pool = new pg.Pool({
-    host: config.database.host,
-    port: config.database.port,
-    user: config.database.username,
-    password: config.database.password,
-    database: config.database.name,
+    ...databaseConfig,
     max: 25,
     min: 2,
   });
@@ -69,8 +76,22 @@ export async function createDatabase({
     }
   }
 
+  async function safelyRunInFreshDatabaseConnection(
+    callback: (client: pg.Client) => Promise<void>
+  ) {
+    const client = new pg.Client(databaseConfig);
+
+    try {
+      await client.connect();
+      await callback(client);
+    } catch (err) {
+      logger.debug("Could not connect to database");
+    }
+  }
+
   return {
     getDatabaseClient,
     runInDatabaseClient,
+    safelyRunInFreshDatabaseConnection,
   };
 }
