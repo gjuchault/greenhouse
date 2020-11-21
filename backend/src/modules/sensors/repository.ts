@@ -79,8 +79,8 @@ export function buildSensorsRepository({
 
   async function addSensorStatement(
     statementInput: StatementInput
-  ): Promise<Statement> {
-    return await database.runInDatabaseClient(async (client) => {
+  ): Promise<void> {
+    return await database.safelyRunInFreshDatabaseConnection(async (client) => {
       const id = uuid();
 
       await client.query(sql`
@@ -93,11 +93,6 @@ export function buildSensorsRepository({
           ${statementInput.source}
         )
       `);
-
-      return {
-        id,
-        ...statementInput,
-      };
     });
   }
 
