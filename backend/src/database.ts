@@ -8,7 +8,6 @@ interface DatabaseDependencies {
 }
 
 export interface Database {
-  getDatabaseClient(): Promise<pg.PoolClient>;
   runInDatabaseClient<TResult>(
     callback: (client: pg.PoolClient) => Promise<TResult>
   ): Promise<TResult>;
@@ -37,7 +36,7 @@ export async function createDatabase({
   });
 
   try {
-    const client = await getDatabaseClient();
+    const client = await getPoolClient();
     await client.query<{ healthcheck: number }>("select 1 as healthcheck");
     client.release();
   } catch (err) {
@@ -47,7 +46,7 @@ export async function createDatabase({
 
   logger.info(`Connected.`);
 
-  async function getDatabaseClient() {
+  async function getPoolClient() {
     if (!pool) {
       throw ono("DB was not initialized");
     }
@@ -60,7 +59,7 @@ export async function createDatabase({
   async function runInDatabaseClient<TResult>(
     callback: (client: pg.PoolClient) => Promise<TResult>
   ) {
-    const client = await getDatabaseClient();
+    const client = await getPoolClient();
 
     try {
       await client.query("begin");
@@ -82,15 +81,20 @@ export async function createDatabase({
     const client = new pg.Client(databaseConfig);
 
     try {
-      await client.connect();
-      await callback(client);
+      await client.query("begin");
+      const result = await callback(client);
+      await client.query("commit");
+
+      return result;
     } catch (err) {
-      logger.debug("Could not connect to database");
+      await client.query("rollback");
+      logger.debug("Could not perform query");
+    } finally {
+      await client.end();
     }
   }
 
   return {
-    getDatabaseClient,
     runInDatabaseClient,
     safelyRunInFreshDatabaseConnection,
   };
