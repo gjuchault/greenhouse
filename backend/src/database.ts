@@ -78,16 +78,15 @@ export async function createDatabase({
   async function safelyRunInFreshDatabaseConnection(
     callback: (client: pg.Client) => Promise<void>
   ) {
-    const client = new pg.Client(databaseConfig);
+    const client = new pg.Client({ ...databaseConfig });
+
+    client.on("error", () => {});
 
     try {
-      await client.query("begin");
-      const result = await callback(client);
-      await client.query("commit");
+      await client.connect();
 
-      return result;
+      await callback(client);
     } catch (err) {
-      await client.query("rollback");
       logger.debug("Could not perform query");
     } finally {
       await client.end();
