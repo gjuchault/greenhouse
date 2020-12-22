@@ -5,6 +5,7 @@ import { Database } from "../../database";
 import { buildActionablesRepository } from "./repository";
 import { EnsureAuthMiddleware } from "../auth";
 import { isUuidValid } from "../../helpers/refinements";
+import { actionableNameRegex, actionableTargetRegex } from "./actionable";
 
 export * from "./actionable";
 
@@ -33,8 +34,8 @@ export async function createActionables({
 
   router.post("/api/actionables", ensureAuth, async (req, res) => {
     const actionableInputSchema = z.object({
-      target: z.string(),
-      name: z.string(),
+      target: z.string().regex(actionableTargetRegex),
+      name: z.string().regex(actionableNameRegex),
       valueType: z.object({
         range: z.union([z.literal("0-1"), z.literal("1-1024")]),
         default: z.number(),
@@ -68,8 +69,8 @@ export async function createActionables({
 
     const actionableInputSchema = z.object({
       id: z.string(),
-      target: z.string(),
-      name: z.string(),
+      target: z.string().regex(actionableTargetRegex),
+      name: z.string().regex(actionableNameRegex),
       valueType: z.object({
         range: z.union([z.literal("0-1"), z.literal("1-1024")]),
         default: z.number(),

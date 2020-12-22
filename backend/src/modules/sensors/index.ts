@@ -6,6 +6,7 @@ import { GreenhouseEvents } from "../../events";
 import { isUuidValid } from "../../helpers/refinements";
 import { EnsureAuthMiddleware } from "../auth";
 import { buildSensorsRepository } from "./repository";
+import { sensorNameRegex, sensorSensorRegex } from "./sensor";
 
 export interface SensorsDependencies {
   router: Router;
@@ -56,8 +57,8 @@ export async function createSensors({
 
   router.post("/api/sensors", ensureAuth, async (req, res) => {
     const sensorInputSchema = z.object({
-      sensor: z.string(),
-      name: z.string(),
+      sensor: z.string().regex(sensorSensorRegex),
+      name: z.string().regex(sensorNameRegex),
       range: z.object({
         min: z.number(),
         max: z.number(),
@@ -92,8 +93,8 @@ export async function createSensors({
 
     const sensorInputSchema = z.object({
       id: z.string(),
-      sensor: z.string(),
-      name: z.string(),
+      sensor: z.string().regex(sensorSensorRegex),
+      name: z.string().regex(sensorNameRegex),
       range: z.object({
         min: z.number(),
         max: z.number(),

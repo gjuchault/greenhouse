@@ -12,6 +12,9 @@ export interface Actionable {
   };
 }
 
+export const actionableNamePattern = /^[a-z0-9-_]+$/i;
+export const actionableTargetPattern = /^[0-9]+$/;
+
 export interface ActionableInput {
   target: string;
   name: string;

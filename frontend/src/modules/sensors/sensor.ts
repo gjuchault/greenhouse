@@ -13,6 +13,9 @@ export interface Sensor {
   };
 }
 
+export const sensorNamePattern = /^[a-z0-9]+$/i;
+export const sensorSensorPattern = /^[0-9]+$/;
+
 export interface SensorInput {
   sensor: string;
   name: string;
