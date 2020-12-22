@@ -53,6 +53,39 @@ export async function createActionables({
     res.status(204).end();
   });
 
+  router.put("/api/actionables/:id", ensureAuth, async (req, res) => {
+    const paramsSchema = z.object({
+      id: z.string().refine(isUuidValid, {
+        message: "String should be an uuid",
+      }),
+    });
+
+    const paramsResult = paramsSchema.safeParse(req.params);
+
+    if (!paramsResult.success) {
+      return res.status(400).json(paramsResult.error).end();
+    }
+
+    const actionableInputSchema = z.object({
+      id: z.string(),
+      target: z.string(),
+      name: z.string(),
+      valueType: z.object({
+        range: z.union([z.literal("0-1"), z.literal("1-1024")]),
+        default: z.number(),
+      }),
+    });
+
+    const result = actionableInputSchema.safeParse(req.body);
+
+    if (!result.success) {
+      return res.status(400).json(result.error).end();
+    }
+
+    await repository.updateActionable(result.data);
+    res.status(204).end();
+  });
+
   router.delete("/api/actionables/:id", ensureAuth, async (req, res) => {
     const paramsSchema = z.object({
       id: z.string().refine(isUuidValid, {

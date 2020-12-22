@@ -4,10 +4,10 @@ export interface Actionable {
   name: string;
   valueType: {
     range: "0-1" | "1-1024";
-    default: string;
+    default: number;
   };
   lastAction?: {
-    value: string;
+    value: number;
     sentAt: string;
   };
 }
@@ -17,7 +17,7 @@ export interface ActionableInput {
   name: string;
   valueType: {
     range: "0-1" | "1-1024";
-    default: string;
+    default: number;
   };
 }
 

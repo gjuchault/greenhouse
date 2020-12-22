@@ -68,6 +68,20 @@ export function buildActionablesRepository({
     });
   }
 
+  async function updateActionable(actionable: Actionable): Promise<void> {
+    return await database.runInDatabaseClient(async (client) => {
+      await client.query(sql`
+        update actionables
+        set 
+          target = ${actionable.target},
+          name = ${actionable.name},
+          value = ${actionable.valueType.range},
+          default_value = ${actionable.valueType.default}
+         where id = ${actionable.id}
+      `);
+    });
+  }
+
   async function setLastActionablesValues(
     lastValues: Map<string, string>
   ): Promise<void> {
@@ -89,6 +103,7 @@ export function buildActionablesRepository({
     listActionables,
     createActionable,
     removeActionable,
+    updateActionable,
     setLastActionablesValues,
   };
 }

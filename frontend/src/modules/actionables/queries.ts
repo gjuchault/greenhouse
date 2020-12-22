@@ -23,6 +23,15 @@ export function useRemoveActionable() {
   );
 }
 
+export function useUpdateActionable() {
+  return useMutation<void, unknown, Actionable>(
+    (actionable) => api.put(`/api/actionables/${actionable.id}`, actionable),
+    {
+      onSuccess: () => queryCache.invalidateQueries("GET /api/actionables"),
+    }
+  );
+}
+
 export function useCreateActionable() {
   return useMutation<void, unknown, ActionableInput>(
     (actionableInput) => api.post(`/api/actionables`, actionableInput),

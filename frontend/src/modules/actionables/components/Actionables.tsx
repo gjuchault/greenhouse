@@ -4,6 +4,7 @@ import {
   useActionables,
   useRemoveActionable,
   useCreateActionable,
+  useUpdateActionable,
 } from "../queries";
 import { ActionableInput } from "../actionable";
 import { ActionablesTable } from "./ActionablesTable";
@@ -12,6 +13,7 @@ export function Actionables() {
   const { data: actionables } = useActionables();
   const [removeActionable] = useRemoveActionable();
   const [createActionable] = useCreateActionable();
+  const [updateActionable] = useUpdateActionable();
 
   if (!actionables) {
     return null;
@@ -40,6 +42,7 @@ export function Actionables() {
           actionables={Array.from(actionables.values())}
           onRemoveActionable={onRemoveActionable}
           onCreateActionable={onCreateActionable}
+          onUpdateActionable={updateActionable}
         />
       </Pane>
     </Card>
