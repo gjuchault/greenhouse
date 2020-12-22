@@ -13,6 +13,9 @@ export interface Sensor {
   };
 }
 
+export const sensorNameRegex = /^[a-z0-9-_]+$/i;
+export const sensorSensorRegex = /^[0-9]+$/i;
+
 export interface SensorInput {
   sensor: string;
   name: string;

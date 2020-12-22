@@ -6,7 +6,12 @@ import {
   FormField,
   SegmentedControl,
 } from "evergreen-ui";
-import { ActionableInput, isValidActionableRange } from "../actionable";
+import {
+  ActionableInput,
+  actionableNamePattern,
+  actionableTargetPattern,
+  isValidActionableRange,
+} from "../actionable";
 
 interface Props {
   isLoading: boolean;
@@ -19,6 +24,12 @@ interface UpdateActionableForm {
   name: string;
   target: string;
   range: string;
+}
+
+interface UpdateActionableFormErrors {
+  name?: boolean;
+  target?: boolean;
+  range?: boolean;
 }
 
 export function UpdateActionable({
@@ -41,6 +52,28 @@ export function UpdateActionable({
     initialValues?.valueType.default ?? 1
   );
 
+  const [errors, setErrors] = useState<UpdateActionableFormErrors>({});
+
+  function handleValidation(values: UpdateActionableForm) {
+    const errors: UpdateActionableFormErrors = {};
+
+    if (!actionableNamePattern.test(values.name)) {
+      errors.name = true;
+    }
+
+    if (!actionableTargetPattern.test(values.target)) {
+      errors.target = true;
+    }
+
+    if (!isValidActionableRange(range)) {
+      errors.range = true;
+    }
+
+    setErrors(errors);
+
+    return errors;
+  }
+
   return (
     <Dialog
       isShown
@@ -53,7 +86,15 @@ export function UpdateActionable({
       onConfirm={() => {
         const { name, target } = getValues();
 
-        if (!isValidActionableRange(range)) {
+        const errors = handleValidation({ name, target, range });
+
+        if (
+          errors.name ||
+          errors.range ||
+          errors.target ||
+          // typescript re-check
+          !isValidActionableRange(range)
+        ) {
           return;
         }
 
@@ -71,6 +112,8 @@ export function UpdateActionable({
         label="Nom"
         name="name"
         ref={register}
+        isInvalid={errors.name}
+        validationMessage={errors.name ? "Nom invalide" : undefined}
         description="Un nom arbirtraire représentant l'actionnable"
         placeholder="Moteur 1"
       />
@@ -78,6 +121,8 @@ export function UpdateActionable({
         label="Adresse"
         name="target"
         ref={register}
+        isInvalid={errors.target}
+        validationMessage={errors.target ? "Identifiant invalide" : undefined}
         description="Un identifiant unique numérique qui cible l'actionnable"
         placeholder="101"
       />
