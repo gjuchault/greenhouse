@@ -67,9 +67,12 @@ export function Table<T extends object>({
       return;
     }
 
+    const filter = state.globalFilter;
+
     setIsRefetchDisabled(true);
     await onRefetch();
     setIsRefetchDisabled(false);
+    setGlobalFilter(filter);
   };
 
   return (
