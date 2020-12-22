@@ -23,6 +23,15 @@ export function useCreateSensor() {
   );
 }
 
+export function useUpdateSensor() {
+  return useMutation<void, unknown, Sensor>(
+    (sensor) => api.put(`/api/sensors/${sensor.id}`, sensor),
+    {
+      onSuccess: () => queryCache.invalidateQueries("GET /api/sensors"),
+    }
+  );
+}
+
 export function useRemoveSensor() {
   return useMutation<void, unknown, { id: string }>(
     ({ id }) => api.delete(`/api/sensors/${id}`),

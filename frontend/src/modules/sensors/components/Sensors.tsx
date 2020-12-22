@@ -1,24 +1,25 @@
 import React from "react";
 import { Pane, Card, Heading, majorScale } from "evergreen-ui";
-import { useSensors, useRemoveSensor, useCreateSensor } from "../queries";
-import { SensorInput } from "../sensor";
+import {
+  useSensors,
+  useRemoveSensor,
+  useCreateSensor,
+  useUpdateSensor,
+} from "../queries";
 import { SensorsTable } from "./SensorsTable";
 
 export function Sensors() {
   const { data: sensors } = useSensors();
   const [removeSensor] = useRemoveSensor();
   const [createSensor] = useCreateSensor();
+  const [updateSensor] = useUpdateSensor();
 
   if (!sensors) {
     return null;
   }
 
-  async function onRemoveSensor(sensorId: string) {
+  async function handleRemoveSensor(sensorId: string) {
     await removeSensor({ id: sensorId });
-  }
-
-  async function onCreateSensor(sensorInput: SensorInput) {
-    await createSensor(sensorInput);
   }
 
   return (
@@ -34,8 +35,9 @@ export function Sensors() {
       <Pane>
         <SensorsTable
           sensors={Array.from(sensors.values())}
-          onCreateSensor={onCreateSensor}
-          onRemoveSensor={onRemoveSensor}
+          onCreateSensor={createSensor}
+          onRemoveSensor={handleRemoveSensor}
+          onUpdateSensor={updateSensor}
         />
       </Pane>
     </Card>

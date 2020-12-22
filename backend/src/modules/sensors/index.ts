@@ -58,8 +58,10 @@ export async function createSensors({
     const sensorInputSchema = z.object({
       sensor: z.string(),
       name: z.string(),
-      min: z.number(),
-      max: z.number(),
+      range: z.object({
+        min: z.number(),
+        max: z.number(),
+      }),
     });
 
     const result = sensorInputSchema.safeParse(req.body);
@@ -68,16 +70,45 @@ export async function createSensors({
       return res.status(400).json(result.error).end();
     }
 
-    const sensor = await repository.createSensor({
-      sensor: result.data.sensor,
-      name: result.data.name,
-      range: {
-        min: result.data.min,
-        max: result.data.max,
-      },
-    });
+    const sensor = await repository.createSensor(result.data);
 
     logger.info(`Created sensor ${sensor.id}`);
+
+    res.status(204).end();
+  });
+
+  router.put("/api/sensors/:id", ensureAuth, async (req, res) => {
+    const paramsSchema = z.object({
+      id: z.string().refine(isUuidValid, {
+        message: "String should be an uuid",
+      }),
+    });
+
+    const paramsResult = paramsSchema.safeParse(req.params);
+
+    if (!paramsResult.success) {
+      return res.status(400).json(paramsResult.error).end();
+    }
+
+    const sensorInputSchema = z.object({
+      id: z.string(),
+      sensor: z.string(),
+      name: z.string(),
+      range: z.object({
+        min: z.number(),
+        max: z.number(),
+      }),
+    });
+
+    const result = sensorInputSchema.safeParse(req.body);
+
+    if (!result.success) {
+      return res.status(400).json(result.error).end();
+    }
+
+    await repository.updateSensor(result.data);
+
+    logger.info(`Updated sensor ${result.data.id}`);
 
     res.status(204).end();
   });

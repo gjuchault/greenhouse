@@ -16,6 +16,8 @@ export interface Sensor {
 export interface SensorInput {
   sensor: string;
   name: string;
-  min: number;
-  max: number;
+  range: {
+    min: number;
+    max: number;
+  };
 }

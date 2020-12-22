@@ -26,7 +26,7 @@ export function ActionablesTable({
     Actionable | undefined
   >(undefined);
   const [isCreatingActionable, setIsCreatingActionable] = useState(false);
-  const [isUpdateingActionable, setIsUpdateingActionable] = useState(false);
+  const [isUpdatingActionable, setIsUpdatingActionable] = useState(false);
   const [isRemoving, setIsRemoving] = useState<boolean>(false);
 
   return (
@@ -60,16 +60,16 @@ export function ActionablesTable({
       )}
       {actionableToUpdate && (
         <UpdateActionable
-          isLoading={isUpdateingActionable}
+          isLoading={isUpdatingActionable}
           initialValues={actionableToUpdate}
           onClose={() => setActionableToUpdate(undefined)}
           onConfirm={async (actionable) => {
-            setIsUpdateingActionable(true);
+            setIsUpdatingActionable(true);
             await onUpdateActionable({
               id: actionableToUpdate.id,
               ...actionable,
             });
-            setIsUpdateingActionable(false);
+            setIsUpdatingActionable(false);
             setActionableToUpdate(undefined);
           }}
         />

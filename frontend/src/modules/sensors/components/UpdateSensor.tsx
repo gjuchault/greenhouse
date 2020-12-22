@@ -6,27 +6,40 @@ import { isValidInteger } from "../../../helpers/number";
 
 interface Props {
   isLoading: boolean;
+  initialValues?: SensorInput;
   onClose(): void;
   onConfirm(sensorInput: SensorInput): void;
 }
 
-interface CreateSensorForm {
+interface UpdateSensorForm {
   name: string;
   sensor: string;
   min: string;
   max: string;
 }
 
-export function CreateSensor({ isLoading, onClose, onConfirm }: Props) {
-  const { register, errors, getValues } = useForm<CreateSensorForm>();
+export function UpdateSensor({
+  isLoading,
+  initialValues,
+  onClose,
+  onConfirm,
+}: Props) {
+  const isUpdateMode = Boolean(initialValues);
+  const { register, errors, getValues } = useForm<UpdateSensorForm>({
+    defaultValues: {
+      ...initialValues,
+      min: initialValues?.range.min.toString(),
+      max: initialValues?.range.max.toString(),
+    },
+  });
 
   return (
     <Dialog
       isShown
-      title="Créer un senseur"
+      title={isUpdateMode ? "Éditer un senseur" : "Créer un senseur"}
       intent="success"
       isConfirmLoading={isLoading}
-      confirmLabel="Créer"
+      confirmLabel={isUpdateMode ? "Éditer" : "Créer"}
       cancelLabel="Annuler"
       onCloseComplete={onClose}
       onConfirm={() => {
@@ -35,8 +48,10 @@ export function CreateSensor({ isLoading, onClose, onConfirm }: Props) {
         onConfirm({
           name,
           sensor,
-          min: Number(min),
-          max: Number(max),
+          range: {
+            min: Number(min),
+            max: Number(max),
+          },
         });
       }}
     >
