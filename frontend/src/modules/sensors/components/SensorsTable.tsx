@@ -3,22 +3,28 @@ import { Menu } from "evergreen-ui";
 import { Sensor, SensorInput } from "../sensor";
 import { Table, makeDateCell } from "../../../components/Table";
 import { Confirm } from "../../../components/Confirm";
-import { CreateSensor } from "./CreateSensor";
+import { UpdateSensor } from "./UpdateSensor";
 
 interface Props {
   sensors: Sensor[];
   onCreateSensor(sensorInput: SensorInput): Promise<void>;
   onRemoveSensor(sensorId: string): Promise<void>;
+  onUpdateSensor(sensor: Sensor): Promise<void>;
 }
 
 export function SensorsTable({
   sensors,
   onCreateSensor,
   onRemoveSensor,
+  onUpdateSensor,
 }: Props) {
   const [sensorToDelete, setsensorToDelete] = useState<Sensor | undefined>(
     undefined
   );
+  const [sensorToUpdate, setSensorToUpdate] = useState<Sensor | undefined>(
+    undefined
+  );
+  const [isUpdatingSensor, setIsUpdatingSensor] = useState(false);
   const [showCreateSensor, setShowCreateSensor] = useState(false);
   const [isCreatingSensor, setIsCreatingSensor] = useState(false);
   const [isRemoving, setIsRemoving] = useState<boolean>(false);
@@ -41,7 +47,7 @@ export function SensorsTable({
         />
       )}
       {showCreateSensor && (
-        <CreateSensor
+        <UpdateSensor
           isLoading={isCreatingSensor}
           onClose={() => setShowCreateSensor(false)}
           onConfirm={async (sensor) => {
@@ -49,6 +55,22 @@ export function SensorsTable({
             await onCreateSensor(sensor);
             setIsCreatingSensor(false);
             setShowCreateSensor(false);
+          }}
+        />
+      )}
+      {sensorToUpdate && (
+        <UpdateSensor
+          isLoading={isUpdatingSensor}
+          initialValues={sensorToUpdate}
+          onClose={() => setSensorToUpdate(undefined)}
+          onConfirm={async (sensor) => {
+            setIsUpdatingSensor(true);
+            await onUpdateSensor({
+              id: sensorToUpdate.id,
+              ...sensor,
+            });
+            setIsUpdatingSensor(false);
+            setSensorToUpdate(undefined);
           }}
         />
       )}
@@ -95,6 +117,15 @@ export function SensorsTable({
         renderMenu={(sensor, close) => (
           <Menu>
             <Menu.Group>
+              <Menu.Item
+                intent="none"
+                onClick={() => {
+                  setSensorToUpdate(sensor);
+                  close();
+                }}
+              >
+                Éditer
+              </Menu.Item>
               <Menu.Item
                 intent="danger"
                 onClick={() => {

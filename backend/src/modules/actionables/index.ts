@@ -83,6 +83,9 @@ export async function createActionables({
     }
 
     await repository.updateActionable(result.data);
+
+    logger.info(`Updated actionable ${result.data.id}`);
+
     res.status(204).end();
   });
 

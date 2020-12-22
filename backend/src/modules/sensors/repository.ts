@@ -77,6 +77,22 @@ export function buildSensorsRepository({
     });
   }
 
+  async function updateSensor(sensor: Sensor): Promise<void> {
+    return await database.runInDatabaseClient(async (client) => {
+      const id = uuid();
+
+      await client.query(sql`
+        update emitter_sensors
+        set
+          sensor = ${sensor.sensor},
+          name = ${sensor.name},
+          min = ${sensor.range.min},
+          max = ${sensor.range.max}
+        where id = ${sensor.id}
+      `);
+    });
+  }
+
   async function addSensorStatement(
     statementInput: StatementInput
   ): Promise<void> {
@@ -99,6 +115,7 @@ export function buildSensorsRepository({
   return {
     listSensors,
     createSensor,
+    updateSensor,
     removeSensor,
     addSensorStatement,
   };
