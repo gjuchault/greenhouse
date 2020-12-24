@@ -50,31 +50,16 @@ export async function createRules({
   executeRules();
   setInterval(executeRules, 10000);
 
-  router.get("/api/rules", ensureAuth, async (req, res) => {
+  router.get("/api/rule", ensureAuth, async (req, res) => {
     const rule = await repository.listRule();
-    const commands = await repository.listCommands();
 
-    res
-      .status(200)
-      .json({ rule, commands: Array.from(commands) })
-      .end();
+    res.status(200).json({ rule }).end();
   });
 
-  router.post("/api/rules", ensureAuth, async (req, res) => {
-    const commandInputSchema = z.union([
-      z.object({
-        kind: z.literal("command"),
-        target: z.string(),
-        value: z.number(),
-        expiresIn: z.string().refine(isDateValid, {
-          message: "String should be a valid date string",
-        }),
-      }),
-      z.object({
-        kind: z.literal("customRule"),
-        rule: z.string(),
-      }),
-    ]);
+  router.post("/api/rule", ensureAuth, async (req, res) => {
+    const commandInputSchema = z.object({
+      rule: z.string(),
+    });
 
     const result = commandInputSchema.safeParse(req.body);
 
@@ -82,21 +67,36 @@ export async function createRules({
       return res.status(400).json(result.error).end();
     }
 
-    if (result.data.kind === "command") {
-      await repository.createCommand(result.data);
-
-      events.emit(
-        "command:send",
-        result.data.target,
-        result.data.value.toString()
-      );
-
-      logger.info(`Created a command`);
-    } else {
-      await repository.updateRule(result.data);
-    }
+    await repository.updateRule(result.data);
 
     res.status(204).end();
+  });
+
+  router.post("/api/commands", ensureAuth, async (req, res) => {
+    const commandInputSchema = z.object({
+      kind: z.literal("command"),
+      target: z.string(),
+      value: z.number(),
+      expiresIn: z.string().refine(isDateValid, {
+        message: "String should be a valid date string",
+      }),
+    });
+
+    const result = commandInputSchema.safeParse(req.body);
+
+    if (!result.success) {
+      return res.status(400).json(result.error).end();
+    }
+
+    await repository.createCommand(result.data);
+
+    events.emit(
+      "command:send",
+      result.data.target,
+      result.data.value.toString()
+    );
+
+    logger.info(`Created a command`);
   });
 
   logger.info("Service started");
