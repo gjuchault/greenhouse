@@ -20,12 +20,7 @@ export interface CommandInput {
   expiresIn: string;
 }
 
-export interface CustomRuleInput {
-  kind: "customRule";
-  rule: string;
-}
-
-export type RuleInput = CommandInput | CustomRuleInput;
+export type RuleInput = { rule: string };
 
 export function makeGreenhouseTypescriptEnvironment(
   actionables: { name: string }[],

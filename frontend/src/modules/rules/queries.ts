@@ -6,7 +6,7 @@ export function useRules() {
   const q = useQuery<
     Response<{ rule: CustomRule; commands: [string, Command][] }>,
     string
-  >("GET /api/rules", () => api.get("/api/rules"));
+  >("GET /api/rule", () => api.get("/api/rule"));
 
   return {
     ...q,
@@ -21,9 +21,9 @@ export function useRules() {
 
 export function useCreateRule() {
   return useMutation<void, unknown, RuleInput>(
-    (body) => api.post("/api/rules", body),
+    (body) => api.post("/api/rule", body),
     {
-      onSuccess: () => queryCache.invalidateQueries("GET /api/rules"),
+      onSuccess: () => queryCache.invalidateQueries("GET /api/rule"),
     }
   );
 }
