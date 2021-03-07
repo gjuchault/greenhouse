@@ -73,7 +73,7 @@ export function buildExecuteRules({
     }
 
     for (const command of commands.values()) {
-      if (command.expiresIn <= now) {
+      if (command.expiresAt <= now) {
         result.set(command.target, command.value.toString());
       }
     }

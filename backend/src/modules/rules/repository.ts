@@ -60,10 +60,10 @@ export function buildRulesRepository({
         id: string;
         target: string;
         value: string;
-        expires_in: number;
+        expires_at: number;
       }>(sql`
-        select id, target, value, expires_in from "commands"
-        where expires_in > NOW()
+        select id, target, value, expires_at from "commands"
+        where expires_at > NOW()
       `);
 
       return keyByWith(data.rows, (item) => item.id, decodeCommand);
@@ -77,9 +77,9 @@ export function buildRulesRepository({
       `);
 
       await client.query(sql`
-        insert into commands(id, target, value, expires_in)
+        insert into commands(id, target, value, expires_at)
           values (${uuid()}, ${commandInput.target}, ${commandInput.value}, ${
-        commandInput.expiresIn
+        commandInput.expiresAt
       })
       `);
 
@@ -100,7 +100,7 @@ export function decodeCommand(commandFromDatabase: unknown): Command {
     id: z.string(),
     target: z.string(),
     value: z.number(),
-    expires_in: z.date(),
+    expires_at: z.date(),
   });
 
   const result = commandDatabaseSchema.safeParse(commandFromDatabase);
@@ -114,7 +114,7 @@ export function decodeCommand(commandFromDatabase: unknown): Command {
     id: result.data.id,
     target: result.data.target,
     value: result.data.value,
-    expiresIn: result.data.expires_in,
+    expiresAt: result.data.expires_at,
   };
 }
 

@@ -72,12 +72,17 @@ export async function createRules({
     res.status(204).end();
   });
 
+  router.get("/api/commands", ensureAuth, async (req, res) => {
+    const commands = await repository.listCommands();
+
+    res.status(200).json(Array.from(commands)).end();
+  });
+
   router.post("/api/commands", ensureAuth, async (req, res) => {
     const commandInputSchema = z.object({
-      kind: z.literal("command"),
       target: z.string(),
       value: z.number(),
-      expiresIn: z.string().refine(isDateValid, {
+      expiresAt: z.string().refine(isDateValid, {
         message: "String should be a valid date string",
       }),
     });
@@ -97,6 +102,8 @@ export async function createRules({
     );
 
     logger.info(`Created a command`);
+
+    res.status(204).end();
   });
 
   logger.info("Service started");

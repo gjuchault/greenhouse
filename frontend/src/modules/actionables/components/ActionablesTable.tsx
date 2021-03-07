@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import { Menu } from "evergreen-ui";
-import { Actionable, ActionableInput } from "../actionable";
+import { Actionable, ActionableInput, CommandInput } from "../actionable";
 import { Table, makeDateCell } from "../../../components/Table";
 import { Confirm } from "../../../components/Confirm";
 import { UpdateActionable } from "./UpdateActionable";
+import { SendCommand } from "./SendCommand";
 
 interface Props {
   actionables: Actionable[];
   onCreateActionable(actionableInput: ActionableInput): Promise<void>;
   onRemoveActionable(actionableId: string): Promise<void>;
   onUpdateActionable(actionable: Actionable): Promise<void>;
+  onSendCommand(commandInput: CommandInput): Promise<void>;
 }
 
 export function ActionablesTable({
@@ -17,6 +19,7 @@ export function ActionablesTable({
   onCreateActionable,
   onRemoveActionable,
   onUpdateActionable,
+  onSendCommand,
 }: Props) {
   const [actionableToDelete, setActionableToDelete] = useState<
     Actionable | undefined
@@ -25,8 +28,15 @@ export function ActionablesTable({
   const [actionableToUpdate, setActionableToUpdate] = useState<
     Actionable | undefined
   >(undefined);
+  const [actionableToSendCommand, setActionableToSendCommand] = useState<
+    Actionable | undefined
+  >(undefined);
   const [isCreatingActionable, setIsCreatingActionable] = useState(false);
   const [isUpdatingActionable, setIsUpdatingActionable] = useState(false);
+  const [
+    isSendingCommandToActionable,
+    setIsSendingCommandToActionable,
+  ] = useState(false);
   const [isRemoving, setIsRemoving] = useState<boolean>(false);
 
   return (
@@ -74,6 +84,22 @@ export function ActionablesTable({
           }}
         />
       )}
+      {actionableToSendCommand && (
+        <SendCommand
+          range={actionableToSendCommand.valueType.range}
+          isLoading={isSendingCommandToActionable}
+          onClose={() => setActionableToSendCommand(undefined)}
+          onConfirm={async (commandInput) => {
+            setIsSendingCommandToActionable(false);
+            await onSendCommand({
+              target: actionableToSendCommand.target,
+              ...commandInput,
+            });
+            setIsSendingCommandToActionable(false);
+            setActionableToSendCommand(undefined);
+          }}
+        />
+      )}
       <Table<Actionable>
         items={actionables}
         renderFilterPlaceholder={(count) =>
@@ -109,6 +135,15 @@ export function ActionablesTable({
         renderMenu={(actionable, close) => (
           <Menu>
             <Menu.Group>
+              <Menu.Item
+                intent="none"
+                onClick={() => {
+                  setActionableToSendCommand(actionable);
+                  close();
+                }}
+              >
+                Envoyer une commande
+              </Menu.Item>
               <Menu.Item
                 intent="none"
                 onClick={() => {

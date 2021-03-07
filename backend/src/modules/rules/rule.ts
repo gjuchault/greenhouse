@@ -3,7 +3,7 @@ export interface Command {
   id: string;
   target: string;
   value: number;
-  expiresIn: Date;
+  expiresAt: Date;
 }
 
 export interface CustomRule {
@@ -16,7 +16,7 @@ export type Rule = Command | CustomRule;
 export interface CommandInput {
   target: string;
   value: number;
-  expiresIn: string;
+  expiresAt: string;
 }
 
 export interface RuleInput {
