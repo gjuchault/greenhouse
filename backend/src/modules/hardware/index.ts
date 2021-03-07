@@ -1,4 +1,5 @@
 import { Router } from "express";
+import * as z from "zod";
 import { createRfxcom, isUsbDeviceRfxcom } from "./rfxcom";
 import { createArduino, isUsbDeviceArduino } from "./arduino";
 import { createLogger } from "../../logger";
@@ -51,9 +52,45 @@ export async function createHardware({
   }
 
   router.get("/api/hardware", ensureAuth, async (req, res) => {
-    const hardware = repository.listHardware();
+    const hardware = await repository.listHardware();
 
     res.status(200).json(hardware).end();
+  });
+
+  // Not fully rest because path contains character /
+  router.post("/api/hardware/update", ensureAuth, async (req, res) => {
+    const hardwareInputSchema = z.object({
+      name: z.string(),
+      path: z.string(),
+    });
+
+    const result = hardwareInputSchema.safeParse(req.body);
+
+    if (!result.success) {
+      return res.status(400).json(result.error).end();
+    }
+
+    const hardware = await repository.setHardwareName({
+      ...result.data,
+    });
+
+    res.status(200).json(hardware).end();
+  });
+
+  router.post("/api/hardware/restart", ensureAuth, async (req, res) => {
+    const hardwareInputSchema = z.object({
+      path: z.string(),
+    });
+
+    const result = hardwareInputSchema.safeParse(req.body);
+
+    if (!result.success) {
+      return res.status(400).json(result.error).end();
+    }
+
+    events.emit("hardware:restart", result.data.path);
+
+    res.status(204).end();
   });
 
   logger.info("Service started");

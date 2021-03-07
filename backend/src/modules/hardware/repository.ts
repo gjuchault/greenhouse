@@ -20,7 +20,7 @@ export function buildHardwareRepository({
     });
   }
 
-  async function setHardwareName(hardware: Hardware) {
+  async function setHardwareName(hardware: Pick<Hardware, "path" | "name">) {
     return await database.runInDatabaseClient(async (client) => {
       await client.query(sql`
         update "hardware"

@@ -103,7 +103,7 @@ export function ActionablesTable({
       <Table<Actionable>
         items={actionables}
         renderFilterPlaceholder={(count) =>
-          `Rechercher parmis ${count} actionnables`
+          `Rechercher parmi ${count} actionnables`
         }
         columnsSizes={["auto", 150, 150, 150, 180]}
         columns={[

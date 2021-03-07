@@ -7,6 +7,7 @@ import { ReactComponent as Rules } from "./rules.svg";
 import { ReactComponent as Actionables } from "./actionables.svg";
 import { ReactComponent as Logs } from "./logs.svg";
 import { ReactComponent as Bee } from "./bee.svg";
+import { ReactComponent as Usb } from "./usb.svg";
 import { ReactComponent as Fish } from "./fish.svg";
 import styles from "./Sidebar.module.css";
 
@@ -49,6 +50,12 @@ export function Sidebar() {
         renderIcon={() => <Actionables />}
       >
         <Text color="white">Actionables</Text>
+      </SidebarButton>
+      <SidebarButton
+        onClick={() => history.push("/hardware")}
+        renderIcon={() => <Usb />}
+      >
+        <Text color="white">Matériel USB</Text>
       </SidebarButton>
       <SidebarButton
         onClick={() => history.push("/rules")}

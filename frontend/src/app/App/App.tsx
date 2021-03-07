@@ -11,6 +11,7 @@ import { Sensors } from "../../modules/sensors";
 import { Logs } from "../../modules/logs";
 import { Actionables } from "../../modules/actionables";
 import { Rules } from "../../modules/rules";
+import { Hardwares } from "../../modules/hardware";
 import { Sidebar } from "../Sidebar";
 
 export function App() {
@@ -38,6 +39,9 @@ export function App() {
                     </Route>
                     <Route path="/rules">
                       <Rules />
+                    </Route>
+                    <Route path="/hardware">
+                      <Hardwares />
                     </Route>
                     <Route path="/actionables">
                       <Actionables />
