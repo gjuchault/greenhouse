@@ -77,7 +77,7 @@ export function SensorsTable({
       <Table<Sensor>
         items={sensors}
         renderFilterPlaceholder={(count) =>
-          `Rechercher parmis ${count} capteurs`
+          `Rechercher parmi ${count} capteurs`
         }
         columnsSizes={["auto", 150, 150, 150, 180, 180, 150]}
         columns={[

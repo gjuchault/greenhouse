@@ -32,7 +32,9 @@ export async function createArduino(
 
     const { sensorId, value } = decodeGreenhouseStatement(parseInt(line, 2));
 
-    logger.debug(`arduino:entry (sensor: ${sensorId} value: ${value})`);
+    logger.debug(
+      `arduino:entry (sensor: ${sensorId} value: ${value} path:${path})`
+    );
     events.emit("arduino:entry", sensorId, value);
   });
 
@@ -43,6 +45,28 @@ export async function createArduino(
     port.write(`${data}\n`, (err) => {
       if (err) logger.error(err);
     });
+  });
+
+  events.on("hardware:restart", (hardwarePath) => {
+    if (hardwarePath === path) {
+      logger.info(`restarting ${path}`);
+      port.set(
+        {
+          dtr: false,
+        },
+        () => {
+          port.flush(() => {
+            setTimeout(() => {
+              port.set({ dtr: true }, () => {
+                port.flush(() => {
+                  logger.info(`restarted ${path}`);
+                });
+              });
+            }, 1000);
+          });
+        }
+      );
+    }
   });
 
   logger.info("Service started");
