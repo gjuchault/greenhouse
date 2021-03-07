@@ -57,7 +57,10 @@ async function main() {
   });
 
   const hardware = await createHardware({
+    router: httpServer.router,
     events,
+    database,
+    ensureAuth: auth.ensureAuth,
   });
 
   const logs = await createLogs({

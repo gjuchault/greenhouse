@@ -24,7 +24,7 @@ export function buildActionablesRepository({
         last_value: string;
         last_value_sent_at: string;
       }>(sql`
-        select * from actionables
+        select * from "actionables"
       `);
 
       return keyByWith(
@@ -42,7 +42,7 @@ export function buildActionablesRepository({
       const id = uuid();
 
       await client.query(sql`
-        insert into actionables(id, target, name, value, default_value)
+        insert into "actionables"("id", "target", "name", "value", "default_value")
         values (
           ${id},
           ${actionableInput.target},
@@ -62,8 +62,8 @@ export function buildActionablesRepository({
   async function removeActionable(actionableId: string): Promise<void> {
     return await database.runInDatabaseClient(async (client) => {
       await client.query(sql`
-        delete from actionables
-        where id = ${actionableId}
+        delete from "actionables"
+        where "id" = ${actionableId}
       `);
     });
   }
@@ -71,13 +71,13 @@ export function buildActionablesRepository({
   async function updateActionable(actionable: Actionable): Promise<void> {
     return await database.runInDatabaseClient(async (client) => {
       await client.query(sql`
-        update actionables
+        update "actionables"
         set 
-          target = ${actionable.target},
-          name = ${actionable.name},
-          value = ${actionable.valueType.range},
-          default_value = ${actionable.valueType.default}
-         where id = ${actionable.id}
+          "target" = ${actionable.target},
+          "name" = ${actionable.name},
+          "value" = ${actionable.valueType.range},
+          "default_value" = ${actionable.valueType.default}
+         where "id" = ${actionable.id}
       `);
     });
   }
@@ -90,10 +90,10 @@ export function buildActionablesRepository({
     return await database.runInDatabaseClient(async (client) => {
       for (const [target, value] of lastValues) {
         await client.query(sql`
-          update actionables set
-            last_value = ${value},
-            last_value_sent_at = ${now}
-          where target = ${target}
+          update "actionables" set
+            "last_value" = ${value},
+            "last_value_sent_at" = ${now}
+          where "target" = ${target}
         `);
       }
     });
