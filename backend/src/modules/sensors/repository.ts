@@ -26,16 +26,17 @@ export function buildSensorsRepository({
         source?: string;
       }>(sql`
         select
-          emitter_sensors.id,
-          emitter_sensors.sensor,
-          emitter_sensors.name,
-          emitter_sensors.min,
-          emitter_sensors.max,
-          statement.value,
-          statement.date,
-          statement.source
-        from emitter_sensors
-        left join statement on statement.id = emitter_sensors.last_statement
+          "emitter_sensors"."id",
+          "emitter_sensors"."sensor",
+          "emitter_sensors"."name",
+          "emitter_sensors"."min",
+          "emitter_sensors"."max",
+          "statement"."value",
+          "statement"."date",
+          "statement"."source"
+        from "emitter_sensors"
+        left join "statement"
+          on "statement"."id" = "emitter_sensors"."last_statement"
       `);
 
       return keyByWith(
@@ -51,7 +52,7 @@ export function buildSensorsRepository({
       const id = uuid();
 
       await client.query(sql`
-        insert into emitter_sensors(id, sensor, name, min, max)
+        insert into "emitter_sensors"("id", "sensor", "name", "min", "max")
         values (
           ${id},
           ${sensorInput.sensor},
@@ -71,8 +72,8 @@ export function buildSensorsRepository({
   async function removeSensor(sensorId: string): Promise<void> {
     return await database.runInDatabaseClient(async (client) => {
       await client.query(sql`
-        delete from emitter_sensors
-        where id = ${sensorId}
+        delete from "emitter_sensors"
+        where "id" = ${sensorId}
       `);
     });
   }
@@ -82,13 +83,13 @@ export function buildSensorsRepository({
       const id = uuid();
 
       await client.query(sql`
-        update emitter_sensors
+        update "emitter_sensors"
         set
-          sensor = ${sensor.sensor},
-          name = ${sensor.name},
-          min = ${sensor.range.min},
-          max = ${sensor.range.max}
-        where id = ${sensor.id}
+          "sensor" = ${sensor.sensor},
+          "name" = ${sensor.name},
+          "min" = ${sensor.range.min},
+          "max" = ${sensor.range.max}
+        where "id" = ${sensor.id}
       `);
     });
   }
@@ -100,7 +101,7 @@ export function buildSensorsRepository({
       const id = uuid();
 
       await client.query(sql`
-        insert into statement(id, sensor, value, date, source)
+        insert into "statement"("id", "sensor", "value", "date", "source")
         values (
           ${id},
           ${statementInput.sensorId},

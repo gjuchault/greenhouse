@@ -10,9 +10,9 @@ export function buildAuthRepository({ database }: AuthRepositoryDependencies) {
   async function getUserByName(name: string) {
     return await database.runInDatabaseClient(async (client) => {
       const data = await client.query<User>(sql`
-        select id, name, password
+        select *
         from "user"
-        where name = ${name}
+        where "name" = ${name}
       `);
 
       if (data.rows.length !== 1) {

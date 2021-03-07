@@ -24,7 +24,7 @@ export function buildRulesRepository({
       const data = await client.query<{
         rule: string;
       }>(sql`
-        select * from rules
+        select * from "rules"
         limit 1
       `);
 
@@ -35,20 +35,20 @@ export function buildRulesRepository({
   async function updateRule(ruleInput: RuleInput): Promise<void> {
     return await database.runInDatabaseClient(async (client) => {
       const existingRule = await client.query<{ count: number }>(sql`
-        select count(1) as count from rules
+        select count(1) as "count" from "rules"
       `);
 
       if (Number(existingRule.rows[0].count) > 0) {
         await client.query(sql`
-          update rules
-          set rule = ${ruleInput.rule}
+          update "rules"
+          set "rule" = ${ruleInput.rule}
         `);
 
         return;
       }
 
       await client.query(sql`
-        insert into rules(id, rule, priority)
+        insert into "rules"("id", "rule", "priority")
         values (${uuid()}, ${ruleInput.rule}, 1)
       `);
     });
@@ -62,8 +62,8 @@ export function buildRulesRepository({
         value: string;
         expires_at: number;
       }>(sql`
-        select id, target, value, expires_at from "commands"
-        where expires_at > NOW()
+        select "id", "target", "value", "expires_at" from "commands"
+        where "expires_at" > now()
       `);
 
       return keyByWith(data.rows, (item) => item.id, decodeCommand);
@@ -73,21 +73,25 @@ export function buildRulesRepository({
   async function createCommand(commandInput: CommandInput) {
     return await database.runInDatabaseClient(async (client) => {
       await client.query(sql`
-        delete from commands where target=${commandInput.target}
+        delete from "commands"
+        where "target" = ${commandInput.target}
       `);
 
       await client.query(sql`
-        insert into commands(id, target, value, expires_at)
-          values (${uuid()}, ${commandInput.target}, ${commandInput.value}, ${
-        commandInput.expiresAt
-      })
+        insert into "commands"("id", "target", "value", "expires_at")
+          values (
+            ${uuid()},
+            ${commandInput.target},
+            ${commandInput.value},
+            ${commandInput.expiresAt}
+          )
       `);
 
       await client.query(sql`
-        update actionables set
-          last_value = ${commandInput.value},
-          last_value_sent_at = ${new Date().toISOString()}
-        where target = ${commandInput.target}
+        update "actionables" set
+          "last_value" = ${commandInput.value},
+          "last_value_sent_at" = ${new Date().toISOString()}
+        where "target" = ${commandInput.target}
       `);
     });
   }

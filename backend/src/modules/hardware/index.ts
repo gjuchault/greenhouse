@@ -1,15 +1,28 @@
+import { Router } from "express";
 import { createRfxcom, isUsbDeviceRfxcom } from "./rfxcom";
 import { createArduino, isUsbDeviceArduino } from "./arduino";
 import { createLogger } from "../../logger";
 import { GreenhouseEvents } from "../../events";
 import { listUsbPorts } from "./serialport";
+import { buildHardwareRepository } from "./repository";
+import { Database } from "../../database";
+import { EnsureAuthMiddleware } from "../auth";
 
 export interface HardwareDependencies {
+  router: Router;
   events: GreenhouseEvents;
+  database: Database;
+  ensureAuth: EnsureAuthMiddleware;
 }
 
-export async function createHardware({ events }: HardwareDependencies) {
+export async function createHardware({
+  router,
+  events,
+  database,
+  ensureAuth,
+}: HardwareDependencies) {
   const logger = createLogger("hardware");
+  const repository = buildHardwareRepository({ database });
 
   logger.info("Starting service...");
 
@@ -23,11 +36,25 @@ export async function createHardware({ events }: HardwareDependencies) {
 
   for (const port of arduinos) {
     await createArduino(port.path, { logger: createLogger("arduino"), events });
+    await repository.upsertHardware({
+      path: port.path,
+      type: "arduino",
+    });
   }
 
   for (const port of rfxcoms) {
     await createRfxcom(port.path, { logger: createLogger("rfxcom"), events });
+    await repository.upsertHardware({
+      path: port.path,
+      type: "rfxcom",
+    });
   }
+
+  router.get("/api/hardware", ensureAuth, async (req, res) => {
+    const hardware = repository.listHardware();
+
+    res.status(200).json(hardware).end();
+  });
 
   logger.info("Service started");
 }
