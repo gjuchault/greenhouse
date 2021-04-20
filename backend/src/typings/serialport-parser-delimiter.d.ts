@@ -1,1 +1,1 @@
-declare module '@serialport/parser-delimiter'
+declare module "@serialport/parser-delimiter";
