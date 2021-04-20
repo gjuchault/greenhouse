@@ -27,35 +27,29 @@ export async function createSensors({
 
   const repository = buildSensorsRepository({ database });
 
-  events.on(
-    "arduino:entry",
-    async (sensorId: string, hardwarePath: string, value: string) => {
-      const statementId = await repository.addSensorStatement({
-        date: new Date().toISOString(),
-        source: "arduino",
-        sensorId,
-        value,
-      });
+  events.on("arduino:entry", async ({ sensorId, hardwarePath, value }) => {
+    const statementId = await repository.addSensorStatement({
+      date: new Date().toISOString(),
+      source: "arduino",
+      sensorId,
+      value,
+    });
 
-      events.emit("hardware:lastStatement", hardwarePath, statementId);
-      events.emit("rules:process");
-    }
-  );
+    events.emit("hardware:lastStatement", { hardwarePath, statementId });
+    events.emit("rules:process");
+  });
 
-  events.on(
-    "radio:entry",
-    async (sensorId: string, hardwarePath: string, value: string) => {
-      const statementId = await repository.addSensorStatement({
-        date: new Date().toISOString(),
-        source: "radio",
-        sensorId,
-        value,
-      });
+  events.on("radio:entry", async ({ sensorId, hardwarePath, value }) => {
+    const statementId = await repository.addSensorStatement({
+      date: new Date().toISOString(),
+      source: "radio",
+      sensorId,
+      value,
+    });
 
-      events.emit("hardware:lastStatement", hardwarePath, statementId);
-      events.emit("rules:process");
-    }
-  );
+    events.emit("hardware:lastStatement", { hardwarePath, statementId });
+    events.emit("rules:process");
+  });
 
   router.get("/api/sensors", ensureAuth, async (req, res) => {
     const sensors = await repository.listSensors();

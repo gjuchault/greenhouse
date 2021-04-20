@@ -37,19 +37,23 @@ export async function createArduino(
     logger.debug(
       `arduino:entry (sensor: ${sensorId} value: ${value} path:${path})`
     );
-    events.emit("arduino:entry", sensorId, hardware.path, value);
+    events.emit("arduino:entry", {
+      sensorId,
+      hardwarePath: hardware.path,
+      value,
+    });
   });
 
-  events.on("command:send", (target, input) => {
-    const data = encodeGreenhouseCommand(target, input);
-    logger.debug(`arduino:command (target: ${target} value: ${input})`);
+  events.on("command:send", ({ target, value }) => {
+    const data = encodeGreenhouseCommand(target, value);
+    logger.debug(`arduino:command (target: ${target} value: ${value})`);
 
     port.write(`${data}\n`, (err) => {
       if (err) logger.error(err);
     });
   });
 
-  events.on("hardware:restart", (hardwarePath) => {
+  events.on("hardware:restart", ({ hardwarePath }) => {
     if (hardwarePath === path) {
       logger.info(`restarting ${path}`);
       port.set({ dtr: false }, () => {

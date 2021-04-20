@@ -83,11 +83,11 @@ export async function createDatabase({
     client.on("error", () => {});
 
     try {
-      await client.query("begin");
       await client.connect();
-      await client.query("commit");
 
+      await client.query("begin");
       await callback(client);
+      await client.query("commit");
     } catch (err) {
       await client.query("rollback");
       logger.debug("Could not perform query");
