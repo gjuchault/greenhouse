@@ -110,6 +110,13 @@ export function buildSensorsRepository({
           ${statementInput.source}
         )
       `);
+
+      await client.query(sql`
+        update "emitter_sensors"
+          set "last_statement" = ${id}
+        where
+          "id" = ${statementInput.sensorId}
+      `);
     });
   }
 

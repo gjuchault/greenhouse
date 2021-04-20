@@ -1,1 +1,1 @@
-declare module 'rfxcom'
+declare module "rfxcom";
