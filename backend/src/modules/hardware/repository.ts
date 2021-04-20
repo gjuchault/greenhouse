@@ -34,7 +34,13 @@ export function buildHardwareRepository({
     });
   }
 
-  async function setHardwareLastStatement(path: string, lastStatement: string) {
+  async function setHardwareLastStatement({
+    path,
+    lastStatement,
+  }: {
+    path: string;
+    lastStatement: string;
+  }) {
     return await database.runInDatabaseClient(async (client) => {
       await client.query(sql`
         update "hardware"

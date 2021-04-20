@@ -46,7 +46,11 @@ export async function createRfxcom(
     const { sensorId, value } = decodeGreenhouseStatement(numericValue);
 
     logger.debug(`radio:entry (sensor: ${sensorId} value: ${value})`);
-    events.emit("radio:entry", sensorId, hardware.path, value);
+    events.emit("radio:entry", {
+      sensorId,
+      hardwarePath: hardware.path,
+      value,
+    });
   });
 
   logger.info("Service started");

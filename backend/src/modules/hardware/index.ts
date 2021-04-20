@@ -73,7 +73,12 @@ export async function createHardware({
     });
   }
 
-  events.on("hardware:lastStatement", repository.setHardwareLastStatement);
+  events.on("hardware:lastStatement", ({ hardwarePath, statementId }) => {
+    return repository.setHardwareLastStatement({
+      path: hardwarePath,
+      lastStatement: statementId,
+    });
+  });
 
   router.get("/api/hardware", ensureAuth, async (req, res) => {
     const hardwares = await repository.listHardware();
@@ -125,7 +130,7 @@ export async function createHardware({
       return res.status(400).json(result.error).end();
     }
 
-    events.emit("hardware:restart", result.data.path);
+    events.emit("hardware:restart", { hardwarePath: result.data.path });
 
     res.status(204).end();
   });

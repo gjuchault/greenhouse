@@ -95,11 +95,10 @@ export async function createRules({
 
     await repository.createCommand(result.data);
 
-    events.emit(
-      "command:send",
-      result.data.target,
-      result.data.value.toString()
-    );
+    events.emit("command:send", {
+      target: result.data.target,
+      value: result.data.value.toString(),
+    });
 
     logger.info(`Created a command`);
 

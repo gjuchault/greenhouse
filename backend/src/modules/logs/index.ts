@@ -21,13 +21,13 @@ export async function createLogs({
 }: RulesDependencies) {
   logger.info("Starting service...");
 
-  events.on("command:send", (target, value) =>
+  events.on("command:send", ({ target, value }) =>
     append({ service: "command", message: `${target} > ${value}` })
   );
-  events.on("arduino:entry", (sensorId, value) =>
+  events.on("arduino:entry", ({ sensorId, value }) =>
     append({ service: "arduino", message: `${sensorId}: ${value}` })
   );
-  events.on("radio:entry", (sensorId, value) =>
+  events.on("radio:entry", ({ sensorId, value }) =>
     append({ service: "radio", message: `${sensorId}: ${value}` })
   );
 
