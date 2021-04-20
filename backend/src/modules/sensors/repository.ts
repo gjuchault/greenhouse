@@ -142,7 +142,7 @@ export function buildSensorsRepository({
         update "emitter_sensors"
           set "last_statement" = ${id}
         where
-          "id" = ${statementInput.sensorId}
+          "sensor" = ${statementInput.sensorId}
       `);
     });
 
