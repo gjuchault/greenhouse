@@ -6,6 +6,7 @@ import {
   decodeGreenhouseStatement,
   encodeGreenhouseCommand,
 } from "../greenhouseProtocol";
+import { Hardware } from "../hardware";
 
 export * from "./device";
 
@@ -16,6 +17,7 @@ export interface ArduinoDependencies {
 
 export async function createArduino(
   path: string,
+  hardware: Hardware,
   { logger, events }: ArduinoDependencies
 ) {
   logger.info(`Starting arduino on ${path}...`);
@@ -35,7 +37,7 @@ export async function createArduino(
     logger.debug(
       `arduino:entry (sensor: ${sensorId} value: ${value} path:${path})`
     );
-    events.emit("arduino:entry", sensorId, value);
+    events.emit("arduino:entry", sensorId, hardware.path, value);
   });
 
   events.on("command:send", (target, input) => {
@@ -50,22 +52,17 @@ export async function createArduino(
   events.on("hardware:restart", (hardwarePath) => {
     if (hardwarePath === path) {
       logger.info(`restarting ${path}`);
-      port.set(
-        {
-          dtr: false,
-        },
-        () => {
-          port.flush(() => {
-            setTimeout(() => {
-              port.set({ dtr: true }, () => {
-                port.flush(() => {
-                  logger.info(`restarted ${path}`);
-                });
+      port.set({ dtr: false }, () => {
+        port.flush(() => {
+          setTimeout(() => {
+            port.set({ dtr: true }, () => {
+              port.flush(() => {
+                logger.info(`restarted ${path}`);
               });
-            }, 1000);
-          });
-        }
-      );
+            });
+          }, 1000);
+        });
+      });
     }
   });
 

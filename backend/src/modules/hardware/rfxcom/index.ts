@@ -2,6 +2,7 @@ import { Logger } from "winston";
 import rfxcom from "rfxcom";
 import { GreenhouseEvents } from "../../../events";
 import { decodeGreenhouseStatement } from "../greenhouseProtocol";
+import { Hardware } from "../hardware";
 
 export * from "./device";
 
@@ -12,6 +13,7 @@ export interface RfxcomDependencies {
 
 export async function createRfxcom(
   path: string,
+  hardware: Hardware,
   { logger, events }: RfxcomDependencies
 ) {
   logger.info(`Starting rfxcom on ${path}...`);
@@ -44,7 +46,7 @@ export async function createRfxcom(
     const { sensorId, value } = decodeGreenhouseStatement(numericValue);
 
     logger.debug(`radio:entry (sensor: ${sensorId} value: ${value})`);
-    events.emit("radio:entry", sensorId, value);
+    events.emit("radio:entry", sensorId, hardware.path, value);
   });
 
   logger.info("Service started");

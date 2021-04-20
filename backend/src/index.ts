@@ -61,6 +61,7 @@ async function main() {
     events,
     database,
     ensureAuth: auth.ensureAuth,
+    getStatementsByIds: sensors.getStatementsByIds,
   });
 
   const logs = await createLogs({

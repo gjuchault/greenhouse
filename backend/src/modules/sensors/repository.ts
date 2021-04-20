@@ -47,6 +47,35 @@ export function buildSensorsRepository({
     });
   }
 
+  async function getStatementsByIds(
+    statementIds: string[]
+  ): Promise<Map<string, Statement>> {
+    return await database.runInDatabaseClient(async (client) => {
+      const data = await client.query<{
+        id: string;
+        sensor: string;
+        value: string;
+        date: number;
+        source: string;
+      }>(sql`
+        select
+          "statement"."id",
+          "statement"."sensor",
+          "statement"."value",
+          "statement"."date",
+          "statement"."source"
+        from "statement"
+        where "id" = any(${statementIds})
+      `);
+
+      return keyByWith(
+        data.rows,
+        (rawStatement) => rawStatement.sensor,
+        decodeStatement
+      );
+    });
+  }
+
   async function createSensor(sensorInput: SensorInput): Promise<Sensor> {
     return await database.runInDatabaseClient(async (client) => {
       const id = uuid();
@@ -80,8 +109,6 @@ export function buildSensorsRepository({
 
   async function updateSensor(sensor: Sensor): Promise<void> {
     return await database.runInDatabaseClient(async (client) => {
-      const id = uuid();
-
       await client.query(sql`
         update "emitter_sensors"
         set
@@ -96,10 +123,10 @@ export function buildSensorsRepository({
 
   async function addSensorStatement(
     statementInput: StatementInput
-  ): Promise<void> {
-    return await database.safelyRunInFreshDatabaseConnection(async (client) => {
-      const id = uuid();
+  ): Promise<string> {
+    const id = uuid();
 
+    await database.safelyRunInFreshDatabaseConnection(async (client) => {
       await client.query(sql`
         insert into "statement"("id", "sensor", "value", "date", "source")
         values (
@@ -118,10 +145,13 @@ export function buildSensorsRepository({
           "id" = ${statementInput.sensorId}
       `);
     });
+
+    return id;
   }
 
   return {
     listSensors,
+    getStatementsByIds,
     createSensor,
     updateSensor,
     removeSensor,
@@ -163,5 +193,29 @@ export function decodeSensor(sensorFromDatabase: unknown): Sensor {
             source: result.data.source,
           }
         : undefined,
+  };
+}
+
+export function decodeStatement(statementFromDatabase: unknown): Statement {
+  const statementDatabaseSchema = z.object({
+    id: z.string(),
+    sensor: z.string(),
+    value: z.string(),
+    date: z.date(),
+    source: z.string(),
+  });
+
+  const result = statementDatabaseSchema.safeParse(statementFromDatabase);
+
+  if (!result.success) {
+    throw ono(`Inconsistency database statement`, result.error);
+  }
+
+  return {
+    id: result.data.id,
+    sensorId: result.data.sensor,
+    value: result.data.value,
+    date: new Date(result.data.date).toISOString(),
+    source: result.data.source,
   };
 }
