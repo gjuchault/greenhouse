@@ -73,6 +73,54 @@ export async function createHardware({
     });
   }
 
+  async function getEnrichedHardwares() {
+    const hardwares = await repository.listHardware();
+
+    const statementsBySensor = await getStatementsByIds(
+      removeHoles(hardwares.map((hardware) => hardware.lastStatement))
+    );
+
+    const statementsByStatementId = new Map(
+      Array.from(statementsBySensor.values()).map((statement) => [
+        statement.id,
+        statement,
+      ])
+    );
+
+    return hardwares.map((hardware) => {
+      return {
+        ...hardware,
+        lastStatement: hardware.lastStatement
+          ? statementsByStatementId.get(hardware.lastStatement)
+          : undefined,
+      };
+    });
+  }
+
+  async function restartHardwareWithoutRecentData() {
+    const hardwares = await getEnrichedHardwares();
+    const now = Date.now();
+
+    for (const hardware of hardwares) {
+      if (!hardware.lastStatement || !hardware.restartIfNoValueFor) {
+        continue;
+      }
+
+      if (
+        new Date(hardware.lastStatement.date).getTime() +
+          hardware.restartIfNoValueFor <
+        now
+      ) {
+        logger.info(
+          `Restarting hardware ${hardware.name} (${hardware.path}): last statement is too old (${hardware.lastStatement.date})`
+        );
+        events.emit("hardware:restart", { hardwarePath: hardware.path });
+      }
+    }
+  }
+
+  restartHardwareWithoutRecentData();
+
   events.on("hardware:lastStatement", ({ hardwarePath, statementId }) => {
     return repository.setHardwareLastStatement({
       path: hardwarePath,
@@ -81,22 +129,9 @@ export async function createHardware({
   });
 
   router.get("/api/hardware", ensureAuth, async (req, res) => {
-    const hardwares = await repository.listHardware();
+    const hardwares = await getEnrichedHardwares();
 
-    const statements = await getStatementsByIds(
-      removeHoles(hardwares.map((hardware) => hardware.lastStatement))
-    );
-
-    const enrichedHardwares = hardwares.map((hardware) => {
-      return {
-        ...hardware,
-        lastStatement: hardware.lastStatement
-          ? statements.get(hardware.lastStatement)
-          : undefined,
-      };
-    });
-
-    res.status(200).json(enrichedHardwares).end();
+    res.status(200).json(hardwares).end();
   });
 
   // Not fully rest because path contains character /
