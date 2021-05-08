@@ -2,6 +2,7 @@ import { Router } from "express";
 import * as z from "zod";
 import { createRfxcom, isUsbDeviceRfxcom } from "./rfxcom";
 import { createArduino, isUsbDeviceArduino } from "./arduino";
+import { createNet } from "./net";
 import { createLogger } from "../../logger";
 import { GreenhouseEvents } from "../../events";
 import { listUsbPorts } from "./serialport";
@@ -72,6 +73,8 @@ export async function createHardware({
       type: "rfxcom",
     });
   }
+
+  await createNet({ logger: createLogger("net"), events });
 
   async function getEnrichedHardwares() {
     const hardwares = await repository.listHardware();

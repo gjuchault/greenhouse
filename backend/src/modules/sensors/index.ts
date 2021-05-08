@@ -42,12 +42,23 @@ export async function createSensors({
   events.on("radio:entry", async ({ sensorId, hardwarePath, value }) => {
     const statementId = await repository.addSensorStatement({
       date: new Date().toISOString(),
-      source: "radio",
+      source: "net",
       sensorId,
       value,
     });
 
     events.emit("hardware:lastStatement", { hardwarePath, statementId });
+    events.emit("rules:process");
+  });
+
+  events.on("net:entry", async ({ sensorId, value }) => {
+    await repository.addSensorStatement({
+      date: new Date().toISOString(),
+      source: "radio",
+      sensorId,
+      value,
+    });
+
     events.emit("rules:process");
   });
 

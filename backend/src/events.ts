@@ -7,6 +7,7 @@ type Events = {
     hardwarePath: string;
     value: string;
   }) => void;
+  "net:entry": (_: { sensorId: string; value: string }) => void;
   "radio:entry": (_: {
     sensorId: string;
     hardwarePath: string;
