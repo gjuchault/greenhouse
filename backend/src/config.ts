@@ -13,6 +13,7 @@ const configSchema = z.object({
   DATABASE_NAME: z.string(),
   HTTP_PORT: z.string(),
   HTTP_BIND: z.string(),
+  NET_PORT: z.string(),
   JWT_SECRET: z.string(),
 });
 
@@ -23,6 +24,10 @@ export const config = {
   http: {
     address: env.HTTP_BIND,
     port: Number(env.HTTP_PORT),
+  },
+  net: {
+    address: env.HTTP_BIND,
+    port: Number(env.NET_PORT),
   },
   database: {
     host: env.DATABASE_HOST,

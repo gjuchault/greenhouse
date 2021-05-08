@@ -30,6 +30,9 @@ export async function createLogs({
   events.on("radio:entry", ({ sensorId, value }) =>
     append({ service: "radio", message: `${sensorId}: ${value}` })
   );
+  events.on("net:entry", ({ sensorId, value }) =>
+    append({ service: "net", message: `${sensorId}: ${value}` })
+  );
 
   router.get("/api/logs", ensureAuth, async (req, res) => {
     res.status(200).json(store).end();
