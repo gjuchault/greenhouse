@@ -2,7 +2,6 @@ import { Logger } from "winston";
 import { createServer } from "net";
 import { config } from "../../../config";
 import { GreenhouseEvents } from "../../../events";
-import { Hardware } from "../hardware";
 import { decodeGreenhouseStatement } from "../greenhouseProtocol";
 
 export interface NetDependencies {
