@@ -5,11 +5,11 @@ import { HardwareTable } from "./HardwareTable";
 import { Hardware } from "../hardware";
 
 export function Hardwares() {
-  const { data: hardware } = useHardware();
+  const { data: hardwares } = useHardware();
   const [updateHardware] = useUpdateHardware();
   const [restartHardware] = useRestartHardware();
 
-  if (!hardware) {
+  if (!hardwares) {
     return null;
   }
 
@@ -35,7 +35,7 @@ export function Hardwares() {
       </Heading>
       <Pane>
         <HardwareTable
-          hardware={hardware}
+          hardwares={hardwares}
           onUpdateHardware={onUpdateHardwareName}
           onRestartHardware={onRestartHardware}
         />

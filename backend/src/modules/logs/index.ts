@@ -21,6 +21,9 @@ export async function createLogs({
 }: RulesDependencies) {
   logger.info("Starting service...");
 
+  events.on("rule:updateActionable", ({ target, value }) =>
+    append({ service: "rules", message: `${target} > ${value}` })
+  );
   events.on("command:send", ({ target, value }) =>
     append({ service: "command", message: `${target} > ${value}` })
   );

@@ -21,6 +21,7 @@ export function ActionablesTable({
   onUpdateActionable,
   onSendCommand,
 }: Props) {
+  const [globalFilter, setGlobalFilter] = useState<string | undefined>();
   const [actionableToDelete, setActionableToDelete] = useState<
     Actionable | undefined
   >(undefined);
@@ -38,6 +39,17 @@ export function ActionablesTable({
     setIsSendingCommandToActionable,
   ] = useState(false);
   const [isRemoving, setIsRemoving] = useState<boolean>(false);
+
+  const filteredActionables = actionables.filter((actionable) => {
+    if (globalFilter !== undefined) {
+      return (
+        actionable.name.includes(globalFilter) ||
+        actionable.target.includes(globalFilter)
+      );
+    }
+
+    return true;
+  });
 
   return (
     <>
@@ -101,9 +113,10 @@ export function ActionablesTable({
         />
       )}
       <Table<Actionable>
-        items={actionables}
-        renderFilterPlaceholder={(count) =>
-          `Rechercher parmi ${count} actionnables`
+        items={filteredActionables}
+        setGlobalFilter={setGlobalFilter}
+        renderFilterPlaceholder={() =>
+          `Rechercher parmi ${actionables.length} actionnables`
         }
         columnsSizes={["auto", 150, 150, 150, 180]}
         columns={[

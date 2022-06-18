@@ -3,7 +3,6 @@ import {
   useTable,
   useSortBy,
   useGlobalFilter,
-  useAsyncDebounce,
   TableOptions,
   Column,
 } from "react-table";
@@ -24,9 +23,11 @@ type Props<T extends object> = Omit<TableOptions<T>, "data"> & {
   items: T[];
   columns: Column<T>[];
   renderMenu?: (row: T, close: () => void) => React.ReactNode;
-  renderFilterPlaceholder: (count: number) => string;
+  renderFilterPlaceholder: () => string;
+  renderFilterBarExtras?: () => React.ReactNode;
   onNewItem?: () => void;
   onRefetch?: () => Promise<void>;
+  setGlobalFilter: (filter: string) => void;
   columnsSizes: (number | "auto")[];
 };
 
@@ -36,6 +37,7 @@ export function Table<T extends object>({
   renderMenu,
   renderFilterPlaceholder,
   onRefetch,
+  setGlobalFilter,
   onNewItem,
   columnsSizes,
   ...props
@@ -50,8 +52,6 @@ export function Table<T extends object>({
     rows,
     prepareRow,
     state,
-    preGlobalFilteredRows,
-    setGlobalFilter,
   } = useTable(
     {
       data,
@@ -67,12 +67,9 @@ export function Table<T extends object>({
       return;
     }
 
-    const filter = state.globalFilter;
-
     setIsRefetchDisabled(true);
     await onRefetch();
     setIsRefetchDisabled(false);
-    setGlobalFilter(filter);
   };
 
   return (
@@ -85,7 +82,6 @@ export function Table<T extends object>({
       >
         <Pane display="flex" justifyContent="flex-start" alignItems="center">
           <GlobalFilter
-            preGlobalFilteredRows={preGlobalFilteredRows}
             globalFilter={state.globalFilter}
             setGlobalFilter={setGlobalFilter}
             renderFilterPlaceholder={renderFilterPlaceholder}
@@ -100,6 +96,7 @@ export function Table<T extends object>({
               Nouveau
             </Button>
           )}
+          {props.renderFilterBarExtras?.()}
         </Pane>
         {onRefetch && (
           <Button
@@ -173,23 +170,20 @@ export function Table<T extends object>({
 }
 
 type GlobalFilterProps = {
-  preGlobalFilteredRows: unknown[];
   globalFilter: string;
-  setGlobalFilter: (value?: string) => void;
-  renderFilterPlaceholder: (count: number) => string;
+  setGlobalFilter: (value: string) => void;
+  renderFilterPlaceholder: () => string;
 };
 
 function GlobalFilter({
-  preGlobalFilteredRows,
   globalFilter,
   setGlobalFilter,
   renderFilterPlaceholder,
 }: GlobalFilterProps) {
-  const count = preGlobalFilteredRows.length;
   const [value, setValue] = React.useState(globalFilter);
-  const onChange = useAsyncDebounce((value) => {
-    setGlobalFilter(value || undefined);
-  }, 200);
+  const onChange = (value: string) => {
+    setGlobalFilter(value);
+  };
 
   return (
     <SearchInput
@@ -200,7 +194,7 @@ function GlobalFilter({
         setValue(e.target.value);
         onChange(e.target.value);
       }}
-      placeholder={renderFilterPlaceholder(count)}
+      placeholder={renderFilterPlaceholder()}
     />
   );
 }

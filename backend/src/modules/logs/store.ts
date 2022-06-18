@@ -10,7 +10,7 @@ export function append({
   const date = new Date();
   store.push([date, service, message]);
 
-  if (store.length > 500) {
+  if (store.length > 5000) {
     store.shift();
   }
 }

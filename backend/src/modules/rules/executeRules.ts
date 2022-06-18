@@ -95,6 +95,7 @@ export function buildExecuteRules({
     for (const [target, value] of newActionablesValues) {
       logger.info(`${target} : ${value}`);
 
+      events.emit("rule:updateActionable", { target, value });
       events.emit("command:send", { target, value });
     }
 

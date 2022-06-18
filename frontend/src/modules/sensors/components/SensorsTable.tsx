@@ -18,6 +18,7 @@ export function SensorsTable({
   onRemoveSensor,
   onUpdateSensor,
 }: Props) {
+  const [globalFilter, setGlobalFilter] = useState<string | undefined>();
   const [sensorToDelete, setsensorToDelete] = useState<Sensor | undefined>(
     undefined
   );
@@ -28,6 +29,17 @@ export function SensorsTable({
   const [showCreateSensor, setShowCreateSensor] = useState(false);
   const [isCreatingSensor, setIsCreatingSensor] = useState(false);
   const [isRemoving, setIsRemoving] = useState<boolean>(false);
+
+  const filteredSensors = sensors.filter((sensor) => {
+    if (globalFilter !== undefined) {
+      return (
+        sensor.name.includes(globalFilter) ||
+        sensor.sensor.includes(globalFilter)
+      );
+    }
+
+    return true;
+  });
 
   return (
     <>
@@ -75,9 +87,10 @@ export function SensorsTable({
         />
       )}
       <Table<Sensor>
-        items={sensors}
-        renderFilterPlaceholder={(count) =>
-          `Rechercher parmi ${count} capteurs`
+        items={filteredSensors}
+        setGlobalFilter={setGlobalFilter}
+        renderFilterPlaceholder={() =>
+          `Rechercher parmi ${sensors.length} capteurs`
         }
         columnsSizes={["auto", 150, 150, 150, 180, 180, 150]}
         columns={[

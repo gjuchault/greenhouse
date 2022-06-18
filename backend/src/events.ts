@@ -1,6 +1,7 @@
 import { createNanoEvents, Emitter } from "nanoevents";
 
 type Events = {
+  "rule:updateActionable": (_: { target: string; value: string }) => void;
   "command:send": (_: { target: string; value: string }) => void;
   "arduino:entry": (_: {
     sensorId: string;

@@ -6,16 +6,17 @@ import { Confirm } from "../../../components/Confirm";
 import { UpdateHardware } from "./UpdateHardware";
 
 interface Props {
-  hardware: Hardware[];
+  hardwares: Hardware[];
   onUpdateHardware(hardware: Hardware): Promise<void>;
   onRestartHardware(hardware: Hardware): Promise<void>;
 }
 
 export function HardwareTable({
-  hardware,
+  hardwares,
   onUpdateHardware,
   onRestartHardware,
 }: Props) {
+  const [globalFilter, setGlobalFilter] = useState<string | undefined>();
   const [hardwareToUpdate, setHardwareToUpdate] = useState<
     Hardware | undefined
   >(undefined);
@@ -24,6 +25,18 @@ export function HardwareTable({
   >(undefined);
   const [isUpdatingHardware, setIsUpdatingHardware] = useState(false);
   const [isRestartingHardware, setIsRestartingHardware] = useState(false);
+
+  const filteredHardwares = hardwares.filter((hardware) => {
+    if (globalFilter !== undefined) {
+      return (
+        hardware.name.includes(globalFilter) ||
+        hardware.path.includes(globalFilter) ||
+        hardware.type.includes(globalFilter)
+      );
+    }
+
+    return true;
+  });
 
   return (
     <>
@@ -57,9 +70,10 @@ export function HardwareTable({
         />
       )}
       <Table<Hardware>
-        items={hardware}
-        renderFilterPlaceholder={(count) =>
-          `Rechercher parmi ${count} matériels USB`
+        items={filteredHardwares}
+        setGlobalFilter={setGlobalFilter}
+        renderFilterPlaceholder={() =>
+          `Rechercher parmi ${hardwares.length} matériels USB`
         }
         columnsSizes={["auto", "auto", "auto"]}
         columns={[
