@@ -1,19 +1,17 @@
-import { useQuery, useMutation } from "react-query";
-import { api, Response } from "../../api";
+import { useMutation } from "react-query";
+import { atomWithQuery } from "jotai/query";
+import { api } from "../../api";
 import { queryClient } from "../../app/App/queryClient";
 import { Sensor, SensorInput } from "./sensor";
 
-export function useSensors() {
-  const q = useQuery<Response<[string, Sensor][]>, string>(
-    "GET /api/sensors",
-    () => api.get("/api/sensors")
-  );
+export const sensorsAtom = atomWithQuery(() => ({
+  queryKey: "GET /api/sensors",
+  async queryFn() {
+    const { data } = await api.get<[string, Sensor][]>("/api/sensors");
 
-  return {
-    ...q,
-    data: q.data ? new Map(q.data.data) : undefined,
-  };
-}
+    return new Map(data);
+  },
+}));
 
 export function useCreateSensor() {
   return useMutation<void, unknown, SensorInput>(

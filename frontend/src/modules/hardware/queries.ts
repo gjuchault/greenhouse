@@ -1,18 +1,17 @@
-import { useMutation, useQuery } from "react-query";
-import { api, Response } from "../../api";
+import { useMutation } from "react-query";
+import { atomWithQuery } from "jotai/query";
+import { api } from "../../api";
 import { queryClient } from "../../app/App/queryClient";
 import { Hardware } from "./hardware";
 
-export function useHardware() {
-  const q = useQuery<Response<Hardware[]>, string>("GET /api/hardware", () =>
-    api.get("/api/hardware")
-  );
+export const hardwareAtom = atomWithQuery(() => ({
+  queryKey: "GET /api/hardware",
+  async queryFn() {
+    const { data } = await api.get<Hardware[]>("/api/hardware");
 
-  return {
-    ...q,
-    data: q.data ? q.data.data : undefined,
-  };
-}
+    return data;
+  },
+}));
 
 export function useUpdateHardware() {
   return useMutation<void, unknown, Pick<Hardware, "path" | "name">>(

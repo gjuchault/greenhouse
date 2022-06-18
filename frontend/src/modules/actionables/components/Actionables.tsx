@@ -1,7 +1,8 @@
-import React from "react";
+import React, { Suspense } from "react";
+import { useAtom } from "jotai";
 import { Pane, Card, Heading, majorScale } from "evergreen-ui";
 import {
-  useActionables,
+  actionablesAtom,
   useRemoveActionable,
   useCreateActionable,
   useUpdateActionable,
@@ -9,17 +10,22 @@ import {
 } from "../queries";
 import { ActionableInput } from "../actionable";
 import { ActionablesTable } from "./ActionablesTable";
+import { SuspenseSpinner } from "../../../components/SuspenseSpinner";
 
 export function Actionables() {
-  const { data: actionables } = useActionables();
+  return (
+    <Suspense fallback={<SuspenseSpinner />}>
+      <SuspensedActionables />
+    </Suspense>
+  );
+}
+
+function SuspensedActionables() {
+  const [actionables] = useAtom(actionablesAtom);
   const { mutateAsync: removeActionable } = useRemoveActionable();
   const { mutateAsync: createActionable } = useCreateActionable();
   const { mutateAsync: updateActionable } = useUpdateActionable();
   const { mutateAsync: sendCommand } = useSendCommand();
-
-  if (!actionables) {
-    return null;
-  }
 
   async function onRemoveActionable(actionableId: string) {
     await removeActionable({ id: actionableId });

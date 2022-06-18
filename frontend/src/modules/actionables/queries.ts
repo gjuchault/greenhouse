@@ -1,19 +1,17 @@
-import { useQuery, useMutation } from "react-query";
-import { api, Response } from "../../api";
+import { useMutation } from "react-query";
+import { atomWithQuery } from "jotai/query";
+import { api } from "../../api";
 import { queryClient } from "../../app/App/queryClient";
 import { Actionable, ActionableInput, CommandInput } from "./actionable";
 
-export function useActionables() {
-  const q = useQuery<Response<[string, Actionable][]>, string>(
-    "GET /api/actionables",
-    () => api.get("/api/actionables")
-  );
+export const actionablesAtom = atomWithQuery(() => ({
+  queryKey: "GET /api/actionables",
+  async queryFn() {
+    const { data } = await api.get<[string, Actionable][]>("/api/actionables");
 
-  return {
-    ...q,
-    data: q.data ? new Map(q.data.data) : undefined,
-  };
-}
+    return new Map(data);
+  },
+}));
 
 export function useRemoveActionable() {
   return useMutation<void, unknown, { id: string }>(

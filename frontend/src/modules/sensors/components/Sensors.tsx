@@ -1,22 +1,28 @@
-import React from "react";
+import React, { Suspense } from "react";
+import { atom, useAtom } from "jotai";
 import { Pane, Card, Heading, majorScale } from "evergreen-ui";
 import {
-  useSensors,
   useRemoveSensor,
   useCreateSensor,
   useUpdateSensor,
+  sensorsAtom,
 } from "../queries";
 import { SensorsTable } from "./SensorsTable";
+import { SuspenseSpinner } from "../../../components/SuspenseSpinner";
 
 export function Sensors() {
-  const { data: sensors } = useSensors();
+  return (
+    <Suspense fallback={<SuspenseSpinner />}>
+      <SuspensedSensors />
+    </Suspense>
+  );
+}
+
+function SuspensedSensors() {
+  const [sensors] = useAtom(sensorsAtom);
   const { mutateAsync: removeSensor } = useRemoveSensor();
   const { mutateAsync: createSensor } = useCreateSensor();
   const { mutateAsync: updateSensor } = useUpdateSensor();
-
-  if (!sensors) {
-    return null;
-  }
 
   async function handleRemoveSensor(sensorId: string) {
     await removeSensor({ id: sensorId });

@@ -1,17 +1,27 @@
-import React from "react";
+import React, { Suspense } from "react";
+import { useAtom } from "jotai";
 import { Pane, Card, Heading, majorScale } from "evergreen-ui";
-import { useHardware, useRestartHardware, useUpdateHardware } from "../queries";
+import {
+  hardwareAtom,
+  useRestartHardware,
+  useUpdateHardware,
+} from "../queries";
 import { HardwareTable } from "./HardwareTable";
 import { Hardware } from "../hardware";
+import { SuspenseSpinner } from "../../../components/SuspenseSpinner";
 
 export function Hardwares() {
-  const { data: hardwares } = useHardware();
+  return (
+    <Suspense fallback={<SuspenseSpinner />}>
+      <SuspensedHardwares />
+    </Suspense>
+  );
+}
+
+function SuspensedHardwares() {
+  const [hardwares] = useAtom(hardwareAtom);
   const { mutateAsync: updateHardware } = useUpdateHardware();
   const { mutateAsync: restartHardware } = useRestartHardware();
-
-  if (!hardwares) {
-    return null;
-  }
 
   async function onUpdateHardwareName(
     hardware: Pick<Hardware, "path" | "name">

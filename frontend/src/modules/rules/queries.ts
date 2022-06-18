@@ -1,24 +1,23 @@
-import { useQuery, useMutation } from "react-query";
-import { api, Response } from "../../api";
+import { atomWithQuery } from "jotai/query";
+import { useMutation } from "react-query";
+import { api } from "../../api";
 import { queryClient } from "../../app/App/queryClient";
 import { CustomRule, Command, RuleInput } from "./rule";
 
-export function useRules() {
-  const q = useQuery<
-    Response<{ rule: CustomRule; commands: [string, Command][] }>,
-    string
-  >("GET /api/rule", () => api.get("/api/rule"));
+export const rulesAtom = atomWithQuery(() => ({
+  queryKey: "GET /api/rule",
+  async queryFn() {
+    const { data } = await api.get<{
+      rule: CustomRule;
+      commands: [string, Command][];
+    }>("/api/rule");
 
-  return {
-    ...q,
-    data: q.data
-      ? {
-          rule: q.data.data.rule,
-          commands: new Map(q.data.data.commands),
-        }
-      : undefined,
-  };
-}
+    return {
+      rule: data.rule,
+      commands: new Map(data.commands),
+    };
+  },
+}));
 
 export function useCreateRule() {
   return useMutation<void, unknown, RuleInput>(

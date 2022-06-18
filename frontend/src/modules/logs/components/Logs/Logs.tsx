@@ -1,14 +1,20 @@
-import React from "react";
+import React, { Suspense } from "react";
+import { useAtom } from "jotai";
 import { Pane, Card, Heading, majorScale } from "evergreen-ui";
-import { useLogs } from "../../queries";
 import { LogsTable } from "../LogsTable";
+import { logsAtom } from "../../queries";
+import { SuspenseSpinner } from "../../../../components/SuspenseSpinner";
 
 export function Logs() {
-  const { data: logs, refetch } = useLogs();
+  return (
+    <Suspense fallback={<SuspenseSpinner />}>
+      <SuspensedLogs />
+    </Suspense>
+  );
+}
 
-  if (!logs) {
-    return null;
-  }
+function SuspensedLogs() {
+  const [logs, update] = useAtom(logsAtom);
 
   return (
     <Card
@@ -24,7 +30,7 @@ export function Logs() {
         <LogsTable
           logs={logs}
           onRefetch={async () => {
-            await refetch();
+            await update({ type: "refetch" });
           }}
         />
       </Pane>

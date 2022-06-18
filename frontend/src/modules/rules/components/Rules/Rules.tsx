@@ -1,16 +1,26 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, Suspense } from "react";
+import { useAtom } from "jotai";
 import { Card, Pane, Heading, Button, majorScale } from "evergreen-ui";
 import { CodeEditor } from "../../../../components/CodeEditor";
-import { useActionables } from "../../../actionables";
-import { useSensors } from "../../../sensors";
-import { useCreateRule, useRules } from "../../queries";
+import { actionablesAtom } from "../../../actionables";
+import { sensorsAtom } from "../../../sensors";
+import { useCreateRule, rulesAtom } from "../../queries";
 import { useMemoizedSorted } from "./useMemoizedSorted";
 import { makeGreenhouseTypescriptEnvironment } from "../../rule";
+import { SuspenseSpinner } from "../../../../components/SuspenseSpinner";
 
 export function Rules() {
-  const { data: rules } = useRules();
-  const { data: actionablesMap } = useActionables();
-  const { data: sensorsMap } = useSensors();
+  return (
+    <Suspense fallback={<SuspenseSpinner />}>
+      <SuspensedRules />
+    </Suspense>
+  );
+}
+
+function SuspensedRules() {
+  const [rules] = useAtom(rulesAtom);
+  const [sensorsMap] = useAtom(sensorsAtom);
+  const [actionablesMap] = useAtom(actionablesAtom);
 
   const { mutateAsync: createRule, status: createRuleStatus } = useCreateRule();
 
@@ -91,7 +101,6 @@ export function Rules() {
         result.set(key, value.toString());
       }
 
-      console.log(result);
       const formattedOutput = Array.from(result.entries()).reduce(
         (acc, [target, value]) => {
           const actionable = actionableByTarget.get(target);
@@ -100,8 +109,6 @@ export function Rules() {
         },
         ""
       );
-
-      // console.log(output, Array.from(output.entries()));
 
       alert(
         "Valide. À l'heure actuelle, les moteurs seraient mis à\n" +

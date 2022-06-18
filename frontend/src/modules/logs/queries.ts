@@ -1,18 +1,15 @@
-import { useQuery } from "react-query";
-import { api, Response } from "../../api";
+import { atomWithQuery } from "jotai/query";
+import { api } from "../../api";
 
-export function useLogs() {
-  const q = useQuery<Response<[string, string, string][]>, string>(
-    "GET /api/logs",
-    () => api.get("/api/logs")
-  );
+export const logsAtom = atomWithQuery(() => ({
+  queryKey: "GET /api/logs",
+  async queryFn() {
+    const { data } = await api.get<[string, string, string][]>("/api/logs");
 
-  return {
-    ...q,
-    data: q.data?.data.map(([date, service, message]) => ({
+    return data.map(([date, service, message]) => ({
       date: new Date(date),
       service,
       message,
-    })),
-  };
-}
+    }));
+  },
+}));
