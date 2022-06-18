@@ -1,7 +1,6 @@
 import React from "react";
 import { Card } from "evergreen-ui";
-import Editor, { loader } from "@monaco-editor/react";
-import { useAsyncEffect } from "../../helpers/useAsyncEffect";
+import Editor, { Monaco } from "@monaco-editor/react";
 
 interface Props {
   value: string;
@@ -10,14 +9,12 @@ interface Props {
 }
 
 export function CodeEditor({ value, typescriptEnvironment, onChange }: Props) {
-  useAsyncEffect(async () => {
-    const instance = await loader.init();
-
-    instance.languages.typescript.javascriptDefaults.addExtraLib(
+  function handleMonacoMount(monaco: Monaco) {
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(
       typescriptEnvironment,
       "ts:greenhouse.d.ts"
     );
-  });
+  }
 
   return (
     <Card height="100%" elevation={0}>
@@ -33,7 +30,8 @@ export function CodeEditor({ value, typescriptEnvironment, onChange }: Props) {
           },
         }}
         value={value}
-        onChange={(_, value) => onChange(value || "")}
+        beforeMount={handleMonacoMount}
+        onChange={(value) => onChange(value ?? "")}
       />
     </Card>
   );

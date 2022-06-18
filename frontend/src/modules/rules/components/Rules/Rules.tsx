@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, Suspense } from "react";
+import React, { useState, useMemo, Suspense } from "react";
 import { useAtom } from "jotai";
 import { Card, Pane, Heading, Button, majorScale } from "evergreen-ui";
 import { CodeEditor } from "../../../../components/CodeEditor";
@@ -27,14 +27,10 @@ function SuspensedRules() {
   const actionables = useMemoizedSorted(actionablesMap, ({ name }) => name);
   const sensors = useMemoizedSorted(sensorsMap, ({ name }) => name);
 
-  const [rule, setRule] = useState("");
-  const [initialRule, setInitialRule] = useState<string | undefined>(undefined);
-  useEffect(() => {
-    if (rules && initialRule === undefined) {
-      setRule(rules?.rule.content || "");
-      setInitialRule(rules?.rule.content || "");
-    }
-  }, [rules, initialRule]);
+  const [rule, setRule] = useState(rules.rule.content);
+  const [initialRule, setInitialRule] = useState<string | undefined>(
+    rules.rule.content
+  );
 
   const hasUnsavedRule = useMemo(() => rule !== initialRule, [
     rule,
