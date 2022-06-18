@@ -52,6 +52,7 @@ async function main() {
     logger: createLogger("rules"),
     ensureAuth: auth.ensureAuth,
     listSensors: sensors.listSensors,
+    listActionable: actionables.listActionable,
     listActionables: actionables.listActionables,
     setLastActionablesValues: actionables.setLastActionablesValues,
   });

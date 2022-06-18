@@ -18,6 +18,7 @@ export interface RulesDependencies {
   database: Database;
   ensureAuth: EnsureAuthMiddleware;
   listSensors(): Promise<Map<string, Sensor>>;
+  listActionable(target: string): Promise<Actionable | undefined>;
   listActionables(): Promise<Map<string, Actionable>>;
   setLastActionablesValues(lastValues: Map<string, string>): Promise<void>;
 }
@@ -29,6 +30,7 @@ export async function createRules({
   database,
   ensureAuth,
   listSensors,
+  listActionable,
   listActionables,
   setLastActionablesValues,
 }: RulesDependencies) {
@@ -93,12 +95,25 @@ export async function createRules({
       return res.status(400).json(result.error).end();
     }
 
+    const actionable = await listActionable(result.data.target);
+
+    if (!actionable) {
+      return;
+    }
+
     await repository.createCommand(result.data);
 
     events.emit("command:send", {
       target: result.data.target,
       value: result.data.value.toString(),
     });
+
+    setTimeout(() => {
+      events.emit("command:send", {
+        target: result.data.target,
+        value: actionable.valueType.default.toString(),
+      });
+    }, new Date(result.data.expiresAt).getTime() - Date.now());
 
     logger.info(`Created a command`);
 

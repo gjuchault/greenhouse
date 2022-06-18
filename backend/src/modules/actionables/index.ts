@@ -110,6 +110,7 @@ export async function createActionables({
   logger.info("Service started");
 
   return {
+    listActionable: repository.listActionable,
     listActionables: repository.listActionables,
     setLastActionablesValues: repository.setLastActionablesValues,
   };

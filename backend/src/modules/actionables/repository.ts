@@ -13,6 +13,24 @@ export interface ActionablesRepositoryDependencies {
 export function buildActionablesRepository({
   database,
 }: ActionablesRepositoryDependencies) {
+  async function listActionable(target: string) {
+    return await database.runInDatabaseClient(async (client) => {
+      const data = await client.query<{
+        id: string;
+        target: string;
+        name: string;
+        value: "0-1" | "1-1024";
+        default_value: string;
+        last_value: string;
+        last_value_sent_at: string;
+      }>(sql`
+        select * from "actionables" where "target" = ${target}
+      `);
+
+      return decodeActionable(data.rows[0]);
+    });
+  }
+
   async function listActionables() {
     return await database.runInDatabaseClient(async (client) => {
       const data = await client.query<{
@@ -100,6 +118,7 @@ export function buildActionablesRepository({
   }
 
   return {
+    listActionable,
     listActionables,
     createActionable,
     removeActionable,

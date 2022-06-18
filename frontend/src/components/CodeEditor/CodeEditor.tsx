@@ -23,7 +23,7 @@ export function CodeEditor({ value, typescriptEnvironment, onChange }: Props) {
     <Card height="100%" elevation={0}>
       <ControlledEditor
         language="javascript"
-        height="500px"
+        height={`${window.innerHeight - 220}px`}
         options={{
           fontSize: 17,
           wordBasedSuggestions: false,

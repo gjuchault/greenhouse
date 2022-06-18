@@ -40,6 +40,79 @@ export function Rules() {
     setInitialRule(newContent);
   }
 
+  async function validate() {
+    const Actionables: Record<string, string> = {};
+    for (const actionable of actionables) {
+      Actionables[actionable.name] = actionable.target;
+    }
+
+    const Sensors: Record<string, string> = {};
+    for (const sensor of sensors) {
+      Sensors[sensor.name] = sensor.sensor;
+    }
+
+    if (!rule.trim().endsWith("motors;")) {
+      alert("Les règles doivent terminer par 'motors;'");
+      return;
+    }
+
+    const sensorBySensor = new Map(
+      sensors.map((sensor) => [sensor.sensor, sensor])
+    );
+    const actionableByTarget = new Map(
+      actionables.map((actionable) => [actionable.target, actionable])
+    );
+
+    const ruleWithReturn = rule.trim().replace(/motors;$/, "return motors;");
+
+    const result: Map<string, string> = new Map(
+      actionables.map((target) => [target.target, "1"])
+    );
+
+    try {
+      // eslint-disable-next-line no-new-func
+      const executeRules = new Function(
+        "date",
+        "sensors",
+        "actionables",
+        "Actionables",
+        "Sensors",
+        ruleWithReturn
+      );
+
+      const output: Map<string, string> = executeRules(
+        new Date(),
+        sensorBySensor,
+        actionableByTarget,
+        Actionables,
+        Sensors
+      );
+
+      for (const [key, value] of Array.from(output.entries())) {
+        result.set(key, value.toString());
+      }
+
+      console.log(result);
+      const formattedOutput = Array.from(result.entries()).reduce(
+        (acc, [target, value]) => {
+          const actionable = actionableByTarget.get(target);
+
+          return acc + `${actionable?.name}: ${value}\n`;
+        },
+        ""
+      );
+
+      // console.log(output, Array.from(output.entries()));
+
+      alert(
+        "Valide. À l'heure actuelle, les moteurs seraient mis à\n" +
+          formattedOutput
+      );
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   return (
     <>
       <Prompt
@@ -64,6 +137,15 @@ export function Rules() {
             marginBottom={majorScale(2)}
           >
             Sauvegarder
+          </Button>
+          <Button
+            type="button"
+            appearance="default"
+            marginLeft={majorScale(2)}
+            onClick={() => validate()}
+            marginBottom={majorScale(2)}
+          >
+            Valider
           </Button>
           <CodeEditor
             value={rule}
