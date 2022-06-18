@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import { atom, useAtom } from "jotai";
+import { useAtom } from "jotai";
 import { Pane, Card, Heading, majorScale } from "evergreen-ui";
 import {
   useRemoveSensor,
