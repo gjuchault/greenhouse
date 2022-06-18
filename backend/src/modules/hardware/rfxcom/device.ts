@@ -1,4 +1,4 @@
-import { PortInfo } from "serialport";
+import { PortInfo } from "../serialport";
 
 const rfxcomManufacturer = ["rfxcom"];
 

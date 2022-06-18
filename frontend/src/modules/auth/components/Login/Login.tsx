@@ -21,7 +21,7 @@ interface LoginForm {
 
 export function Login({ onLoggedIn }: LoginProps) {
   const { handleSubmit, register } = useForm<LoginForm>();
-  const [sendLogin, { isLoading }] = useLogin();
+  const { mutateAsync: sendLogin, isLoading } = useLogin();
 
   async function login(form: LoginForm) {
     const res = await sendLogin(form);
@@ -46,16 +46,14 @@ export function Login({ onLoggedIn }: LoginProps) {
         <form onSubmit={handleSubmit(login)}>
           <Pane display="flex" flexDirection="column">
             <TextInput
-              ref={register}
-              name="user"
+              {...register("user")}
               type="text"
               disabled={isLoading}
               placeholder="Nom"
               marginBottom={majorScale(2)}
             />
             <TextInput
-              ref={register}
-              name="password"
+              {...register("password")}
               type="password"
               disabled={isLoading}
               placeholder="Mot de passe"

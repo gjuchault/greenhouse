@@ -110,8 +110,7 @@ export function UpdateActionable({
     >
       <TextInputField
         label="Nom"
-        name="name"
-        ref={register}
+        {...register("name")}
         isInvalid={errors.name}
         validationMessage={errors.name ? "Nom invalide" : undefined}
         description="Un nom arbirtraire représentant l'actionnable"
@@ -119,8 +118,7 @@ export function UpdateActionable({
       />
       <TextInputField
         label="Adresse"
-        name="target"
-        ref={register}
+        {...register("target")}
         isInvalid={errors.target}
         validationMessage={errors.target ? "Identifiant invalide" : undefined}
         description="Un identifiant unique numérique qui cible l'actionnable"

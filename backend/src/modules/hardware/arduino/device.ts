@@ -1,4 +1,4 @@
-import { PortInfo } from "serialport";
+import { PortInfo } from "../serialport";
 
 const arduinoManufacturer = ["1a86", "arduino"];
 

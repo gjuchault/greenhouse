@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Prompt } from "react-router";
 import { Card, Pane, Heading, Button, majorScale } from "evergreen-ui";
 import { CodeEditor } from "../../../../components/CodeEditor";
 import { useActionables } from "../../../actionables";
@@ -13,7 +12,7 @@ export function Rules() {
   const { data: actionablesMap } = useActionables();
   const { data: sensorsMap } = useSensors();
 
-  const [createRule, { status: createRuleStatus }] = useCreateRule();
+  const { mutateAsync: createRule, status: createRuleStatus } = useCreateRule();
 
   const actionables = useMemoizedSorted(actionablesMap, ({ name }) => name);
   const sensors = useMemoizedSorted(sensorsMap, ({ name }) => name);
@@ -115,10 +114,6 @@ export function Rules() {
 
   return (
     <>
-      <Prompt
-        when={hasUnsavedRule}
-        message="Vous n'avez pas sauvegardé la règle, êtes-vous sûr de vouloir quitter la page ?"
-      />
       <Card
         background="white"
         padding={majorScale(3)}

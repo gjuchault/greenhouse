@@ -12,10 +12,10 @@ import { ActionablesTable } from "./ActionablesTable";
 
 export function Actionables() {
   const { data: actionables } = useActionables();
-  const [removeActionable] = useRemoveActionable();
-  const [createActionable] = useCreateActionable();
-  const [updateActionable] = useUpdateActionable();
-  const [sendCommand] = useSendCommand();
+  const { mutateAsync: removeActionable } = useRemoveActionable();
+  const { mutateAsync: createActionable } = useCreateActionable();
+  const { mutateAsync: updateActionable } = useUpdateActionable();
+  const { mutateAsync: sendCommand } = useSendCommand();
 
   if (!actionables) {
     return null;

@@ -1,5 +1,5 @@
 import { Logger } from "winston";
-import Delimiter from "@serialport/parser-delimiter";
+import { DelimiterParser } from "@serialport/parser-delimiter";
 import { GreenhouseEvents } from "../../../events";
 import { openPort } from "../serialport";
 import {
@@ -23,7 +23,7 @@ export async function createArduino(
   logger.info(`Starting arduino on ${path}...`);
 
   const port = await openPort(path);
-  const parser = port.pipe(new Delimiter({ delimiter: "\r\n" }));
+  const parser = port.pipe(new DelimiterParser({ delimiter: "\r\n" }));
 
   port.on("error", (err) => {
     logger.error(err);

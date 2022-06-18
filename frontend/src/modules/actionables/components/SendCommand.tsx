@@ -111,9 +111,8 @@ export function SendCommand({ range, isLoading, onClose, onConfirm }: Props) {
 
       <TextInputField
         label="Expiration"
-        name="expiresIn"
         type="string"
-        ref={register}
+        {...register("expiresIn")}
         isInvalid={errors.expiresIn}
         validationMessage={errors.expiresIn ? "Expiration invalide" : undefined}
         description="Le moment à partir duquel la commande expire et le moteur de règle reprend la priorité"

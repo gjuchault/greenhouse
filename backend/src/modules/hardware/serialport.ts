@@ -1,4 +1,7 @@
-import SerialPort from "serialport";
+import { SerialPort } from "serialport";
+
+type PortInfoArray = Awaited<ReturnType<typeof SerialPort.list>>;
+export type PortInfo = PortInfoArray[number];
 
 export async function listUsbPorts() {
   const ports = await SerialPort.list();
@@ -11,8 +14,8 @@ export async function listUsbPorts() {
 export async function openPort(path: string) {
   return new Promise<SerialPort>((resolve, reject) => {
     const port = new SerialPort(
-      path,
       {
+        path,
         baudRate: 115200,
       },
       (err) => {

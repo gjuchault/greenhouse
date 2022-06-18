@@ -10,9 +10,9 @@ import { SensorsTable } from "./SensorsTable";
 
 export function Sensors() {
   const { data: sensors } = useSensors();
-  const [removeSensor] = useRemoveSensor();
-  const [createSensor] = useCreateSensor();
-  const [updateSensor] = useUpdateSensor();
+  const { mutateAsync: removeSensor } = useRemoveSensor();
+  const { mutateAsync: createSensor } = useCreateSensor();
+  const { mutateAsync: updateSensor } = useUpdateSensor();
 
   if (!sensors) {
     return null;

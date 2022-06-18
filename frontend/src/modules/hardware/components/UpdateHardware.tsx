@@ -70,8 +70,7 @@ export function UpdateHardware({
     >
       <TextInputField
         label="Nom"
-        name="name"
-        ref={register}
+        {...register("name")}
         isInvalid={errors.name}
         validationMessage={errors.name ? "Nom invalide" : undefined}
         description="Un nom arbirtraire représentant le matériel USB"

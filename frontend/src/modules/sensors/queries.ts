@@ -1,5 +1,6 @@
-import { useQuery, useMutation, queryCache } from "react-query";
+import { useQuery, useMutation } from "react-query";
 import { api, Response } from "../../api";
+import { queryClient } from "../../app/App/queryClient";
 import { Sensor, SensorInput } from "./sensor";
 
 export function useSensors() {
@@ -18,7 +19,7 @@ export function useCreateSensor() {
   return useMutation<void, unknown, SensorInput>(
     (sensorInput) => api.post(`/api/sensors`, sensorInput),
     {
-      onSuccess: () => queryCache.invalidateQueries("GET /api/sensors"),
+      onSuccess: () => queryClient.invalidateQueries("GET /api/sensors"),
     }
   );
 }
@@ -27,7 +28,7 @@ export function useUpdateSensor() {
   return useMutation<void, unknown, Sensor>(
     (sensor) => api.put(`/api/sensors/${sensor.id}`, sensor),
     {
-      onSuccess: () => queryCache.invalidateQueries("GET /api/sensors"),
+      onSuccess: () => queryClient.invalidateQueries("GET /api/sensors"),
     }
   );
 }
@@ -36,7 +37,7 @@ export function useRemoveSensor() {
   return useMutation<void, unknown, { id: string }>(
     ({ id }) => api.delete(`/api/sensors/${id}`),
     {
-      onSuccess: () => queryCache.invalidateQueries("GET /api/sensors"),
+      onSuccess: () => queryClient.invalidateQueries("GET /api/sensors"),
     }
   );
 }

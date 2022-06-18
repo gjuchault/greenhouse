@@ -6,8 +6,8 @@ import { Hardware } from "../hardware";
 
 export function Hardwares() {
   const { data: hardwares } = useHardware();
-  const [updateHardware] = useUpdateHardware();
-  const [restartHardware] = useRestartHardware();
+  const { mutateAsync: updateHardware } = useUpdateHardware();
+  const { mutateAsync: restartHardware } = useRestartHardware();
 
   if (!hardwares) {
     return null;

@@ -1,5 +1,6 @@
-import { useQuery, useMutation, queryCache } from "react-query";
+import { useQuery, useMutation } from "react-query";
 import { api, Response } from "../../api";
+import { queryClient } from "../../app/App/queryClient";
 import { CustomRule, Command, RuleInput } from "./rule";
 
 export function useRules() {
@@ -23,7 +24,7 @@ export function useCreateRule() {
   return useMutation<void, unknown, RuleInput>(
     (body) => api.post("/api/rule", body),
     {
-      onSuccess: () => queryCache.invalidateQueries("GET /api/rule"),
+      onSuccess: () => queryClient.invalidateQueries("GET /api/rule"),
     }
   );
 }

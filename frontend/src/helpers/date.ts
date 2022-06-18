@@ -1,5 +1,3 @@
-import ms from "ms";
-
 export function formatDate(input: Date | string, precise: boolean = false) {
   return new Date(input).toLocaleDateString("fr-FR", {
     day: "numeric",

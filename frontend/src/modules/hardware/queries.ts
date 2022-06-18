@@ -1,5 +1,6 @@
-import { useMutation, useQuery, queryCache } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import { api, Response } from "../../api";
+import { queryClient } from "../../app/App/queryClient";
 import { Hardware } from "./hardware";
 
 export function useHardware() {
@@ -21,7 +22,7 @@ export function useUpdateHardware() {
         name: hardware.name,
       }),
     {
-      onSuccess: () => queryCache.invalidateQueries("GET /api/hardware"),
+      onSuccess: () => queryClient.invalidateQueries("GET /api/hardware"),
     }
   );
 }

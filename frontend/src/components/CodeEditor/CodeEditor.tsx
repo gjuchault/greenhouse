@@ -1,6 +1,6 @@
 import React from "react";
 import { Card } from "evergreen-ui";
-import { ControlledEditor, monaco } from "@monaco-editor/react";
+import Editor, { loader } from "@monaco-editor/react";
 import { useAsyncEffect } from "../../helpers/useAsyncEffect";
 
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
 
 export function CodeEditor({ value, typescriptEnvironment, onChange }: Props) {
   useAsyncEffect(async () => {
-    const instance = await monaco.init();
+    const instance = await loader.init();
 
     instance.languages.typescript.javascriptDefaults.addExtraLib(
       typescriptEnvironment,
@@ -21,7 +21,7 @@ export function CodeEditor({ value, typescriptEnvironment, onChange }: Props) {
 
   return (
     <Card height="100%" elevation={0}>
-      <ControlledEditor
+      <Editor
         language="javascript"
         height={`${window.innerHeight - 220}px`}
         options={{

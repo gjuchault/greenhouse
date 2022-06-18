@@ -119,10 +119,16 @@ export function Table<T extends object>({
                   maxWidth={width}
                   {...column.getHeaderProps(column.getSortByToggleProps())}
                 >
-                  {column.render("Header")}
-                  <span>
-                    {column.isSorted ? (column.isSortedDesc ? " ↓" : " ↑") : ""}
-                  </span>
+                  <>
+                    {column.render("Header")}
+                    <span>
+                      {column.isSorted
+                        ? column.isSortedDesc
+                          ? " ↓"
+                          : " ↑"
+                        : ""}
+                    </span>
+                  </>
                 </EvergreenTable.TextHeaderCell>
               );
             });
@@ -142,7 +148,7 @@ export function Table<T extends object>({
                       maxWidth={width}
                       {...cell.getCellProps()}
                     >
-                      {cell.render("Cell")}
+                      <>{cell.render("Cell")}</>
                     </EvergreenTable.TextCell>
                   );
                 })}

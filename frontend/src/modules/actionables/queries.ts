@@ -1,5 +1,6 @@
-import { useQuery, useMutation, queryCache } from "react-query";
+import { useQuery, useMutation } from "react-query";
 import { api, Response } from "../../api";
+import { queryClient } from "../../app/App/queryClient";
 import { Actionable, ActionableInput, CommandInput } from "./actionable";
 
 export function useActionables() {
@@ -18,7 +19,7 @@ export function useRemoveActionable() {
   return useMutation<void, unknown, { id: string }>(
     ({ id }) => api.delete(`/api/actionables/${id}`),
     {
-      onSuccess: () => queryCache.invalidateQueries("GET /api/actionables"),
+      onSuccess: () => queryClient.invalidateQueries("GET /api/actionables"),
     }
   );
 }
@@ -27,7 +28,7 @@ export function useUpdateActionable() {
   return useMutation<void, unknown, Actionable>(
     (actionable) => api.put(`/api/actionables/${actionable.id}`, actionable),
     {
-      onSuccess: () => queryCache.invalidateQueries("GET /api/actionables"),
+      onSuccess: () => queryClient.invalidateQueries("GET /api/actionables"),
     }
   );
 }
@@ -36,7 +37,7 @@ export function useCreateActionable() {
   return useMutation<void, unknown, ActionableInput>(
     (actionableInput) => api.post(`/api/actionables`, actionableInput),
     {
-      onSuccess: () => queryCache.invalidateQueries("GET /api/actionables"),
+      onSuccess: () => queryClient.invalidateQueries("GET /api/actionables"),
     }
   );
 }
@@ -45,7 +46,7 @@ export function useSendCommand() {
   return useMutation<void, unknown, CommandInput>(
     (commandInput) => api.post(`/api/commands`, commandInput),
     {
-      onSuccess: () => queryCache.invalidateQueries("GET /api/actionables"),
+      onSuccess: () => queryClient.invalidateQueries("GET /api/actionables"),
     }
   );
 }

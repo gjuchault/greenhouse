@@ -1,5 +1,5 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Pane, Text, Heading, useTheme, majorScale } from "evergreen-ui";
 import { ReactComponent as Logout } from "./logout.svg";
 import { ReactComponent as Sensors } from "./sensors.svg";
@@ -20,14 +20,14 @@ const logos = new Map([
 
 export function Sidebar() {
   const theme = useTheme();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const logout = () => {
     offlineLogout();
   };
 
   return (
-    <Pane width="200px" background={theme.palette.blue.base}>
+    <Pane width="200px" background={theme.colors.blue500}>
       <Pane display="flex" marginTop={majorScale(3)} justifyContent="center">
         {logos.get(process.env.APP_LOGO || "fish")}
       </Pane>
@@ -40,31 +40,31 @@ export function Sidebar() {
         {process.env.APP_NAME}
       </Heading>
       <SidebarButton
-        onClick={() => history.push("/sensors")}
+        onClick={() => navigate("/sensors")}
         renderIcon={() => <Sensors />}
       >
         <Text color="white">Capteurs</Text>
       </SidebarButton>
       <SidebarButton
-        onClick={() => history.push("/actionables")}
+        onClick={() => navigate("/actionables")}
         renderIcon={() => <Actionables />}
       >
         <Text color="white">Actionables</Text>
       </SidebarButton>
       <SidebarButton
-        onClick={() => history.push("/hardware")}
+        onClick={() => navigate("/hardware")}
         renderIcon={() => <Usb />}
       >
         <Text color="white">Matériel USB</Text>
       </SidebarButton>
       <SidebarButton
-        onClick={() => history.push("/rules")}
+        onClick={() => navigate("/rules")}
         renderIcon={() => <Rules />}
       >
         <Text color="white">Règles</Text>
       </SidebarButton>
       <SidebarButton
-        onClick={() => history.push("/logs")}
+        onClick={() => navigate("/logs")}
         renderIcon={() => <Logs />}
       >
         <Text color="white">Logs</Text>

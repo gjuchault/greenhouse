@@ -87,8 +87,7 @@ export function UpdateSensor({
       }}
     >
       <TextInputField
-        ref={register}
-        name="name"
+        {...register("name")}
         label="Nom"
         isInvalid={errors.name}
         validationMessage={errors.name ? "Nom invalide" : undefined}
@@ -96,8 +95,7 @@ export function UpdateSensor({
         placeholder="Capteur Lumière 1"
       />
       <TextInputField
-        ref={register}
-        name="sensor"
+        {...register("sensor")}
         label="Adresse"
         isInvalid={errors.sensor}
         validationMessage={errors.sensor ? "Identifiant invalide" : undefined}
@@ -105,16 +103,14 @@ export function UpdateSensor({
         placeholder="36"
       />
       <TextInputField
-        ref={register({ validate: (value) => isValidInteger(value) })}
-        name="min"
+        {...register("min", { validate: (value) => isValidInteger(value) })}
         label="Minimum"
         description="Valeur minimum du senseur"
         placeholder="0"
         validationMessage={errors.min && "Veuillez entrer un nombre entier"}
       />
       <TextInputField
-        ref={register}
-        name="max"
+        {...register("max")}
         label="Maximum"
         description="Valeur maximum du senseur"
         placeholder="1"
