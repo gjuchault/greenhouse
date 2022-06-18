@@ -1,3 +1,5 @@
+import ms from "ms";
+
 export function formatDate(input: Date | string, precise: boolean = false) {
   return new Date(input).toLocaleDateString("fr-FR", {
     day: "numeric",
@@ -32,33 +34,4 @@ export function formatDistance(to: Date | string) {
     }
     duration /= division.amount;
   }
-}
-
-export function dateToInputDateString(input: Date) {
-  const date = [
-    input.getFullYear().toString(),
-    input.getMonth().toString().padStart(2, "0"),
-    input.getDate().toString().padStart(2, "0"),
-  ].join("-");
-
-  const time = [
-    input.getHours().toString().padStart(2, "0"),
-    input.getMinutes().toString().padStart(2, "0"),
-    input.getSeconds().toString().padStart(2, "0"),
-  ].join(":");
-
-  return `${date}T${time}`;
-}
-
-export function inputDateStringToDate(input: string) {
-  const parameters = input.split(/[-:T]/).map((p) => Number(p));
-
-  if (parameters.length !== 6) {
-    return;
-  }
-
-  return new Date(
-    ...(parameters as [number, number, number, number, number, number]),
-    0
-  );
 }

@@ -26,7 +26,15 @@ export function buildExecuteRules({
   listActionables,
   setLastActionablesValues,
 }: ExecuteRulesDependencies) {
+  let isRunning = false;
+
   async function executeRules() {
+    if (isRunning) {
+      return;
+    }
+
+    isRunning = true;
+
     const [rule, commands, sensors, actionables] = await Promise.all([
       listRule(),
       listCommands(),
@@ -91,7 +99,8 @@ export function buildExecuteRules({
     }
 
     await setLastActionablesValues(newActionablesValues);
+    isRunning = false;
   }
 
-  return debounce(executeRules, 5000);
+  return executeRules;
 }

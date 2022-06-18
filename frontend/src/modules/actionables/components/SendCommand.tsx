@@ -6,11 +6,8 @@ import {
   FormField,
   SegmentedControl,
 } from "evergreen-ui";
-import { commandInputValuePattern, isExpiresAtValid } from "../actionable";
-import {
-  dateToInputDateString,
-  inputDateStringToDate,
-} from "../../../helpers/date";
+import ms from "ms";
+import { commandInputValuePattern } from "../actionable";
 
 interface Props {
   range: "0-1" | "1-1024";
@@ -21,20 +18,18 @@ interface Props {
 
 interface SendCommandForm {
   value: number;
-  expiresAt: string;
+  expiresIn: string;
 }
 
 interface SendCommandFormErrors {
   value?: boolean;
-  expiresAt?: boolean;
+  expiresIn?: boolean;
 }
-
-const fiveMinutes = 5 * 60 * 1000;
 
 export function SendCommand({ range, isLoading, onClose, onConfirm }: Props) {
   const { register, getValues } = useForm<SendCommandForm>({
     defaultValues: {
-      expiresAt: dateToInputDateString(new Date(Date.now() + fiveMinutes)),
+      expiresIn: "30s",
     },
   });
 
@@ -49,8 +44,8 @@ export function SendCommand({ range, isLoading, onClose, onConfirm }: Props) {
       errors.value = true;
     }
 
-    if (!isExpiresAtValid(values.expiresAt)) {
-      errors.expiresAt = true;
+    if (ms(values.expiresIn) === undefined) {
+      errors.expiresIn = true;
     }
 
     setErrors(errors);
@@ -68,18 +63,17 @@ export function SendCommand({ range, isLoading, onClose, onConfirm }: Props) {
       cancelLabel="Annuler"
       onCloseComplete={onClose}
       onConfirm={() => {
-        const { expiresAt } = getValues();
+        const { expiresIn } = getValues();
 
-        const errors = handleValidation({ value, expiresAt });
-        const expiresAtDate = inputDateStringToDate(expiresAt);
+        const errors = handleValidation({ value, expiresIn });
 
-        if (errors.value || errors.expiresAt || !expiresAtDate) {
+        if (errors.value || errors.expiresIn) {
           return;
         }
 
         onConfirm({
           value,
-          expiresAt: expiresAtDate.toISOString(),
+          expiresIn,
         });
       }}
     >
@@ -117,12 +111,11 @@ export function SendCommand({ range, isLoading, onClose, onConfirm }: Props) {
 
       <TextInputField
         label="Expiration"
-        name="expiresAt"
-        type="datetime-local"
-        min={new Date().toISOString().slice(0, -5)}
+        name="expiresIn"
+        type="string"
         ref={register}
-        isInvalid={errors.expiresAt}
-        validationMessage={errors.expiresAt ? "Expiration invalide" : undefined}
+        isInvalid={errors.expiresIn}
+        validationMessage={errors.expiresIn ? "Expiration invalide" : undefined}
         description="Le moment à partir duquel la commande expire et le moteur de règle reprend la priorité"
       />
     </Dialog>
