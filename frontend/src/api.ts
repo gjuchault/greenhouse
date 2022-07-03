@@ -36,5 +36,5 @@ function createBaseUrl() {
     return `${protocol}//${hostname}:3000/`;
   }
 
-  return `${protocol}//${hostname}:${port}/`;
+  return localStorage.apiUrl ?? `${protocol}//${hostname}:${port}/`;
 }

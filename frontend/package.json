@@ -36,7 +36,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "serve": "serve -s build -l 8080",
+    "serve": "serve -s build -l tcp://0.0.0.0:8080",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "clear": "rm -rf build",
