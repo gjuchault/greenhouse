@@ -86,13 +86,8 @@ export function SendCommand({ range, isLoading, onClose, onConfirm }: Props) {
               { label: "1", value: 1 },
             ]}
             value={value}
-            onChange={(value) => {
-              if (typeof value !== "number") {
-                throw new Error(
-                  `Expected number for value, but got ${typeof value}`
-                );
-              }
-              setValue(value);
+            onChange={(value: string | number | boolean) => {
+              setValue(Number(value));
             }}
           />
         </FormField>

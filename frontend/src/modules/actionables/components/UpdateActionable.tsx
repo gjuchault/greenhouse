@@ -136,7 +136,9 @@ export function UpdateActionable({
             { label: "1-1024", value: "1-1024" },
           ]}
           value={range}
-          onChange={(value) => setRange(value.toString())}
+          onChange={(value: string | number | boolean) =>
+            setRange(value.toString())
+          }
         />
       </FormField>
       {range === "0-1" && (
@@ -148,13 +150,8 @@ export function UpdateActionable({
               { label: "1", value: 1 },
             ]}
             value={defaultValue}
-            onChange={(value) => {
-              if (typeof value !== "number") {
-                throw new Error(
-                  `Expected number for value, but got ${typeof value}`
-                );
-              }
-              setDefaultValue(value);
+            onChange={(value: string | number | boolean) => {
+              setDefaultValue(Number(value));
             }}
           />
         </FormField>
